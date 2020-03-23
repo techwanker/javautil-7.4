@@ -1,0 +1,41 @@
+package com.pacificdataservices.pdssr;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+
+import org.junit.Test;
+
+public class StringFormatTest {
+
+	@Test
+	public void testEtlFileId() {
+		String format = "No customer total record for etl_file_id %s";
+		ArrayList argList = new ArrayList();
+		argList.add(1l);
+		Object[] args = argList.toArray();
+		String formattedString = String.format(format, args);
+		assertEquals("No customer total record for etl_file_id 1", formattedString);
+		
+	}
+	
+	@Test
+	public void testNoSales() {
+		String format =  "etl_customer_id %s ship_to_cust_id %s name: %s has no sales in load %s";
+		ArrayList argList = new ArrayList();
+		argList.add(12l);
+		argList.add(151L);
+		argList.add("Steve's Snacks");
+		argList.add(3L);
+		Object[] args = argList.toArray();
+		String formattedString = String.format(format, args);
+		assertEquals("etl_customer_id 12 ship_to_cust_id 151 name: Steve's Snacks has no sales in load 3", formattedString);
+		
+	}
+	
+	public void testFormats() {
+		String actual = null;
+		actual = String.format("%d", 9);
+		assertEquals("9",actual);
+	}
+}

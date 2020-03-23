@@ -1,0 +1,3 @@
+bindDefinitions:
+    etl_file_id:
+       bindTypeName: long

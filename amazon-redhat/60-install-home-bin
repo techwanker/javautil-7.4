@@ -1,0 +1,28 @@
+# install-home-bin.sh
+#
+#
+set -x
+## this user  
+#
+if [ ! -d ~/bin ] ; then
+    mkdir ~/bin
+fi
+cp -r  ../home_files/bin/* ~/bin
+
+#!* add bin to path in .bashr
+grep  "addbindir" ~/.bashrc  
+if [ $? -ne 0 ] ; then
+    echo "PATH=\$PATH:~/bin # addbindir" >> ~/.bashrc
+fi
+
+## oracle
+grep oracle /etc/passwd
+if [ $? -eq 0 ] ; then
+    if [ ! -d ~oracle/bin ] ; then
+        sudo mkdir -p ~oracle/bin
+    fi
+    sudo chown oracle ~oracle/bin
+    sudo cp  ../home_files/bin/* ~oracle/bin
+    #!* add bin to path in .bashrc
+    sudo su - oracle -c 'grep  "addbindir" ~oracle/.bashrc || echo "PATH=\$PATH:~/bin # addbindir" >> ~oracle/.bashrc'
+fi

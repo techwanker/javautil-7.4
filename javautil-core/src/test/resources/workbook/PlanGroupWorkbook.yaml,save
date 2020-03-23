@@ -1,0 +1,101 @@
+name:  Dataload Workbook
+description: Workbook for Dataload
+narrative:
+bindDefinitions:
+    plan_grp:
+        bindTypeName: long
+columns:
+    extended_net_amt:
+        excelFormat: "#,###.00;[RED]-#,###.00"
+        dataTypeName: NUMERIC
+        heading: "Invoice $"
+    ship_dt:
+        dataTypeName: DATE
+        excelFormat:  YYYY-MM-DD
+    invoice_dt:
+        dataTypeName: DATE
+        excelFormat:  YYYY-MM-DD
+worksheets:
+    ItemMaster:   
+        name: ic_item_mast
+        sql: >
+            select * 
+            from ic_item_mast 
+            where item_nbr in (
+                select item_nbr 
+                from aps_plan_grp
+                where plan_grp_nbr :plan_grp_nbr
+    VendorQuotes:
+        name: vq_qte_hdr_dtl_vw
+        sql: >
+            select
+                vq_qte_cd,
+                vq_qte_dt,
+                org_cd,
+                org_nm,
+                curr_cd_qte,
+                vq_qte_eff_dt,
+                vq_qte_exp_dt,
+                item_cd_qte,
+                qte_qty_stk_um,
+                qte_cost,
+                rev_lvl,
+                rqst_dt,
+                lead_tm_wk_prom,
+                prom_dt,
+                vq_lost_cd
+            from vq_qte_vw
+            where item_nbr_qte in (
+                select item_nbr 
+                from aps_plan_grp
+                where plan_grp_nbr = 10 )
+    Onhand:   
+        name: Onhand 
+        sql: >
+            select
+                facility,              
+                aps_sply_sub_pool_nbr,
+                org_nbr_mfr,
+                org_cd org_cd_mfr,
+                org_nbr_vnd,
+                org_cd org_cd_vend,
+                lot_nbr,
+                lot_um,
+                item_nbr,
+                item_cd,
+                m.item_descr,
+                avail_dt,
+                gross_avail_qty,
+                rev_lvl,
+                pk_supply,
+                sply_identifier,
+                lot_cost,
+                cntry_cd_origin,
+                mfr_date,
+                expire_dt,
+                rcpt_dt,
+                avail_dt_id
+            from 
+                aps_avail_onhand_vw 
+            where 
+                a.item_nbr in (
+                    select item_nbr
+                    from aps_plan_grp 
+                    where plan_grp_nbr = :plan_grp_nbr
+                ) 
+    ApprovedMfr:
+        name: Approved Mfr
+        sql: >
+            select 
+                item_cd,
+                org_nbr_cust,
+                org_cd_cust,
+                org_cd_mfr,
+                eff_dt_beg,
+                eff_dt_end,
+                mfr_restrict_id
+            from oe_cust_mfr_vw
+            where item_nbr in (
+                select item_nbr from aps_plan_grp where plan_grp_nbr = :plan_grp_nbr
+            )
+        

@@ -1,0 +1,1 @@
+~/bin/tnsadminconfig.sh ORCLCDB

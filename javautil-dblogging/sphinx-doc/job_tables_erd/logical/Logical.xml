@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<LogicalDesign class="oracle.dbtools.crest.model.design.logical.LogicalDesign" name="Logical" id="4ADA65C4-A801-2546-FFBC-C604D1E0558B" mainViewID="9CDD5E31-6809-70CC-4B83-9CA2B240B56D">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:44:18 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</LogicalDesign>

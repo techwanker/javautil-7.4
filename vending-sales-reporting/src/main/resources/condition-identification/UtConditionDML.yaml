@@ -1,0 +1,43 @@
+deleteRow:
+    sql: >
+        delete from ut_condition_row_msg 
+        where ut_condition_run_step_id in (
+            select ut_condition_run_step_id 
+            from ut_condition_run_step 
+            where ut_condition_run_id = :ut_condition_run_id)
+deleteStep:
+    sql: > 
+        delete from ut_condition_run_step  
+        where ut_condition_run_id = :ut_condition_run_id
+deleteParm:
+    sql: >
+        delete from ut_condition_run_parm 
+        where ut_condition_run_id = :ut_condition_run_id
+deleteRun:
+    sql: >
+        delete from ut_condition_run  
+         where ut_condition_run_id = :ut_condition_run_id
+selectRow:
+    sql: >
+        select ut_condition_run_step_id, count(*) row_count 
+        from ut_condition_row_msg 
+        group by ut_condition_run_step_id  
+        order by ut_condition_run_step_id
+selectStep:
+    sql: >
+        select ut_condition_run_id, count(*) row_count 
+        from ut_condition_run_step 
+        group by ut_condition_run_id  
+        order by ut_condition_run_id
+selectParm:
+    sql: >
+        select to_number(parm_value_str,'99999') etl_file_id, count(*) 
+        from ut_condition_run_parm where parm_nm = 'ETL_FILE_ID'  
+        group by to_number(parm_value_str,'99999')  
+        order by to_number(parm_value_str,'99999')
+selectRun:
+    sql: >
+         select ut_condition_run_id, count(*) 
+         from ut_condition_run
+         group by ut_condition_run_id 
+         order by ut_condition_run_id

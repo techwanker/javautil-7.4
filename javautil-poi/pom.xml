@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>javautil-poi</artifactId>
+	<packaging>jar</packaging>
+	<name>javautil-poi</name>
+
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>org.javautil</groupId>
+		<artifactId>javautil-pom</artifactId>
+		<version>VER-7.4.0</version>
+		<relativePath>../javautil-pom</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.javautil</groupId>
+			<artifactId>javautil-core</artifactId>
+			<version>${org.javautil.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javautil</groupId>
+			<artifactId>javautil-dblogging</artifactId>
+			<version>${org.javautil.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${org.apache.poi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>${org.apache.commons-collections.version}</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+</project>

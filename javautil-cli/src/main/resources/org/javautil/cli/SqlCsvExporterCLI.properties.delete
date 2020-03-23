@@ -1,0 +1,7 @@
+application.name=SqlCsvExporter
+application.HelpText=Exports the results of a sql query to a file in CSV format
+outputFile.description=The name of the output file. If not specified, writes to stdout
+JDBCURL.description=The name of an environment variable that contains the JDBC URL of the database eg "jdbc:postgresql://localhost/sales_reporting_db" 
+usernamePassword.description=The name of an environment variable that contains the username and password separated by a slash  e.g. username/password
+
+

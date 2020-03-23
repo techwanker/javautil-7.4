@@ -1,0 +1,45 @@
+\section{Java}
+\subsection{Download}
+Download from http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html or google search ``java download''
+You will want an SE jdk
+Move the download to /common/Downloads and extract.
+\begin{verbatim}
+cd /opt
+sudo tar xvf jdk-8u111-linux-x64.tar.gz 
+\end{verbatim}
+\subsection{Add to path}
+edit ~/.bashrc 
+\begin{verbatim}
+export JAVA_HOME=/opt/jdk1.8.0_111
+PATH=$JAVA_HOME/bin:$PATH
+\end{verbatim}
+
+\section{Maven}
+for fedora 
+\begin{verbatim}
+ dnf install maven
+\end{verbatim}
+
+\section{Eclipse}
+\subsection{Download}
+Download from http://www.eclipse.org/downloads/download.php
+store in /common/Downloads
+\subsection{Install}
+\subsubsection{Extract}
+\begin{verbatim}
+cd /opt
+sudo tar xvf /common/Downloads/eclipse-epsilon-1.3-linux-gtk-x86_64.tar.gz 
+\end{verbatim}
+\subsection{add to path}
+modify your 
+cd ~
+vi .bashrc
+add the following
+\begin{verbatim}
+ECLIPSE_HOME=/opt/eclipse-epsilon-1.3-linux-gtk-x86_64
+export PATH=$ECLIPSE_HOME:$PATH
+\end{verbatim}
+\subsection{Install Maven plugin}
+http://www.eclipse.org/m2e/
+
+goto eclipse help->Install New Software

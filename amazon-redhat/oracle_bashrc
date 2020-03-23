@@ -1,0 +1,37 @@
+shrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# User specific environment
+PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+export PATH
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+export ORACLE_SID=ORCLCDB
+export ORAENV_ASK=no
+. oraenv
+
+    start_oracle() {
+        tnsadmin=/opt/oracle/product/19c/dbhome_1/network/admin
+        cd $tnsadmin
+        my_host=`hostname`
+        sed -i -e "s/ip_[^)]*/${my_host}/"  tnsnames.ora
+        sed -i -e "s/ip_[^)]*/${my_host}/"  listener.ora
+        lsnrctl start
+        sqlplus / as sysdba <<:EOF:
+            startup;
+            exit;
+
+:EOF:
+
+        lsnrctl status 
+}
+
+alias vim=vi
+

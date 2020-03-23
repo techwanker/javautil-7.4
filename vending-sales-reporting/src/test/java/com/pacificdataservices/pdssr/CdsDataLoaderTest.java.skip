@@ -1,0 +1,27 @@
+package com.pacificdataservices.pdssr;
+
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+
+import org.javautil.sql.Dialect;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CdsDataLoaderTest extends DbTest {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Test
+	public void test1() throws IOException, SQLException, PropertyVetoException, ParseException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.execute("set schema 'integration_test'");
+		CdsDataLoader cdl = new CdsDataLoader(conn,Dialect.POSTGRES);
+		cdl.process("src/test/resources/dataloads/201502.cds", conn, "EXOTICTX", false);
+
+	}
+}

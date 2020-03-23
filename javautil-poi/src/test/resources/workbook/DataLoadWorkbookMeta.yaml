@@ -1,0 +1,35 @@
+name:  Dataload Workbook
+description: Workbook for Dataload
+narrative:
+bindDefinitions:
+    etl_file_id:
+       bindTypeName: long
+columns:
+    extended_net_amt:
+       excelFormat: "#,###.00;[RED]-#,###.00"
+       dataTypeName: NUMERIC
+    shipDt:
+       dataTypeName: DATE
+    invoiceDt:
+       dataTypeName: DATE
+       excelFormat:  YYYY-MM-DD
+worksheets:
+    Sales:   
+       name: Sales
+       sql: >
+           select * 
+           from etl_sale
+           where etl_file_id =:etl_file_id
+    Customers:   
+       name: Customers
+       sql: >
+           select * 
+           from etl_customer 
+           where etl_file_id =:etl_file_id
+    Inventory:   
+       name: Inventory
+       sql: >
+           select * 
+           from etl_inventory
+           where etl_file_id =:etl_file_id
+    

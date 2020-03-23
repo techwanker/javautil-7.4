@@ -1,0 +1,41 @@
+<h1 id="creating-an-amazon-redhat-instance">Creating an Amazon Redhat Instance</h1>
+<h1 id="steps">Steps</h1>
+<h1 id="ssh">ssh</h1>
+<h2 id="pem-files">pem files</h2>
+<p>You should know have a pem file in ~/.ssh such as <em>javautil-6.pem</em></p>
+<p>Permissions must be 600 chmod 600 ~/.ssh/javautil-6.pem</p>
+<h2 id="config">config</h2>
+<p>The first line of your config file should be</p>
+<p>ServerAliveInterval 120</p>
+<p>Or your sessions will time out</p>
+<p>Each remote host should be specified</p>
+<pre><code>Host ec2-3-95-139-161.compute-1.amazonaws.com
+    IdentityFile ~/.ssh/javautil-6.pem</code></pre>
+<h1 id="amazon">.amazon</h1>
+<h1 id="set-up-config-on-amazon">set up config on amazon</h1>
+<p>jjs ~&gt;cd .ssh jjs ~/.ssh&gt;scp * ec2-user@$amazon:.ssh</p>
+<h1 id="push-the-configuration-over">Push the configuration over</h1>
+<p>brazil setamazon newbigred</p>
+<pre><code>qcd 6
+
+cd amazon-redhat</code></pre>
+<p>st set to ec2-54-90-173-30.compute-1.amazonaws.com jjs ~/.ssh&gt;scp javautil-6.pem ec2-user@<span class="math"><em>a</em><em>m</em><em>a</em><em>z</em><em>o</em><em>n</em> : .<em>s</em><em>s</em><em>h</em><em>j</em><em>a</em><em>v</em><em>a</em><em>u</em><em>t</em><em>i</em><em>l</em> − 6.<em>p</em><em>e</em><em>m</em>100</span>amazon:config config</p>
+<h1 id="images">Images</h1>
+<div class="figure">
+<img src="./01-choose-ami.png" alt="Choose AMI" /><p class="caption">Choose AMI</p>
+</div>
+<div class="figure">
+<img src="./02-choose-instance-type.png" alt="Choose Instance Type" /><p class="caption">Choose Instance Type</p>
+</div>
+<div class="figure">
+<img src="./04-add-storage.png" alt="Add storage" /><p class="caption">Add storage</p>
+</div>
+<div class="figure">
+<img src="./07-key-pair.png" alt="Select key pair" /><p class="caption">Select key pair</p>
+</div>
+<div class="figure">
+<img src="07-review-instance-launch.png" alt="Review and launch" /><p class="caption">Review and launch</p>
+</div>
+<div class="figure">
+<img src="09-snapshot.png" alt="Create a snapshot" /><p class="caption">Create a snapshot</p>
+</div>

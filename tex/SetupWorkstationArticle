@@ -1,0 +1,15 @@
+\section{Java}
+\section{Maven}
+\section{Eclipse}
+\subsection{Download}
+Download from http://www.eclipse.org/downloads/download.php
+store in /common/Downloads
+\subsection{Install}
+\subsubsection{Extract}
+\begin{verbatim}
+cd /opt
+tar xvf /common/Downloads/eclipse-epsilon-1.3-linux-gtk-x86_64.tar.gz 
+\end{verbatim}
+\subsection{add to path}
+modify your 
+cd ~

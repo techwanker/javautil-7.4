@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableSpaceOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableSpaceOraclev10g" name="SALES_REPORTING" directorySegmentName="seg_0" id="74411DDD-44CF-D3D7-7EAF-CF2F56C1444E">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>SALES_REPORTING</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 23:12:04 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<dsInitialExtent>65536</dsInitialExtent>
+<dsMaxExtents>2147483645</dsMaxExtents>
+<emUniformSize>0</emUniformSize>
+<extentManagement>LOCAL</extentManagement>
+<minExtLen>65536</minExtLen>
+<dsCompression>NOCOMPRESS</dsCompression>
+<encrypt>NO</encrypt>
+<fileType>SMALLFILE</fileType>
+</TableSpaceOraclev10g>

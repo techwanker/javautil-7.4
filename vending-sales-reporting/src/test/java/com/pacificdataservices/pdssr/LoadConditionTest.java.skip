@@ -1,0 +1,63 @@
+package com.pacificdataservices.pdssr;
+
+import java.beans.PropertyVetoException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+
+import javax.sql.DataSource;
+
+import org.javautil.sql.Binds;
+import org.javautil.sql.DataSourceFactory;
+import org.javautil.sql.Dialect;
+import org.javautil.sql.SqlStatement;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class LoadConditionTest {
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	private Dialect dialect = Dialect.POSTGRES;
+
+	Connection getConnection() throws FileNotFoundException, PropertyVetoException, SQLException {
+		logger.debug("getting connection");
+		String homeDir = System.getProperty("user.home");
+		String yamlName = homeDir + "/connections_java.yaml";
+		DataSourceFactory dsf = new DataSourceFactory(yamlName);
+		DataSource ds = dsf.getDatasource("current");
+		Connection conn = ds.getConnection();
+	   
+		Statement stmt = conn.createStatement();
+		stmt.execute("set schema 'integration_test'");
+		logger.debug("returning connection");
+		return conn;
+	}
+	
+	@Test
+	public void runConditionsAll() throws FileNotFoundException, SQLException, PropertyVetoException {
+		logger.info("runConditionsAll");
+		Connection conn = getConnection();
+		
+		LoadConditionIdentification lci =  new LoadConditionIdentification(conn,Dialect.POSTGRES);
+		SqlStatement loads = new SqlStatement("select etl_file_id from etl_file");
+		for (Binds binds : loads.iterator(conn, dialect, new Binds())) {
+			Long etl_file_id = binds.getLong("ETL_FILE_ID");
+			logger.info("processing " +  etl_file_id);
+		    lci.process(etl_file_id, 0);
+		}
+		conn.commit();
+	}
+
+	//@Test
+	public void test1() throws IOException, SQLException, PropertyVetoException, ParseException {
+		Connection conn = getConnection();
+		LoadConditionIdentification lci =  new LoadConditionIdentification(conn,Dialect.POSTGRES);
+		lci.process(12, 6);
+		conn.commit();
+	}
+}

@@ -1,0 +1,12 @@
+
+description = 'javautil-oracle'
+dependencies {
+    compile group: 'jaxen', name: 'jaxen', version:'1.1.1'
+  compile project(':javautil-jdbc')
+  compile project(':javautil-core')
+  compile project(':javautil-commandline')
+    compile group: 'com.oracle', name: 'oracle-jdbc6', version:'11.2.0.4'
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version:'20030818.201141'
+    compile group: 'org.apache.openjpa', name: 'openjpa-all', version:'2.0.0-beta2'
+  testCompile project(':javautil-test')
+}

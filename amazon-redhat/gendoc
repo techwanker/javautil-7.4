@@ -1,0 +1,12 @@
+set -x
+for f in *.sh
+do
+   md_target=`basename $f .sh`.md
+   sed -e "s/#!//" $f > sphinx/$md_target
+   rst_target=`basename $md_target .md`.rst
+   echo rst_target $rst_target
+   pandoc sphinx/$md_target -o sphinx/$rst_target
+done
+cd sphinx
+make html
+firefox _build/html/index.html

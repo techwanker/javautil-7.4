@@ -1,0 +1,18 @@
+SQL> alter session set container = sales_reporting_pdb;
+
+Session altered.
+
+SQL> 
+SQL> grant connect to  &test_dblogger identified  by tutorial container=all;
+old   1: grant connect to  &test_dblogger identified  by tutorial container=all
+new   1: grant connect to  dblogger_test identified  by tutorial container=all
+grant connect to  dblogger_test identified  by tutorial container=all
+*
+ERROR at line 1:
+ORA-65050: Common DDLs only allowed in root. 
+
+
+SQL> grant create session to &test_dbloger
+  2  grant create table to &test_dblogger;
+Enter value for test_dbloger: 
+SQL> exit

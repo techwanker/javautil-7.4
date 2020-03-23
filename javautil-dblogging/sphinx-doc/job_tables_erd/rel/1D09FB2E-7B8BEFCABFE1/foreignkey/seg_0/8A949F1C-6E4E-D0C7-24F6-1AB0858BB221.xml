@@ -1,0 +1,19 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="8A949F1C-6E4E-D0C7-24F6-1AB0858BB221" containerWithKeyObject="D027137C-9ECB-8C8A-CA6B-B89A5319D47A" localFKIndex="99D88DCD-3B43-581A-E373-A8C201881CCC" name="STEP_STATUS_FK">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>STEP_STATUS_FK</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<referredTableLongName>SR.JOB_LOG</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>98C0BAC3-1933-CC52-83DC-BBB0B29975FB</referredTableID>
+<keyObject>FC0E449C-5221-1557-392C-36C494D0AB0E</keyObject>
+<referredKeyID>FC0E449C-5221-1557-392C-36C494D0AB0E</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>JOB_LOG_ID</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

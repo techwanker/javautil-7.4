@@ -1,0 +1,1 @@
+cd javautil-pom && mvn clean install -DskipTests=true

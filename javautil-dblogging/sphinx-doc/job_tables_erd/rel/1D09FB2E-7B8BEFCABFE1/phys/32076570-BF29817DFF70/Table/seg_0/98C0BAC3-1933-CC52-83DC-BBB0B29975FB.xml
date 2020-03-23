@@ -1,0 +1,166 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="JOB_LOG" directorySegmentName="seg_0" id="98C0BAC3-1933-CC52-83DC-BBB0B29975FB">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:53 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<schemaObject>AD5682B3-3406-2317-FEAC-0F9D8AD4B6DF</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>A9C9C0CC-6895-59A9-C489-117C8FDEA2C2</segment>
+<tableSpace>74411DDD-44CF-D3D7-7EAF-CF2F56C1444E</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="STATUS_TS" id="0060C63C-CF33-1261-6344-E7C6ECA4BF2A">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="END_TS" id="05D59467-8DA1-FA3C-8E1F-948E505D5938">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SERIAL_NBR" id="1A4B2265-943C-796E-08E1-A76DABECD239">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="TRACEFILE_NAME" id="2321D57C-E693-C954-3604-E5F384DE0A2D">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="STATUS_MSG" id="3A54D32E-4828-BD5A-8C1B-9A05657D053B">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCHEMA_NAME" id="3D31497A-65CB-18AC-3BD1-C781E6002E04">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="TRACEFILE_JSON" id="5AC4D4D0-71E7-BEF9-4998-5D358A826C7B">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="PROCESS_NAME" id="70F20F63-B5BE-B072-FA1E-E742C0F745C3">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ABORT_STACKTRACE" id="8BF715B1-D191-077B-01B1-E00ADB26ECFC">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="TRACEFILE_DATA" id="913A7AD0-BFA7-59F2-4A95-9C1DA024747D">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="IGNORE_FLG" id="9647C691-9615-BAC1-7818-394124FA5D73">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<defaultValue>&apos;N&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="SID" id="D09A9FF7-F6D2-26F8-176A-30280F3DF2CB">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CLASSNAME" id="DAD99383-A9D2-28DE-FC62-1181EA932AEE">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="THREAD_NAME" id="F30F9808-DA8F-66DD-259E-4E2E0649093C">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ELAPSED_MILLIS" id="F576EA0A-6846-40B9-E298-DEB2C180375D">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="MODULE_NAME" id="FF91B306-D6BE-E5DE-778B-D4E6F1275DDA">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="JOB_LOG_ID" id="FFAD04C7-C3F8-7D83-83DC-696B81A6B485">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="JOB_LOG_PK" id="AFCF2AB5-74EA-E36B-32BE-B5BB6B13DB84">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<schemaObject>AD5682B3-3406-2317-FEAC-0F9D8AD4B6DF</schemaObject>
+<segment>35F72C89-9F3F-BBAF-60D0-58E6B4B1D193</segment>
+<tableSpace>74411DDD-44CF-D3D7-7EAF-CF2F56C1444E</tableSpace>
+</IndexProxy>
+</indexProxies>
+<lobStorages>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0000190733C00015$$" id="FAF718BE-E1A3-983B-5E5C-CAD139F3F6C2">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>TRACEFILE_DATA</column>
+<compression>NO</compression>
+<duplication>KEEP_DUPLICATES</duplication>
+<logging>YES</logging>
+<tableSpace>74411DDD-44CF-D3D7-7EAF-CF2F56C1444E</tableSpace>
+<lobStorageType>SECUREFILE</lobStorageType>
+</LobStorage>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0000190733C00016$$" id="A41BFFF4-B1C7-F6EA-A645-B4C11431A22B">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>TRACEFILE_JSON</column>
+<compression>NO</compression>
+<duplication>KEEP_DUPLICATES</duplication>
+<logging>YES</logging>
+<tableSpace>74411DDD-44CF-D3D7-7EAF-CF2F56C1444E</tableSpace>
+<lobStorageType>SECUREFILE</lobStorageType>
+</LobStorage>
+<LobStorage class="oracle.dbtools.crest.model.design.storage.oracle.v11g.LobStorageOraclev11g" name="SYS_LOB0000190733C00017$$" id="FEC28E6F-3D91-D8DA-2518-F33C28DC7DD0">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<cache>NOCACHE</cache>
+<chunk>8192</chunk>
+<column>ABORT_STACKTRACE</column>
+<compression>NO</compression>
+<duplication>KEEP_DUPLICATES</duplication>
+<logging>YES</logging>
+<tableSpace>74411DDD-44CF-D3D7-7EAF-CF2F56C1444E</tableSpace>
+<lobStorageType>SECUREFILE</lobStorageType>
+</LobStorage>
+</lobStorages>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="JOB_LOG_PK" id="FC0E449C-5221-1557-392C-36C494D0AB0E">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<segment>35F72C89-9F3F-BBAF-60D0-58E6B4B1D193</segment>
+<tableSpace>74411DDD-44CF-D3D7-7EAF-CF2F56C1444E</tableSpace>
+<existingIndex>AFCF2AB5-74EA-E36B-32BE-B5BB6B13DB84</existingIndex>
+<indexSegment>35F72C89-9F3F-BBAF-60D0-58E6B4B1D193</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

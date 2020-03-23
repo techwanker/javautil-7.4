@@ -1,0 +1,46 @@
+package com.pacificdataservices.pdssr;
+
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+
+import org.javautil.misc.Timer;
+import org.javautil.sql.Binds;
+import org.javautil.sql.Dialect;
+import org.javautil.sql.SqlStatement;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CdsUnloadTest extends DbTest {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	//@Test
+	public void test1() throws IOException, SQLException, PropertyVetoException, ParseException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.execute("set schema 'integration_test'");
+		CdsUnload unloader = new CdsUnload(conn, Dialect.POSTGRES, false);
+		unloader.process(1, "/tmp/1.cds", true);
+	}
+	
+	
+	public void unloadAll() throws SQLException, IOException, PropertyVetoException {
+		Timer t = new Timer("unloadAll");
+		Connection conn = getConnection();
+		Dialect dialect = getDialect();
+		SqlStatement loads = new SqlStatement("select etl_file_id from etl_file");
+		String destDir = "/tmp/";
+		CdsUnload unloader = new CdsUnload(conn, dialect, false);
+		for (Binds binds : loads.iterator(conn, dialect, new Binds())) {
+			long etlFileId = binds.getLong("ETL_FILE_ID");
+			String fileName  = destDir + etlFileId + ".cds";
+			unloader.process(etlFileId, fileName, false);
+		}
+	
+		t.logElapsed();
+	}
+}

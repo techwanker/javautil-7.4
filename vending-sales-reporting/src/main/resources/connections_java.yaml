@@ -1,0 +1,57 @@
+"sr":
+    driver_class: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost/sales_reporting_db"
+    username: "jjs"
+    password: "jjs"
+"sales":
+    url: "oracle:sr/sales@localhost:1521:ASUSFED25"
+"web_gus":
+    url: "oracle:web_gus/diamondmine@localhost:1521:dev12c"
+"sqlite":
+    driver_class: "org.sqlite.JDBC"
+    url: "jdbc:sqlite:/tmp/etl.db"
+"sales_reporting":
+    driver_class: "org.sqlite.JDBC"
+    url: "jdbc:sqlite3:/tmp/etl.db"
+"sales_reporting_db":
+    driver_class: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost/sales_reporting_db"
+    username: "jjs"
+    password: "jjs"
+"test":
+    driver_class: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost/sales_reporting_db"
+    username: "jjs"
+    password: "jjs"
+    sql:
+        -  "set schema 'sales_reporting'"
+"it":
+    driver_class: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost/sales_reporting_db"
+    username: "jjs"
+    password: "jjs"
+    sql:
+        -  "set schema 'integration_test'"
+"current":
+    driver_class: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost/sales_reporting_db"
+    username: "jjs"
+    password: "jjs"
+"h2_mem":
+    driver_class: "org.h2.Driver"
+    url: "jdbc:h2:mem:test"
+    username: "sa"
+    password: "sa"
+"h2_scratch":
+    driver_class: "org.h2.Driver"
+    url: "jdbc:h2:file:/scratch/it.dbf"
+    username: "sa"
+    password: "sa"
+"pdssr_it":
+    driver_class: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost/sales_reporting_db"
+    username: "jjs"
+    password: "jjs"
+"sqlite3_mem":
+    driver_class: "org.sqlite.JDBC"
+    url: "sqlite::memory:"

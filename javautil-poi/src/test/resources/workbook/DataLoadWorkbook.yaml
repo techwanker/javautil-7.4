@@ -1,0 +1,26 @@
+name:  Dataload Workbook
+description: Workbook for Dataload
+narrative:
+bindDefinitions:
+    etl_file_id:
+       bindTypeName: long
+worksheets:
+    Customers:   
+       name: Customers
+       sql: >
+           select * 
+           from etl_customer 
+           where etl_file_id =:etl_file_id
+    Sales:   
+       name: Sales
+       sql: >
+           select * 
+           from etl_sale
+           where etl_file_id =:etl_file_id
+    Invenotory:   
+       name: Inventory
+       sql: >
+           select * 
+           from etl_inventory
+           where etl_file_id =:etl_file_id
+    

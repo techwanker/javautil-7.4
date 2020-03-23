@@ -1,0 +1,2 @@
+ssh ec2-user@$amazon  "mkdir artifacts"
+scp -r ~/artifacts ec2-user@$amazon:~/artifacts
