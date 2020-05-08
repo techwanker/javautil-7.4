@@ -72,31 +72,31 @@ public class HibernateMarshallerFactory2 {
 						retval = true;
 						break;
 					}
-				System.out.println("skipping " + retval + "  declaredClass " + declaredClass + " declaring " + declaringClass);
-					if (f.getAnnotation(Serialize.class) != null) {
-						skipReason = "include has Serialize";
-						break;
-					}
-					if (f.getAnnotation(ManyToMany.class) != null) {
-						skipReason = "field ManyToMany";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(OneToOne.class) != null) {
-						skipReason = "field OneToOne";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(OneToMany.class) != null) {
-						skipReason = "field OneToMany";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(ManyToOne.class) != null) {
-						skipReason = "field ManyToOone";
-						retval = true;
-						break;
-					}
+//				System.out.println("skipping " + retval + "  declaredClass " + declaredClass + " declaring " + declaringClass);
+//					if (f.getAnnotation(Serialize.class) != null) {
+//						skipReason = "include has Serialize";
+//						break;
+//					}
+//					if (f.getAnnotation(ManyToMany.class) != null) {
+//						skipReason = "field ManyToMany";
+//						retval = true;
+//						break;
+//					}
+//					if (f.getAnnotation(OneToOne.class) != null) {
+//						skipReason = "field OneToOne";
+//						retval = true;
+//						break;
+//					}
+//					if (f.getAnnotation(OneToMany.class) != null) {
+//						skipReason = "field OneToMany";
+//						retval = true;
+//						break;
+//					}
+//					if (f.getAnnotation(ManyToOne.class) != null) {
+//						skipReason = "field ManyToOone";
+//						retval = true;
+//						break;
+//					}
 					// try the field
 					String capitalizedAttribute = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 					if (f.getDeclaredType().equals(boolean.class)) {
