@@ -32,67 +32,68 @@ SQL> create or replace PACKAGE pllog AS
  32  	     p_trace_level  in pls_integer default G_INFO);
  33  
  34  
- 35  	 function begin_job (
+ 35  	FUNCTION begin_job (
  36  	     p_process_name in varchar,
- 37  	     p_log_set	 in varchar default null,
+ 37  	     p_log_set	    in varchar default null,
  38  	     p_classname    in varchar default null,
  39  	     p_module_name  in varchar default null,
  40  	     p_status_msg   in varchar default null,
  41  	     p_thread_name  in varchar default null,
  42  	     logfile_name   in varchar default null,
- 43  	     p_log_level in pls_integer default G_INFO,
- 44  	     p_trace_level  in pls_integer default G_INFO)
- 45  	 return varchar;
- 46  
- 47  	 procedure end_job;
- 48  
- 49  	 procedure abort_job(p_stacktrace in varchar default null);
- 50  
- 51  	 procedure set_action (p_action in	  varchar) ;
- 52  
- 53  	 procedure set_module (
- 54  	     p_module_name in	     varchar,
- 55  	     p_action_name in	varchar
- 56  	 );
- 57  
- 58  	 function get_my_tracefile
- 59  	 return clob ;
- 60  
- 61  	 function get_directory_path
- 62  	 return varchar;
- 63  
- 64  	 function get_tracefile(p_file_name in varchar)
- 65  	 return clob;
- 66  
- 67  	 function get_my_tracefile_name
- 68  	 return varchar;
- 69  
- 70  	 function basename (p_full_path in varchar,
- 71  			    p_suffix	in varchar default null,
- 72  			    p_separator in char default '/')
- 73  	 return varchar;
- 74  
- 75  	 procedure prepare_connection;
- 76  
- 77  	 procedure trace_step(p_step_name in varchar, p_job_step_id in number);
- 78  
- 79  	 function set_tracefile_identifier(p_job_nbr in number)
- 80  	 return varchar;
- 81  
+ 43  	     logfile_directory in varchar default 'JOB_MSG_DIR',
+ 44  	     p_log_level    in pls_integer default G_INFO,
+ 45  	     p_trace_level  in pls_integer default G_INFO)
+ 46  	     return varchar;
+ 47  
+ 48  	 procedure end_job;
+ 49  
+ 50  	 procedure abort_job(p_stacktrace in varchar default null);
+ 51  
+ 52  	 procedure set_action (p_action in	  varchar) ;
+ 53  
+ 54  	 procedure set_module (
+ 55  	     p_module_name in	     varchar,
+ 56  	     p_action_name in	varchar
+ 57  	 );
+ 58  
+ 59  	 function get_my_tracefile
+ 60  	 return clob ;
+ 61  
+ 62  	 function get_directory_path
+ 63  	 return varchar;
+ 64  
+ 65  	 function get_tracefile(p_file_name in varchar)
+ 66  	 return clob;
+ 67  
+ 68  	 function get_my_tracefile_name
+ 69  	 return varchar;
+ 70  
+ 71  	 function basename (p_full_path in varchar,
+ 72  			    p_suffix	in varchar default null,
+ 73  			    p_separator in char default '/')
+ 74  	 return varchar;
+ 75  
+ 76  	 procedure prepare_connection;
+ 77  
+ 78  	 procedure trace_step(p_step_name in varchar, p_job_step_id in number);
+ 79  
+ 80  	 function set_tracefile_identifier(p_job_nbr in number)
+ 81  	 return varchar;
  82  
- 83    procedure log (
- 84  	   p_log_msg	  in   varchar,
- 85  	   p_log_level	  in   pls_integer default g_info,
- 86  	   p_job_log_id   in   pls_integer default null,
- 87  	   p_job_msg_id   in   pls_integer default null,
- 88  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
- 89  	   p_caller_name  in   varchar default null,
- 90  	   p_line_number  in   pls_integer default null,
- 91  	   p_dump_stack   in   boolean default false
- 92  	);
- 93  
- 94  END pllog ;
- 95  /
+ 83  
+ 84    procedure log (
+ 85  	   p_log_msg	  in   varchar,
+ 86  	   p_log_level	  in   pls_integer default g_info,
+ 87  	   p_job_log_id   in   pls_integer default null,
+ 88  	   p_job_msg_id   in   pls_integer default null,
+ 89  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
+ 90  	   p_caller_name  in   varchar default null,
+ 91  	   p_line_number  in   pls_integer default null,
+ 92  	   p_dump_stack   in   boolean default false
+ 93  	);
+ 94  
+ 95  END pllog ;
+ 96  /
 
 Package created.
 

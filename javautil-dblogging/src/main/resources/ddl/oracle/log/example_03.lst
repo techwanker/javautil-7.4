@@ -1,0 +1,47 @@
+SQL> 
+SQL> declare
+  2  	 token varchar(32);
+  3  begin
+  4  	 token := pllog.begin_job(p_process_name => 'example 03',
+  5  		       p_log_level	=> 3);
+  6  	 pllog.log('begins',4,$$PLS_UNIT,$$PLS_LINE);
+  7  	 for lvl in 1 .. 9
+  8  	 loop
+  9  	     pllog.log('lvl is ' || lvl,lvl,$$PLS_UNIT,$$PLS_LINE);
+ 10  	 end loop;
+ 11  	 pllog.end_job;
+ 12  end;
+ 13  /
+begin_job logfile_name "                                                        
+begin_log() logfile_name "2020-05-14T11:15:36.613725000"                        
+log() caller:  my_logger_level 3 p_log_level 4 g_job_log.log_level 3            
+log() skip p_log_level 4 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 1 g_job_log.log_level 3            
+logger_message_formatter job_log_id **                                          
+log() about to write 11,,,,"2020-05-14T11:15:36.616245000","lvl is 1","",""     
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T11:15:36.613725000"        
+log() caller:  my_logger_level 3 p_log_level 2 g_job_log.log_level 3            
+logger_message_formatter job_log_id **                                          
+log() about to write 22,,,,"2020-05-14T11:15:36.620517000","lvl is 2","",""     
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T11:15:36.613725000"        
+log() caller:  my_logger_level 3 p_log_level 3 g_job_log.log_level 3            
+logger_message_formatter job_log_id **                                          
+log() about to write 33,,,,"2020-05-14T11:15:36.620640000","lvl is 3","",""     
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T11:15:36.613725000"        
+log() caller:  my_logger_level 3 p_log_level 4 g_job_log.log_level 3            
+log() skip p_log_level 4 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 5 g_job_log.log_level 3            
+log() skip p_log_level 5 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 6 g_job_log.log_level 3            
+log() skip p_log_level 6 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 7 g_job_log.log_level 3            
+log() skip p_log_level 7 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 8 g_job_log.log_level 3            
+log() skip p_log_level 8 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 9 g_job_log.log_level 3            
+log() skip p_log_level 9 my_logger_level 3                                      
+
+PL/SQL procedure successfully completed.
+
+SQL> --#<
+SQL> exit

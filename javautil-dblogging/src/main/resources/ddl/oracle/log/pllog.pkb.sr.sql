@@ -6,7 +6,7 @@ CREATE OR REPLACE PACKAGE BODY pllog
 is
     g_debug                 boolean := true;
     g_job_msg_dir           varchar (32) := 'JOB_MSG_DIR';
-    g_file_handle           UTL_FILE.file_type;
+    --g_file_handle           UTL_FILE.file_type;
     g_logfile_name          varchar(255);
 
   
@@ -23,7 +23,7 @@ is
 	my_timestamp varchar(256) :=  to_char (current_timestamp, 'YYYY-MM-DD HH24:MI:SSXFF');
     begin
         my_timestamp := replace(my_timestamp,' ','T');
-        dbms_output.put_line('format_time ' || my_timestamp);       
+        -- dbms_output.put_line('format_time ' || my_timestamp);       
         return my_timestamp;
     end format_time;
 
@@ -140,6 +140,7 @@ is
     begin
         dbms_output.put_line('begin_log() logfile_name "' || logfile_name || '"');
         g_job_log.logfile_name := logfile_name;
+        g_job_log.directory_name := logfile_directory;
         --g_job_log.job_log_id   := job_log_id_seq.nextval;
         g_job_log.process_name := p_process_name;
         g_job_log.classname    := p_classname;
@@ -169,6 +170,7 @@ is
         p_status_msg   in varchar default null,
         p_thread_name  in varchar default null,
         logfile_name   in varchar default null,
+        logfile_directory in varchar default 'JOB_MSG_DIR',
         p_log_level    in pls_integer default G_INFO,
         p_trace_level  in pls_integer default G_INFO)
         return varchar
@@ -176,11 +178,19 @@ is
     is
         my_tracefile_name varchar(256);
         my_job_token varchar(64) := format_time(current_timestamp);
+        my_logfile_name varchar(64);
     begin
         dbms_output.put_line('begin_job logfile_name "' || logfile_name);
-
+    
+        if logfile_name is not null then
+            my_logfile_name := logfile_name;
+        else 
+            my_logfile_name := my_job_token;
+        end if;
+ 
         begin_log (
-	    logfile_name   => logfile_name,
+	    logfile_name   => my_logfile_name,
+            logfile_directory => logfile_directory,
             p_process_name => p_process_name,
             p_log_set      => p_log_set,
             p_classname    => p_classname,
@@ -191,13 +201,12 @@ is
             p_trace_level  => p_trace_level  
 	);
 
+	g_job_log.job_log_id := job_log_id_seq.nextval;
         set_action('begin_job ' || to_char(g_job_log.job_log_id)); 
-
         job_log_insert ( g_job_log);
 
         return my_job_token;
-         
-    end begin_job;
+         end begin_job;
    
  
 
@@ -269,6 +278,7 @@ is
     end set_module ;
 
    function open_log_file (
+        directory_name in varchar,
         p_file_name in varchar, 
         p_headers in boolean default true)
    return utl_file.file_type
@@ -276,14 +286,14 @@ is
    --% opens a log file with the specified file name in the directory g_job_msg_dir
    is
       my_directory_path varchar2(4000);
-
+      my_handle utl_file.file_type;
    begin
-      dbms_output.put_line('open_log_file() dir: ' || g_job_msg_dir || '" file: "' 
-              || p_file_name || '"');
-      if (NOT UTL_FILE.is_open (g_file_handle)) then
-            g_file_handle := utl_file.fopen(g_job_msg_dir,p_file_name,'a');
-      end if;
-      return g_file_handle;
+      dbms_output.put_line('open_log_file() dir: "' || directory_name || 
+                           '" file: "' || p_file_name || '"');
+      --if (NOT UTL_FILE.is_open (g_file_handle)) then
+            my_handle := utl_file.fopen(directory_name,p_file_name,'a');
+      --end if;
+      return my_handle;
    end open_log_file;
 
    function get_directory_path return varchar is
@@ -488,8 +498,8 @@ is
      	  dbms_output.put_line('log() about to write ' || to_char(p_log_level) || my_message); 
      	  --dbms_output.put_line('p_caller_name ' || p_caller_name);
      	  --dbms_output.put_line('p_line_number ' || p_line_number);
-          my_file_handle := open_log_file (g_job_log.logfile_name); 
-          UTL_FILE.put_line (g_file_handle, my_message);
+          my_file_handle := open_log_file (g_job_log.directory_name,g_job_log.logfile_name); 
+          UTL_FILE.put_line (my_file_handle, my_message);
           utl_file.fclose(my_file_handle); 
           
       else

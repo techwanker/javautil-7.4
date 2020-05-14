@@ -1,0 +1,40 @@
+SQL> begin
+  2  	 pllog.begin_log(p_process_name => 'example 02',
+  3  		       logfile_name   => 'example_02.log',
+  4  		       p_log_level	=> 3);
+  5  	 pllog.log('severe',1);
+  6  	 pllog.log('warning',2);
+  7  	 pllog.log('undefined',3);
+  8  	 pllog.log('info',4);
+  9  	 pllog.log('verbose',6);
+ 10  	 pllog.log('debug',7);
+ 11  	 pllog.log('trace',9);
+ 12  end;
+ 13  /
+format_time 2020-05-14T10:44:34.495224000                                       
+begin_log() logfile_name "example_02.log"                                       
+log() caller:  my_logger_level 3 p_log_level 1 g_job_log.log_level 3            
+logger_message_formatter job_log_id **                                          
+log() about to write 11,,,,"2020-05-14T10:44:34.503829000","severe","",""       
+open_log_file() dir: "JOB_MSG_DIR" file: "example_02.log"                       
+log() caller:  my_logger_level 3 p_log_level 2 g_job_log.log_level 3            
+logger_message_formatter job_log_id **                                          
+log() about to write 22,,,,"2020-05-14T10:44:34.505126000","warning","",""      
+open_log_file() dir: "JOB_MSG_DIR" file: "example_02.log"                       
+log() caller:  my_logger_level 3 p_log_level 3 g_job_log.log_level 3            
+logger_message_formatter job_log_id **                                          
+log() about to write 33,,,,"2020-05-14T10:44:34.505576000","undefined","",""    
+open_log_file() dir: "JOB_MSG_DIR" file: "example_02.log"                       
+log() caller:  my_logger_level 3 p_log_level 4 g_job_log.log_level 3            
+log() skip p_log_level 4 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 6 g_job_log.log_level 3            
+log() skip p_log_level 6 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 7 g_job_log.log_level 3            
+log() skip p_log_level 7 my_logger_level 3                                      
+log() caller:  my_logger_level 3 p_log_level 9 g_job_log.log_level 3            
+log() skip p_log_level 9 my_logger_level 3                                      
+
+PL/SQL procedure successfully completed.
+
+SQL> --#<
+SQL> exit

@@ -34,17 +34,18 @@ create or replace PACKAGE pllog AS
         p_trace_level  in pls_integer default G_INFO);
 
 
-    function begin_job (
+   FUNCTION begin_job ( 
         p_process_name in varchar,
-        p_log_set   in varchar default null,
+        p_log_set      in varchar default null,
         p_classname    in varchar default null,
         p_module_name  in varchar default null,
         p_status_msg   in varchar default null,
         p_thread_name  in varchar default null,
         logfile_name   in varchar default null,
-        p_log_level in pls_integer default G_INFO,
+        logfile_directory in varchar default 'JOB_MSG_DIR',
+        p_log_level    in pls_integer default G_INFO,
         p_trace_level  in pls_integer default G_INFO)
-    return varchar;
+        return varchar;
 
     procedure end_job;
 
