@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -24,10 +26,11 @@ import com.google.gson.GsonBuilder;
 // https://stackoverflow.com/questions/19782745/converting-hibernate-objects-to-json-using-gson/21151855
 // https://stackoverflow.com/questions/13459718/could-not-serialize-object-cause-of-hibernateproxy
 // https://www.concretepage.com/google-api/java-gson-serialization-deserialization-json
-
 // consider https://stackoverflow.com/questions/6873020/gson-date-format
 public class HibernateMarshallerFactory {
 	private static final Class<?>[] skipAnnotationClasses = { Serialize.class, ManyToMany.class, OneToOne.class, OneToMany.class, ManyToOne.class};
+	private static final Class<?>[] skipClasses = {SimpleDateFormat.class, DecimalFormat.class};
+	private static final HashSet <Class> skipClassSet = new HashSet<Class> (Arrays.asList(skipClasses));
 	public static Gson getHibernateGson() {
 		return getHibernateGsonWithProxyDateFormatter();
 	}
@@ -62,54 +65,20 @@ public class HibernateMarshallerFactory {
 				String fieldName = f.getName();
 				String getterName = null;
 				Class<?> declaringClass = f.getDeclaringClass();
-				String skipReason = null;
-				String skipMember = null;
-				String skipMethod = null;
-				Collection<Annotation> annotations = f.getAnnotations();
+//				Collection<Annotation> annotations = f.getAnnotations();
 				Boolean isFieldInSuper = null;
-				Class<?> declaredClass = f.getDeclaredClass();
+//				Class<?> declaredClass = f.getDeclaredClass();
 				while (true) {
-					if (declaredClass == DecimalFormat.class  || declaringClass == DecimalFormat.class) {
-						skipReason = "DecimalFormat";
-						logger.debug("skipping {}",skipReason);
-						retval = true;
-						break;
-					}
-					logger.debug("skipping {} declaredClass {} declaringClass", retval, declaredClass, declaringClass);
 					for (@SuppressWarnings("rawtypes") Class clazz : skipAnnotationClasses) {
 						if (f.getAnnotation(clazz) != null) {
-							skipMember = clazz.getName() + " member";
-							logger.debug("skipping fieldName{} because {}", fieldName, clazz.getName() );
+							logger.debug("skipping fieldName {} because {}", fieldName, clazz) ;
 							retval = true;
 							break;
 						}
 					}
-					if (f.getAnnotation(Serialize.class) != null) {
-						skipReason = "Serialize member";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(ManyToMany.class) != null) {
-						skipReason = "ManyToMany member";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(OneToOne.class) != null) {
-						skipReason = "OneToOne member";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(OneToMany.class) != null) {
-						skipReason = "OneToMany member";
-						retval = true;
-						break;
-					}
-					if (f.getAnnotation(ManyToOne.class) != null) {
-						skipReason = "ManyToOne member";
-						retval = true;
-						break;
-					}
-					// try the field
+					//
+					// try the getter
+					//
 					String capitalizedAttribute = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 					if (f.getDeclaredType().equals(boolean.class)) {
 						getterName = "is" + capitalizedAttribute;
@@ -122,52 +91,22 @@ public class HibernateMarshallerFactory {
 						getter = declaringClass.getMethod(getterName);
 						for (@SuppressWarnings("rawtypes") Class methodClass : skipAnnotationClasses) {
 							if (getter.getAnnotation(methodClass) != null) {
-								skipMethod = methodClass.getName() + " method";
 								logger.debug("skipping fieldName{} because getter {} has {}", fieldName, getter.getName(), methodClass );
-
 								retval = true;
 								break;
 							}
 						}
-//						if (getter.getAnnotation(ManyToMany.class) != null) {
-//							logger.debug("skipping fieldName{} because getter {} has {}", fieldName, getter.getName(), ManyToMany.class );
-//							skipReason = "ManyToMany method";
-//							retval = true;
-//							break;
-//						}
-//						if (getter.getAnnotation(OneToOne.class) != null) {
-//							logger.debug("skipping fieldName{} because getter {} has {}", fieldName, getter.getName(), OneToOne.class );
-//							skipReason = "OneToOne method";
-//							retval = true;
-//							break;
-//						}
-//						if (getter.getAnnotation(OneToMany.class) != null) {
-//							logger.debug("skipping fieldName{} because getter {} has {}", fieldName, getter.getName(), OneToMany.class );
-//							skipReason = "OneToMany on method";
-//							retval = true;
-//							break;
-//						}
-//						if (getter.getAnnotation(ManyToOne.class) != null) {
-//							logger.debug("skipping fieldName{} because getter {} has {}", fieldName, getter.getName(), ManyToOne.class );
-//							skipReason = "ManyToOne method";
-//							retval = true;
-//							break;
-//						}
 						Class<?> theClass = f.getDeclaringClass();
 						isFieldInSuper =  isFieldInSuperclass(theClass, fieldName);            
-						//logger.debug("{} {} isFieldInSuper {}",theClass.getName(),fieldName,isFieldInSuper );
 						if (! retval) {
-						retval = isFieldInSuper;
+							retval = isFieldInSuper;
 						}
 					} catch (NoSuchMethodException | SecurityException e) {
 						logger.debug("could not get method '{}' for field {} in class {}\n{}", getterName, fieldName,
 								declaringClass.getName(), e.getMessage());
-						//						e.printStackTrace();
 					}
 					break;
 				}
-				logger.debug("skip? {} inSuper? {} class: {} fieldName: {} methodName {} annotations: {} reason: {}",
-						retval, isFieldInSuper, declaringClass, fieldName, getterName, annotations, skipReason);
 				return retval;
 			}
 
@@ -190,22 +129,12 @@ public class HibernateMarshallerFactory {
 			}
 			@Override
 			public boolean shouldSkipClass(Class<?> aClass) {
-				boolean retval = false;
-				if (aClass == SimpleDateFormat.class) {
-					retval = true;
-				}
-				if (aClass == DecimalFormat.class) {
-					retval = true;
-				}
-				logger.debug("shouldSkipClass {}", retval);
-				return retval;
+				return skipClassSet.contains(aClass);
 			}
 
 		}).setPrettyPrinting();
 
 		return gsonNoChildren;
 	}
-
-
 
 }

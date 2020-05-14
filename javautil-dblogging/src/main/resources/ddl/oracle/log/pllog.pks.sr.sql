@@ -1,4 +1,6 @@
-create or replace PACKAGE logger AS
+spool pllog.pks.lst
+set echo on
+create or replace PACKAGE pllog AS
     G_SEVERE       CONSTANT PLS_INTEGER := 1 ;
     G_WARNING      CONSTANT PLS_INTEGER := 2 ;
     G_INFO         CONSTANT PLS_INTEGER := 4 ;
@@ -13,19 +15,34 @@ create or replace PACKAGE logger AS
     function format_time(p_timestamp in timestamp) 
     return varchar;
 
-    procedure set_filter_level (p_level in pls_integer);
+--    procedure set_logger_level (p_level in pls_integer);
 
     function get_new_job_log_id 
     return number;
 
-    function begin_job (
-        p_process_name in varchar,
-        p_logger_set   in varchar default null,
+
+   procedure begin_log ( 
+        logfile_name   in varchar,
+        logfile_directory in varchar default 'JOB_MSG_DIR',
+        p_process_name in varchar default null,
+        p_log_set      in varchar default null,
         p_classname    in varchar default null,
         p_module_name  in varchar default null,
         p_status_msg   in varchar default null,
         p_thread_name  in varchar default null,
-        p_logger_level in pls_integer default G_INFO,
+        p_log_level    in pls_integer default G_INFO,
+        p_trace_level  in pls_integer default G_INFO);
+
+
+    function begin_job (
+        p_process_name in varchar,
+        p_log_set   in varchar default null,
+        p_classname    in varchar default null,
+        p_module_name  in varchar default null,
+        p_status_msg   in varchar default null,
+        p_thread_name  in varchar default null,
+        logfile_name   in varchar default null,
+        p_log_level in pls_integer default G_INFO,
         p_trace_level  in pls_integer default G_INFO)
     return varchar;
 
@@ -33,10 +50,10 @@ create or replace PACKAGE logger AS
 
     procedure abort_job(p_stacktrace in varchar default null);
 
-    procedure set_action (p_action IN        VARCHAR2) ;
+    procedure set_action (p_action in        varchar) ;
 
     procedure set_module (
-        p_module_name IN        VARCHAR,
+        p_module_name in        varchar,
         p_action_name in   varchar
     );
 
@@ -52,10 +69,10 @@ create or replace PACKAGE logger AS
     function get_my_tracefile_name 
     return varchar;
 
-    function basename (p_full_path in varchar2,
-                       p_suffix    in varchar2 default null,
+    function basename (p_full_path in varchar,
+                       p_suffix    in varchar default null,
                        p_separator in char default '/') 
-    return varchar2;
+    return varchar;
 
     procedure prepare_connection;
 
@@ -64,4 +81,18 @@ create or replace PACKAGE logger AS
     function set_tracefile_identifier(p_job_nbr in number) 
     return varchar;
 
-END logger ;
+
+  procedure log (
+      p_log_msg      in   varchar,
+      p_log_level    in   pls_integer default g_info,
+      p_job_log_id   in   pls_integer default null,
+      p_job_msg_id   in   pls_integer default null,
+      p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
+      p_caller_name  in   varchar default null,
+      p_line_number  in   pls_integer default null,
+      p_dump_stack   in   boolean default false
+   );
+
+END pllog ;
+/
+show errors

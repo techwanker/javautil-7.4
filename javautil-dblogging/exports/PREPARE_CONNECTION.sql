@@ -1,10 +1,9 @@
--- https://docstore.mik.ua/orelly/oracle/guide8i/ch08_04.htm
-/**
- * 
- * 
- */
-set echo on
-CREATE OR REPLACE PROCEDURE prepare_connection (p_logger_set_nm in varchar default null)
+--------------------------------------------------------
+--  DDL for Procedure PREPARE_CONNECTION
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE EDITIONABLE PROCEDURE "PREPARE_CONNECTION" (p_logger_set_nm in varchar default null)
 AS
    context_info DBMS_SESSION.AppCtxTabTyp;
    info_count PLS_INTEGER;
@@ -21,18 +20,18 @@ AS
 
 BEGIN
    DBMS_SESSION.LIST_CONTEXT ( context_info, info_count);
-   indx := context_info.FIRST;   
+   indx := context_info.FIRST;
    LOOP
       EXIT WHEN indx IS NULL;
       DBMS_SESSION.CLEAR_CONTEXT(
          context_info(indx).namespace,
          context_info(indx).attribute,
-         null 
+         null
       );
       indx := context_info.NEXT (indx);
    END LOOP;
-   DBMS_SESSION.RESET_PACKAGE;  
- 
+   DBMS_SESSION.RESET_PACKAGE;
+
    for logger_rec in log_cur
    loop
        DBMS_SESSION.SET_CONTEXT ( namespace => 'logger',
@@ -41,8 +40,5 @@ BEGIN
 
    end loop;
 END;
-/
-show errors;
 
-create public synonym prepare_connection for prepare_connection;
-grant execute on prepare_connection to public;
+/

@@ -1,4 +1,32 @@
-create sequence job_log_id_seq;
+head	1.2;
+access;
+symbols;
+locks
+	jjs:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2020.05.11.23.01.10;	author jjs;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2020.04.26.05.12.02;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@create sequence job_log_id_seq;
 
 create table job_log (    
     job_log_id number(9),
@@ -16,12 +44,9 @@ create table job_log (
     module_name          varchar(64),
     classname            varchar(255),
     tracefile_name       varchar(4000),
-    msg_lvl              number(1),
-    trace_level          number(2),
     tracefile_data       clob,
     tracefile_json       clob,
     abort_stacktrace     clob,
-    
     check ( ignore_flg in ('Y', 'N')) ,
     constraint job_log_pk primary key (job_log_id)
    ); 
@@ -107,3 +132,14 @@ select
    end_ts - status_ts elapsed_millis 
 from job_log;
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+d27 2
+@

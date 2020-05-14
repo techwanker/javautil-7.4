@@ -1,4 +1,8 @@
-create or replace PACKAGE logger AS
+--------------------------------------------------------
+--  DDL for Package LOGGER
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "LOGGER" AS
     G_SEVERE       CONSTANT PLS_INTEGER := 1 ;
     G_WARNING      CONSTANT PLS_INTEGER := 2 ;
     G_INFO         CONSTANT PLS_INTEGER := 4 ;
@@ -65,3 +69,5 @@ create or replace PACKAGE logger AS
     return varchar;
 
 END logger ;
+
+/

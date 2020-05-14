@@ -1,0 +1,28 @@
+head	1.1;
+access;
+symbols;
+locks
+	jjs:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.11.23.01.10;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@1. Create a unique file and return name
+2. Log Job ID in log file
+3. For security reasons have job_token
+4  store token and file name in job log
+@

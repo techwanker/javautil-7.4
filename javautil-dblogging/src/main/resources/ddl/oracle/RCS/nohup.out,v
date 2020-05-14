@@ -1,0 +1,109 @@
+head	1.1;
+access;
+symbols;
+locks
+	jjs:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.11.23.01.10;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@[21787:21787:0412/161741.877834:ERROR:sandbox_linux.cc(372)] InitializeSandbox() called with multiple threads in process gpu-process.
+[21752:21792:0412/161749.401504:ERROR:token_service_table.cc(140)] Failed to decrypt token for service AccountId-111275040267764796607
+[21819:7:0412/161749.660744:ERROR:child_process_sandbox_support_impl_linux.cc(79)] FontService unique font name matching request did not receive a response.
+[21819:7:0412/161749.661682:ERROR:child_process_sandbox_support_impl_linux.cc(79)] FontService unique font name matching request did not receive a response.
+[22115:148:0412/161830.304665:ERROR:child_process_sandbox_support_impl_linux.cc(79)] FontService unique font name matching request did not receive a response.
+[22115:148:0412/161830.305364:ERROR:child_process_sandbox_support_impl_linux.cc(79)] FontService unique font name matching request did not receive a response.
+[22115:148:0412/161830.306018:ERROR:child_process_sandbox_support_impl_linux.cc(79)] FontService unique font name matching request did not receive a response.
+[22115:148:0412/161830.306362:ERROR:child_process_sandbox_support_impl_linux.cc(79)] FontService unique font name matching request did not receive a response.
+[21752:21774:0416/183809.894833:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0416/183835.739141:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0416/183917.138220:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0416/193957.949398:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0416/194023.836251:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0416/194110.986158:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0416/194257.262310:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+[21752:21774:0417/102036.236177:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -106
+
+ Oracle SQL Developer
+ Copyright (c) 2005, 2018, Oracle and/or its affiliates. All rights reserved.
+
+UsersCache.fillIn() time = 4  ret==null?: true
+UsersCache.fillIn() time = 5  ret==null?: true
+java.lang.ArrayIndexOutOfBoundsException: -1
+	at java.util.ArrayList.elementData(ArrayList.java:422)
+	at java.util.ArrayList.get(ArrayList.java:435)
+	at oracle.dbtools.parser.plsql.SyntaxError.checkSyntax(SyntaxError.java:148)
+	at oracle.dbtools.parser.plsql.SyntaxError.checkSyntax(SyntaxError.java:99)
+	at oracle.dbtools.parser.plsql.SyntaxError.checkSyntax(SyntaxError.java:92)
+	at oracle.dbtools.parser.plsql.SyntaxError.checkSQLQuerySyntax(SyntaxError.java:53)
+	at oracle.dbtools.worksheet.commands.autotrace.AutotraceActionProvider.analyzeSQL(AutotraceActionProvider.java:150)
+	at oracle.dbtools.worksheet.commands.autotrace.AutotraceActionProvider.checkActionEnabled(AutotraceActionProvider.java:125)
+	at oracle.dbtools.worksheet.editor.Worksheet$WorksheetController.update(Worksheet.java:722)
+	at oracle.ide.controller.IdeAction.updateAction(IdeAction.java:787)
+	at oracle.ide.controller.MenuManager.updateMenuItemAction(MenuManager.java:1257)
+	at oracle.ide.controller.MenuManager.updateMenuItems(MenuManager.java:1211)
+	at oracle.ide.controller.MenuManager.access$700(MenuManager.java:93)
+	at oracle.ide.controller.MenuManager$PrivateMenuListener.menuSelected(MenuManager.java:1346)
+	at javax.swing.JMenu.fireMenuSelected(JMenu.java:1038)
+	at javax.swing.JMenu$MenuChangeListener.stateChanged(JMenu.java:1118)
+	at javax.swing.DefaultButtonModel.fireStateChanged(DefaultButtonModel.java:349)
+	at javax.swing.DefaultButtonModel.setSelected(DefaultButtonModel.java:232)
+	at javax.swing.JMenu.setSelected(JMenu.java:305)
+	at javax.swing.JMenu.menuSelectionChanged(JMenu.java:1187)
+	at javax.swing.MenuSelectionManager.setSelectedPath(MenuSelectionManager.java:127)
+	at javax.swing.plaf.basic.BasicMenuUI$Handler.mouseEntered(BasicMenuUI.java:511)
+	at java.awt.AWTEventMulticaster.mouseEntered(AWTEventMulticaster.java:299)
+	at java.awt.Component.processMouseEvent(Component.java:6548)
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3324)
+	at java.awt.Component.processEvent(Component.java:6304)
+	at java.awt.Container.processEvent(Container.java:2239)
+	at java.awt.Component.dispatchEventImpl(Component.java:4889)
+	at java.awt.Container.dispatchEventImpl(Container.java:2297)
+	at java.awt.Component.dispatchEvent(Component.java:4711)
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4904)
+	at java.awt.LightweightDispatcher.retargetMouseEnterExit(Container.java:4686)
+	at java.awt.LightweightDispatcher.trackMouseEnterExit(Container.java:4664)
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4515)
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4476)
+	at java.awt.Container.dispatchEventImpl(Container.java:2283)
+	at java.awt.Window.dispatchEventImpl(Window.java:2746)
+	at java.awt.Component.dispatchEvent(Component.java:4711)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:760)
+	at java.awt.EventQueue.access$500(EventQueue.java:97)
+	at java.awt.EventQueue$3.run(EventQueue.java:709)
+	at java.awt.EventQueue$3.run(EventQueue.java:703)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:74)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:84)
+	at java.awt.EventQueue$4.run(EventQueue.java:733)
+	at java.awt.EventQueue$4.run(EventQueue.java:731)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:74)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:730)
+	at oracle.javatools.internal.ui.EventQueueWrapper._dispatchEvent(EventQueueWrapper.java:169)
+	at oracle.javatools.internal.ui.EventQueueWrapper.dispatchEvent(EventQueueWrapper.java:151)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:205)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+UsersCache.fillIn() time = 95  ret==null?: true
+UsersCache.fillIn() time = 16  ret==null?: true
+UsersCache.fillIn() time = 2  ret==null?: true
+UsersCache.fillIn() time = 1  ret==null?: true
+@

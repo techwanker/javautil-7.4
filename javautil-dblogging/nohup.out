@@ -1,0 +1,25 @@
+
+ Oracle SQL Developer
+ Copyright (c) 2005, 2018, Oracle and/or its affiliates. All rights reserved.
+
+UsersCache.fillIn() time = 8  ret==null?: true
+UsersCache.fillIn() time = 4  ret==null?: true
+UsersCache.fillIn() time = 401  ret==null?: true
+UsersCache.fillIn() time = 162  ret==null?: true
+UsersCache.fillIn() time = 20  ret==null?: true
+UsersCache.fillIn() time = 9  ret==null?: true
+UsersCache.fillIn() time = 1  ret==null?: true
+UsersCache.fillIn() time = 3  ret==null?: true
+UsersCache.fillIn() time = 1  ret==null?: true
+UsersCache.fillIn() time = 2  ret==null?: true
+UsersCache.fillIn() time = 36  ret==null?: true
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console. Set system property 'log4j2.debug' to show Log4j2 internal initialization logging.
+sqlType == null for _name=JOB_LOG_ID _varName=JOB_LOG_ID
+sqlType == null for _name=JOB_MSG_ID _varName=JOB_MSG_ID
+sqlType == null for _name=LINE_NUMBER _varName=LINE_NUMBER
+sqlType == null for _name=LOG_LEVEL _varName=LOG_LEVEL
+sqlType == null for _name=JOB_LOG_ID _varName=JOB_LOG_ID
+sqlType == null for _name=JOB_MSG_ID _varName=JOB_MSG_ID
+sqlType == null for _name=LINE_NUMBER _varName=LINE_NUMBER
+sqlType == null for _name=LOG_LEVEL _varName=LOG_LEVEL
+/common/opt/sqldeveloper/sqldeveloper/bin/../../ide/bin/launcher.sh: line 1606: 26508 Killed                  ${JAVA} "${APP_VM_OPTS[@]}" ${APP_ENV_VARS} -classpath ${APP_CLASSPATH} ${APP_MAIN_CLASS} "${APP_APP_OPTS[@]}"

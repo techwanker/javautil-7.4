@@ -1,7 +1,8 @@
---#<
-set echo on 
---#>
-CREATE OR REPLACE PACKAGE BODY logger
+--------------------------------------------------------
+--  DDL for Package Body LOGGER
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "LOGGER" 
 is
     g_job_msg_dir    varchar2 (32) := 'UT_PROCESS_LOG_DIR';
     g_filter_level          pls_integer := G_INFO ;
@@ -92,7 +93,7 @@ is
    is
        pragma autonomous_transaction ;
    begin
-    
+
       if p_log_level = g_snap OR p_log_level <= g_record_level then
           insert into job_msg (
                job_msg_id,    job_log_id,        log_seq_nbr,         log_msg_id,    
@@ -144,8 +145,8 @@ is
    );
        commit;
    end job_log_insert;
- 
- 
+
+
     --%~~~<
    FUNCTION begin_job ( 
         p_process_name in varchar,
@@ -168,7 +169,7 @@ is
         g_process_start_tm := current_timestamp;
         my_tracefile_name := set_tracefile_identifier(my_job_log_id);
         set_action('begin_job ' || to_char(my_job_log_id)); 
-        
+
         g_log_file_name := my_job_token;
         dbms_output.put_line('begin_job g_log_file_name ' || g_log_file_name);
 
@@ -182,12 +183,12 @@ is
             p_job_token    => my_job_token,
             p_logfile_name => my_job_token,
             p_trace_level  => p_trace_level);
-            
+
             return my_job_token;
-         
+
     end begin_job;
-   
- 
+
+
 
    procedure end_job
    --::* update job_log.status_id to 'C' and status_msg to 'DONE'
@@ -210,7 +211,7 @@ is
       commit;
       set_action('end_job complete');
    end end_job;
-   
+
     procedure abort_job(p_stacktrace in varchar default null)
     --::* procedure abort_job
     --::* update job_log
@@ -226,7 +227,7 @@ is
         set_action('abort_job');
         g_process_end_tm := current_timestamp;
         elapsed_tm := g_process_end_tm - g_process_start_tm;
-      
+
         if p_stacktrace is not null then
             stack := p_stacktrace;
         else
@@ -263,7 +264,7 @@ is
        select  owner, directory_name, directory_path
        from    all_directories
        where   directory_name = g_job_msg_dir;
- 
+
        directory_rec directory_cur%rowtype;
 
     begin
@@ -296,7 +297,7 @@ is
 
        return my_basename;
     end basename;
-  
+
     function get_my_tracefile return clob is
     begin
         return get_tracefile(basename(get_my_tracefile_name));
@@ -378,12 +379,5 @@ begin
    dbms_output.ENABLE(1000000) ;
   -- set_context;
 end logger;
-/
 
-begin
-      sys.DBMS_MONITOR.session_trace_enable(waits=>TRUE, binds=>FALSE);
-end;
 /
---#<
-show errors
---#>

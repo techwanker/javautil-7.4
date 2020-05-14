@@ -1,6 +1,8 @@
-set echo on
-spool pllogger.pkgb.lst
-CREATE OR REPLACE PACKAGE BODY pllogger
+--------------------------------------------------------
+--  DDL for Package Body PLLOGGER
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "PLLOGGER" 
 is
    g_job_msg_dir    varchar2 (32) := 'JOB_MSG_DIR';
    g_job_msg_id     pls_integer;
@@ -35,22 +37,22 @@ is
    /* https://livesql.oracle.com/apex/livesql/docs/lnpls/plsql-collections-and-records/composites1.html */
 
    type logger_dtl_type is table of logger_dtl%rowtype index by varchar(64);
-   
+
    logger_dtls logger_dtl_type;
-    
+
    procedure set_trace (p_trace_level in pls_integer)
    is
    begin
       DBMS_TRACE.set_plsql_trace (p_trace_level);
    end set_trace;
-   
+
    procedure set_job_token(p_job_token in varchar) is
    begin
        select * into g_job_log
        from job_log
        where job_token  = p_job_token;
     end;
-    
+
     procedure  emit_header is
     begin
         if g_emit_headers then
@@ -58,7 +60,7 @@ is
                                               '"timestamp","log_msg","caller_name","call_stack"');
          end if;
     end emit_header;
-    
+
    function open_log_file (
         p_file_name in varchar, 
         p_headers in boolean default true)
@@ -78,10 +80,10 @@ is
          --utl_file.fclose(g_file_handle);
          --g_file_handle := utl_file.fopen(g_job_msg_dir,g_log_file_name,'a');
          emit_header;
-     
+
       else
          dbms_output.put_line('open_log_file log_file is open: ' || g_log_file_name);
-      
+
       end if;
       return my_log_file_name;
    end open_log_file;
@@ -103,7 +105,7 @@ is
 	  commit;
   end;
   */
-  
+
     procedure use_logger_set(p_set_nm in varchar) 
     is
         no_such_logger_set exception;
@@ -111,10 +113,10 @@ is
        dbms_output.put_line('use_logger_set "' || p_set_nm || '"');
        select * into g_logger_hdr from logger_hdr 
        where logger_set_nm = upper(p_set_nm);
-       
+
        exception when
            no_data_found then raise_application_error(-200001,'no_such_logger_set ' || p_set_nm);
-       
+
        for dtl in ( select * 
        from logger_dtl
        where logger_hdr_id = g_logger_hdr.logger_hdr_id)
@@ -122,7 +124,7 @@ is
            logger_dtls(upper(dtl.logger_nm)) := dtl;
        end loop;
     end;
-       
+
     procedure logger_dtls_to_str is
         ndx varchar(64);
         dtl logger_dtl%rowtype;
@@ -132,7 +134,7 @@ is
        -- dbms_output.put_line('about to get first');
        -- ndx := logger_dtls.first();
         -- dbms_output.put_line('ndx "' || ndx || '"');
-        
+
         while ndx is not null loop
             dtl :=  logger_dtls(ndx);
             retval := retval || dtl.logger_nm  || ' ' || dtl.log_lvl || '\n';
@@ -151,7 +153,7 @@ is
     begin 
          dbms_output.put_line('get_log_level()  p_logger_name *' || p_logger_name || ' my_logger_name *' || my_logger_name || '*');
          logger_dtls_to_str;
-         
+
          begin
              my_log_dtl  := logger_dtls(my_logger_name);
              retval := my_log_dtl.log_lvl;
@@ -160,11 +162,11 @@ is
              dbms_output.put_line('logger not found ' || my_logger_name);
              retval := g_filter_level;
          end;
-         
+
         dbms_output.put_line('get_log_level() ====> ' || p_logger_name || ' ' || to_char(my_log_dtl.log_lvl) || ' retval ' || to_char(retval));
-        
+
         return retval;
-            
+
     end get_log_level;
   --::<
   procedure create_process_log (
@@ -188,7 +190,7 @@ is
       -- long_message  clob;
       my_log_file_name varchar2(4000);
       my_logger_level number;
-   
+
    begin
        if p_caller_name is not null then  -- TODO make it work with null
            my_logger_level := get_log_level(p_caller_name);
@@ -196,7 +198,7 @@ is
            my_logger_level := g_filter_level;
        end if;
        g_next_log_seq_nbr := 1;
-       
+
     /*
       if g_log_file_name is NULL then  -- TODO name shoul be in one place
          g_log_file_name := g_process_name || '_' || to_char (current_timestamp, 'YYYY-MM-DD_HH24MisSXFF');
@@ -209,7 +211,7 @@ is
         dbms_output.put_line('my_log_file_name: ' || my_log_file_name);
         dbms_output.put_line('g_next_log_seq_nbr ' || g_next_log_seq_nbr);
       end if;
-      
+
       if p_log_level <= my_logger_level then
           g_next_log_seq_nbr := g_next_log_seq_nbr + 1;   -- TODO this should go as too much work if multiple connections
 
@@ -570,7 +572,7 @@ is
       p_unit           in   varchar     default null,
       p_line           in   pls_integer default null,
       p_record_stack   in   BOOLEAN         -- record the call stack
-  
+
    ) 
    is 
       stack   varchar2 (32767);
@@ -639,9 +641,9 @@ is
                         p_level     in number)
     is 
         logger_rec logger_hdr%rowtype;
-    
+
     begin
-      
+
              insert into logger_dtl (logger_dtl_id, logger_hdr_id, 
                      logger_nm, log_lvl)
              select logger_dtl_id_seq.nextval, 
@@ -650,7 +652,7 @@ is
              from   logger_hdr 
              where 
                    logger_set_nm = upper(p_set_nm);
-            
+
              exception when dup_val_on_index 
              then
                  update logger_dtl 
@@ -661,18 +663,16 @@ is
                          where logger_set_nm = upper(p_set_nm) 
 			)
                          and logger_nm = upper(p_logger_nm);
-                   
-             
-             
+
+
+
     end define_logger_level;
-    
+
 
 
 
 begin
    dbms_output.ENABLE(1000000) ;
 end pllogger;
+
 /
---#<
-show errors
---#>

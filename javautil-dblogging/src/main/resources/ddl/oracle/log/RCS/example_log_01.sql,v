@@ -1,0 +1,40 @@
+head	1.1;
+access;
+symbols;
+locks
+	jjs:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.13.23.27.22;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@exit
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@set serveroutput on
+set echo on
+spool example_01.lst
+begin
+    log.begin_job(p_process_name => 'example 01',
+                  logfile_name   => 'example_01.log');
+    log.log('one message');
+    log.end_job;
+exception when others
+then
+	pllogger.severe($$PLSQL_UINIT,$$PLSQL_LINE,sqlerrm);
+	logger.abort_job;
+raise;
+end;
+--#<
+@

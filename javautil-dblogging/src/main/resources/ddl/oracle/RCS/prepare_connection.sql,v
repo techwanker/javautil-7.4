@@ -1,4 +1,27 @@
--- https://docstore.mik.ua/orelly/oracle/guide8i/ch08_04.htm
+head	1.1;
+access;
+symbols;
+locks
+	jjs:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.04.26.05.12.02;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@-- https://docstore.mik.ua/orelly/oracle/guide8i/ch08_04.htm
 /**
  * 
  * 
@@ -46,3 +69,4 @@ show errors;
 
 create public synonym prepare_connection for prepare_connection;
 grant execute on prepare_connection to public;
+@

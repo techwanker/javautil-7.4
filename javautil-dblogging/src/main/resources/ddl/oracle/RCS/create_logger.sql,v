@@ -1,0 +1,26 @@
+head	1.1;
+access;
+symbols;
+locks
+	jjs:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.04.26.05.12.02;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@@@ dblogger_install.pks.sr.sql
+@@ dblogger_install.pkb.sr.sql
+@
