@@ -89,21 +89,27 @@ SQL> create or replace PACKAGE pllog AS
  89  	   p_line_number  in   pls_integer default null,
  90  	   p_dump_stack   in   boolean default false
  91  	);
- 92  /*
- 93    procedure log (
- 94  	   p_log_msg	  in   varchar,
- 95  	   p_log_level	  in   pls_integer default g_info,
- 96  	   p_job_log_id   in   pls_integer default null,
- 97  	   p_job_msg_id   in   pls_integer default null,
- 98  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
- 99  	   p_caller_name  in   varchar default null,
-100  	   p_line_number  in   pls_integer default null,
-101  	   p_dump_stack   in   boolean default false
-102  	);
-103  */
-104  
-105  END pllog ;
-106  /
+ 92  
+ 93    procedure log2 (
+ 94  	   message     in   varchar,
+ 95  	   level       in   pls_integer default g_info
+ 96  	);
+ 97  
+ 98  /*
+ 99    procedure log (
+100  	   p_log_msg	  in   varchar,
+101  	   p_log_level	  in   pls_integer default g_info,
+102  	   p_job_log_id   in   pls_integer default null,
+103  	   p_job_msg_id   in   pls_integer default null,
+104  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
+105  	   p_caller_name  in   varchar default null,
+106  	   p_line_number  in   pls_integer default null,
+107  	   p_dump_stack   in   boolean default false
+108  	);
+109  */
+110  
+111  END pllog ;
+112  /
 
 Package created.
 

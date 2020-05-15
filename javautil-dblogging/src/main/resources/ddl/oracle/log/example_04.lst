@@ -1,3 +1,4 @@
+noise
 SQL> 
 SQL> create or replace
   2  procedure example_04
@@ -20,7 +21,7 @@ Procedure created.
 SQL> --#<
 SQL> exec example_04
 begin_job logfile_name "                                                        
-begin_log() logfile_name "2020-05-15T08:04:49.415910000-533.log"                
+begin_log() logfile_name "2020-05-15T08:07:25.966616000-534.log"                
 log() caller:  line  my_logger_level 3 p_log_level 4 g_job_log.log_level 3      
 log() skip p_log_level 4 my_logger_level 3                                      
 get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
@@ -30,8 +31,8 @@ logger not found EXAMPLE_04
 get_log_level() ====> EXAMPLE_04  retval 3                                      
 log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 1                
 g_job_log.log_level 3                                                           
-log(): 11,"2020-05-15T08:04:49.432737000","lvl is 1","EXAMPLE_04",10,533,,""    
-open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:04:49.415910000-533.log"
+log(): 11,"2020-05-15T08:07:25.972137000","lvl is 1","EXAMPLE_04",10,534,,""    
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:07:25.966616000-534.log"
 get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
 logger_dtls_to_str                                                              
 >>                                                                              
@@ -39,8 +40,8 @@ logger not found EXAMPLE_04
 get_log_level() ====> EXAMPLE_04  retval 3                                      
 log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 2                
 g_job_log.log_level 3                                                           
-log(): 22,"2020-05-15T08:04:49.442159000","lvl is 2","EXAMPLE_04",10,533,,""    
-open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:04:49.415910000-533.log"
+log(): 22,"2020-05-15T08:07:25.977891000","lvl is 2","EXAMPLE_04",10,534,,""    
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:07:25.966616000-534.log"
 get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
 logger_dtls_to_str                                                              
 >>                                                                              
@@ -48,8 +49,8 @@ logger not found EXAMPLE_04
 get_log_level() ====> EXAMPLE_04  retval 3                                      
 log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 3                
 g_job_log.log_level 3                                                           
-log(): 33,"2020-05-15T08:04:49.444329000","lvl is 3","EXAMPLE_04",10,533,,""    
-open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:04:49.415910000-533.log"
+log(): 33,"2020-05-15T08:07:25.979755000","lvl is 3","EXAMPLE_04",10,534,,""    
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:07:25.966616000-534.log"
 get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
 logger_dtls_to_str                                                              
 >>                                                                              

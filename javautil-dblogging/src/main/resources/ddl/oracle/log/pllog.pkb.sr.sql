@@ -1,6 +1,6 @@
 --#<
 set echo on 
-spool log.pkb.lst
+spool pllog.pkb.lst
 --#>
 CREATE OR REPLACE PACKAGE BODY pllog
 is
@@ -12,10 +12,9 @@ is
   
    type logger_dtl_type is table of logger_dtl%rowtype index by varchar(64);
    
-     logger_dtls logger_dtl_type;
+    logger_dtls logger_dtl_type;
 
     g_job_log job_log%rowtype;
-    
     
     function format_time(p_timestamp in timestamp)
     return varchar 
@@ -73,6 +72,8 @@ is
         return get_my_tracefile_name;
     end set_tracefile_identifier;
 
+     
+    
     procedure job_msg_insert (
                p_job_log_id in pls_integer,
     --           g_next_log_seq_nbr in pls_integer,
@@ -416,7 +417,7 @@ is
         dtl logger_dtl%rowtype;
         retval long := '';
     begin
-        dbms_output.put_line('logger_dtls_to_str');
+        --  dbms_output.put_line('logger_dtls_to_str');
        -- dbms_output.put_line('about to get first');
        -- ndx := logger_dtls.first();
         -- dbms_output.put_line('ndx "' || ndx || '"');
@@ -426,7 +427,9 @@ is
             retval := retval || dtl.logger_nm  || ' ' || dtl.log_lvl || '\n';
             ndx := logger_dtls.next(ndx);
         end loop;
-        dbms_output.put_line('>> ' || retval);
+        if (g_debug ) then
+            dbms_output.put_line('>> ' || retval);
+        end if;
        -- dbms_output.put_line('end logger_dtls_to_str');
     end logger_dtls_to_str;
     
@@ -435,9 +438,10 @@ is
     is 
         my_logger_name varchar(64) := upper(p_logger_name);
         my_log_dtl logger_dtl%rowtype;
+        was_not varchar(9) := ' was '; 
         retval number;
     begin 
-         dbms_output.put_line('get_log_level()  p_logger_name *' || p_logger_name || ' my_logger_name *' || my_logger_name || '*');
+         -- dbms_output.put_line('get_log_level()  p_logger_name *' || p_logger_name || ' my_logger_name *' || my_logger_name || '*');
          logger_dtls_to_str;
          
          begin
@@ -445,16 +449,33 @@ is
              retval := my_log_dtl.log_lvl;
          exception 
             when no_data_found then
-             dbms_output.put_line('logger not found ' || my_logger_name);
-             retval := g_job_log.log_level;
+              was_not := ' was not ';
+              dbms_output.put_line('logger not found ' || my_logger_name);
+              retval := g_job_log.log_level;
          end;
          
-        dbms_output.put_line('get_log_level() ====> ' || p_logger_name || ' ' || to_char(my_log_dtl.log_lvl) || ' retval ' || to_char(retval));
-        
+        dbms_output.put_line('get_log_level() ' ||
+                ' logger: "'  || p_logger_name || '" ' ||
+                was_not || ' found '  ||
+                ' level '   || to_char(my_log_dtl.log_lvl) || 
+                ' retval ' || to_char(retval));
         return retval;
             
     end get_log_level;
 
+   procedure log2(message in varchar,
+                  level   in pls_integer default g_info) 
+   is
+      owner       varchar(64);
+      name        varchar(64);
+      line        number;
+      caller_type varchar(64);
+   begin
+       OWA_UTIL.who_called_me (owner,name,line,caller_type);
+       --dbms_output.put_line('name: ' || name || ' line: ' || line);
+   end log2;
+   
+   
   procedure log (
       p_log_msg      in   varchar,
       p_log_level    in   pls_integer default g_info,
@@ -469,20 +490,26 @@ is
   --   
       my_logger_level number;
       my_file_handle utl_file.file_type;
-   
+      skip varchar(6) := ' skip ';
    begin
        if p_caller_name is not null then  -- TODO make it work with null
            my_logger_level := get_log_level(p_caller_name);
         else
            my_logger_level := g_job_log.log_level;
        end if;
-       dbms_output.put_line(
-          'log() caller: ' || p_caller_name || 
-          ' line ' || p_line_number ||  
-          ' my_logger_level ' || to_char(my_logger_level) ||
-          ' p_log_level '     || to_char(p_log_level) ||
-          ' g_job_log.log_level '     || to_char(g_job_log.log_level));
+       
+      if p_log_level <= my_logger_level then
+          skip := '      ';
+      end if;
 
+       dbms_output.put_line(
+          'log() ' ||  skip ||
+           'caller: ' || p_caller_name || 
+          ' line: ' || p_line_number ||  
+          ' my_logger_level: ' || to_char(my_logger_level) ||
+          ' p_log_level: '     || to_char(p_log_level) ||
+          ' g_job_log.log_level: '     || to_char(g_job_log.log_level));
+      
       
       if p_log_level <= my_logger_level then
           my_message := logger_message_formatter  (
@@ -494,17 +521,17 @@ is
               line_number  => p_line_number,
               call_stack   => null
           );
-     	  dbms_output.put_line('log(): ' || to_char(p_log_level) || my_message); 
+     	  --dbms_output.put_line('log(): ' || to_char(p_log_level) || my_message); 
           my_file_handle := open_log_file (g_job_log.directory_name,g_job_log.logfile_name); 
           UTL_FILE.put_line (my_file_handle, my_message);
           utl_file.fclose(my_file_handle); 
-          
+          /*
       else
           dbms_output.put_line(
             'log() skip p_log_level ' || to_char(p_log_level) || 
 	    ' my_logger_level ' || to_char(my_logger_level) || 
             ' ' || my_message);
-
+         */
       end if;
       
       -- commit;

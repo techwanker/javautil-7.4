@@ -91,6 +91,12 @@ create or replace PACKAGE pllog AS
       p_line_number  in   pls_integer default null,
       p_dump_stack   in   boolean default false
    );
+   
+  procedure log2 (
+      message     in   varchar,
+      level       in   pls_integer default g_info
+   );
+   
 /*
   procedure log (
       p_log_msg      in   varchar,
