@@ -1,0 +1,74 @@
+SQL> 
+SQL> create or replace
+  2  procedure example_01
+  3  is
+  4  begin
+  5  	 pllog.log('severe',1);
+  6  	 pllog.log('warning',2);
+  7  	 pllog.log('undefined',3);
+  8  	 pllog.log('info',4);
+  9  	 pllog.log('verbose',6);
+ 10  	 pllog.log('debug',7);
+ 11  	 pllog.log('trace',9);
+ 12  end;
+ 13  /
+
+Procedure created.
+
+SQL> 
+SQL> create or replace
+  2  procedure example_04
+  3  is
+  4  	 token varchar(32);
+  5  begin
+  6  	 pllog.log('begins',4,$$PLS_UNIT,$$PLS_LINE);
+  7  	 for lvl in 1 .. 9
+  8  	 loop
+  9  	     pllog.log('lvl is ' || lvl,lvl,$$PLSQL_UNIT,$$PLSQL_LINE);
+ 10  	 end loop;
+ 11  end;
+ 12  /
+
+Procedure created.
+
+SQL> 
+SQL> create or replace
+  2  procedure example_05
+  3  is
+  4  begin
+  5  	 pllog.log('begins',4,$$PLS_UNIT,$$PLS_LINE);
+  6  	 for lvl in 1 .. 9
+  7  	 loop
+  8  	     pllog.log('lvl is ' || lvl,lvl,$$PLSQL_UNIT,$$PLSQL_LINE);
+  9  	 end loop;
+ 10  	 pllog.end_job;
+ 11  end;
+ 12  /
+
+Procedure created.
+
+SQL> --#<
+SQL> declare
+  2  	 token varchar(32);
+  3  	 logname varchar(32) := to_char(job_log_id_seq.nextval) || '.log';
+  4  begin
+  5  	pllog.begin_log(logfile_name => logname, p_log_level	  => 3);
+  6  	example_01;
+  7  	example_04;
+  8  	example_05;
+  9  end;
+ 10  /
+begin_log() logfile_name "540.log"                                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+open_log_file() dir: "JOB_MSG_DIR" file: "540.log"                              
+
+PL/SQL procedure successfully completed.
+
+SQL> exit;
