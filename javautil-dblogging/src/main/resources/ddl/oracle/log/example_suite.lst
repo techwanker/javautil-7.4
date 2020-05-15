@@ -59,96 +59,69 @@ SQL> declare
   9  	example_05;
  10  end;
  11  /
-begin_log() logfile_name "549.log"                                              
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 1,"2020-05-15T18:22:19.143683000","severe","EXAMPLE_01",4,,,""           
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 2,"2020-05-15T18:22:19.149234000","warning","EXAMPLE_01",5,,,""          
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 3,"2020-05-15T18:22:19.151395000","undefined","EXAMPLE_01",6,,,""        
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
+begin_log() logfile_name "551.log"                                              
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 1,"2020-05-15T18:27:57.929649000","severe","EXAMPLE_01",4,,,""           
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 2,"2020-05-15T18:27:57.933600000","warning","EXAMPLE_01",5,,,""          
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 3,"2020-05-15T18:27:57.935245000","undefined","EXAMPLE_01",6,,,""        
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
 log()       caller:  line:  my_logger_level: 3 p_log_level: 4                   
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
 log()       caller:  line:  my_logger_level: 3 p_log_level: 6                   
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
 log()       caller:  line:  my_logger_level: 3 p_log_level: 7                   
-logger not found EXAMPLE_01                                                     
-get_log_level()  logger: "EXAMPLE_01"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_01" was not found  level  retval 3            
 log()       caller:  line:  my_logger_level: 3 p_log_level: 9                   
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller:  line:  my_logger_level: 3 p_log_level: 4                   
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 1,"2020-05-15T18:22:19.162204000","lvl is 1","EXAMPLE_04",8,,,""         
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 2,"2020-05-15T18:22:19.163801000","lvl is 2","EXAMPLE_04",8,,,""         
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 3,"2020-05-15T18:22:19.165267000","lvl is 3","EXAMPLE_04",8,,,""         
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 1,"2020-05-15T18:27:57.945757000","lvl is 1","EXAMPLE_04",8,,,""         
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 2,"2020-05-15T18:27:57.947596000","lvl is 2","EXAMPLE_04",8,,,""         
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 3,"2020-05-15T18:27:57.949365000","lvl is 3","EXAMPLE_04",8,,,""         
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 4        
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 5        
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 6        
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 7        
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 8        
-logger not found EXAMPLE_04                                                     
-get_log_level()  logger: "EXAMPLE_04"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_04" was not found  level  retval 3            
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 9        
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller:  line:  my_logger_level: 3 p_log_level: 4                   
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 1,"2020-05-15T18:22:19.176830000","lvl is 1","EXAMPLE_05",7,,,""         
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 2,"2020-05-15T18:22:19.178714000","lvl is 2","EXAMPLE_05",7,,,""         
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "549.log"                              
-log(): 3,"2020-05-15T18:22:19.180314000","lvl is 3","EXAMPLE_05",7,,,""         
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 1,"2020-05-15T18:27:57.961269000","lvl is 1","EXAMPLE_05",7,,,""         
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 2,"2020-05-15T18:27:57.962857000","lvl is 2","EXAMPLE_05",7,,,""         
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
+open_log_file() dir: "JOB_MSG_DIR" file: "551.log"                              
+log(): 3,"2020-05-15T18:27:57.964360000","lvl is 3","EXAMPLE_05",7,,,""         
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller: EXAMPLE_05 line: 7 my_logger_level: 3 p_log_level: 4        
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller: EXAMPLE_05 line: 7 my_logger_level: 3 p_log_level: 5        
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller: EXAMPLE_05 line: 7 my_logger_level: 3 p_log_level: 6        
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller: EXAMPLE_05 line: 7 my_logger_level: 3 p_log_level: 7        
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller: EXAMPLE_05 line: 7 my_logger_level: 3 p_log_level: 8        
-logger not found EXAMPLE_05                                                     
-get_log_level()  logger: "EXAMPLE_05"  was not  found  level  retval 3          
+get_log_level()  logger: "EXAMPLE_05" was not found  level  retval 3            
 log()       caller: EXAMPLE_05 line: 7 my_logger_level: 3 p_log_level: 9        
 
 PL/SQL procedure successfully completed.

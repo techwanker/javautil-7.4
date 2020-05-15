@@ -446,8 +446,8 @@ is
     is 
         my_logger_name varchar(64) := upper(p_logger_name);
         my_log_dtl logger_dtl%rowtype;
-        was_not varchar(9) := ' was '; 
         retval number;
+        was_not varchar(9) := ' was ';
     begin 
          -- dbms_output.put_line('get_log_level()  p_logger_name *' || p_logger_name || ' my_logger_name *' || my_logger_name || '*');
          logger_dtls_to_str;
@@ -457,11 +457,8 @@ is
              retval := my_log_dtl.log_lvl;
          exception 
             when no_data_found then
-              was_not := ' was not ';
-              if (g_debug) then
-                  dbms_output.put_line('logger not found ' || my_logger_name);
-              end if;
               retval := g_job_log.log_level;
+              was_not := 'was not';
          end;
         
         if (g_debug) then 
