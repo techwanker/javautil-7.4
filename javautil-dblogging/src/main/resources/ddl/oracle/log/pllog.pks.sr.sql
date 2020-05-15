@@ -82,7 +82,16 @@ create or replace PACKAGE pllog AS
     function set_tracefile_identifier(p_job_nbr in number) 
     return varchar;
 
+  procedure log (
+      -- TOD no database updates, no commit or autonomous required
 
+      p_log_msg      in   varchar,
+      p_log_level    in   pls_integer default g_info,
+      p_caller_name  in   varchar default null,
+      p_line_number  in   pls_integer default null,
+      p_dump_stack   in   boolean default false
+   );
+/*
   procedure log (
       p_log_msg      in   varchar,
       p_log_level    in   pls_integer default g_info,
@@ -93,6 +102,7 @@ create or replace PACKAGE pllog AS
       p_line_number  in   pls_integer default null,
       p_dump_stack   in   boolean default false
    );
+*/
 
 END pllog ;
 /

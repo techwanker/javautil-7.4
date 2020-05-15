@@ -1,0 +1,22 @@
+SQL> declare
+  2  	      token varchar(32);
+  3  begin
+  4  	      token := pllog.begin_job(p_process_name => 'example 03',
+  5  			    p_log_level      => 3);
+  6  	      pllog.log('begins',4,$$PLS_UNIT,$$PLS_LINE);
+  7  	      for lvl in 1 .. 9
+  8  	      loop
+  9  		  pllog.log('lvl is ' || lvl,lvl,$$PLS_UNIT,$$PLS_LINE);
+ 10  	      end loop;
+ 11  	      pllog.end_job;
+ 12  end;
+ 13  /
+declare
+*
+ERROR at line 1:
+ORA-04063: package body "SR.PLLOG" has errors 
+ORA-06508: PL/SQL: could not find program unit being called: "SR.PLLOG" 
+ORA-06512: at line 4 
+
+
+SQL> exit

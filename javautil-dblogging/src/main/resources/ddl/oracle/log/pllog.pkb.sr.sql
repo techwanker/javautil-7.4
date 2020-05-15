@@ -182,10 +182,13 @@ is
     begin
         dbms_output.put_line('begin_job logfile_name "' || logfile_name);
     
+	g_job_log.job_log_id := job_log_id_seq.nextval;
+
         if logfile_name is not null then
             my_logfile_name := logfile_name;
         else 
-            my_logfile_name := my_job_token;
+            my_logfile_name := my_job_token || '-' || g_job_log.job_log_id  ||
+                               '.log';
         end if;
  
         begin_log (
@@ -201,7 +204,6 @@ is
             p_trace_level  => p_trace_level  
 	);
 
-	g_job_log.job_log_id := job_log_id_seq.nextval;
         set_action('begin_job ' || to_char(g_job_log.job_log_id)); 
         job_log_insert ( g_job_log);
 
@@ -454,13 +456,8 @@ is
     end get_log_level;
 
   procedure log (
-      -- TOD no database updates, no commit or autonomous required
-
       p_log_msg      in   varchar,
       p_log_level    in   pls_integer default g_info,
-      p_job_log_id   in   pls_integer default null,
-      p_job_msg_id   in   pls_integer default null,
-      p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
       p_caller_name  in   varchar default null,
       p_line_number  in   pls_integer default null,
       p_dump_stack   in   boolean default false
@@ -479,7 +476,9 @@ is
         else
            my_logger_level := g_job_log.log_level;
        end if;
-       dbms_output.put_line('log() caller: ' || p_caller_name || 
+       dbms_output.put_line(
+          'log() caller: ' || p_caller_name || 
+          ' line ' || p_line_number ||  
           ' my_logger_level ' || to_char(my_logger_level) ||
           ' p_log_level '     || to_char(p_log_level) ||
           ' g_job_log.log_level '     || to_char(g_job_log.log_level));
@@ -487,17 +486,15 @@ is
       
       if p_log_level <= my_logger_level then
           my_message := logger_message_formatter  (
-              job_log_id   => p_job_log_id,
-              job_msg_id   => p_job_msg_id,
+              job_log_id   => g_job_log.job_log_id,
+              job_msg_id   => null,
               log_msg      => p_log_msg,
               log_level    => p_log_level,
               caller_name  => p_caller_name,
               line_number  => p_line_number,
               call_stack   => null
           );
-     	  dbms_output.put_line('log() about to write ' || to_char(p_log_level) || my_message); 
-     	  --dbms_output.put_line('p_caller_name ' || p_caller_name);
-     	  --dbms_output.put_line('p_line_number ' || p_line_number);
+     	  dbms_output.put_line('log(): ' || to_char(p_log_level) || my_message); 
           my_file_handle := open_log_file (g_job_log.directory_name,g_job_log.logfile_name); 
           UTL_FILE.put_line (my_file_handle, my_message);
           utl_file.fclose(my_file_handle); 

@@ -13,21 +13,18 @@ SQL> declare
  12  end;
  13  /
 begin_job logfile_name "                                                        
-begin_log() logfile_name "2020-05-14T11:15:36.613725000"                        
+begin_log() logfile_name "2020-05-14T17:21:33.445705000"                        
 log() caller:  my_logger_level 3 p_log_level 4 g_job_log.log_level 3            
 log() skip p_log_level 4 my_logger_level 3                                      
 log() caller:  my_logger_level 3 p_log_level 1 g_job_log.log_level 3            
-logger_message_formatter job_log_id **                                          
-log() about to write 11,,,,"2020-05-14T11:15:36.616245000","lvl is 1","",""     
-open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T11:15:36.613725000"        
+log() about to write 11,"2020-05-14T17:21:33.448517000","lvl is 1","",,,,""     
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T17:21:33.445705000"        
 log() caller:  my_logger_level 3 p_log_level 2 g_job_log.log_level 3            
-logger_message_formatter job_log_id **                                          
-log() about to write 22,,,,"2020-05-14T11:15:36.620517000","lvl is 2","",""     
-open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T11:15:36.613725000"        
+log() about to write 22,"2020-05-14T17:21:33.451547000","lvl is 2","",,,,""     
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T17:21:33.445705000"        
 log() caller:  my_logger_level 3 p_log_level 3 g_job_log.log_level 3            
-logger_message_formatter job_log_id **                                          
-log() about to write 33,,,,"2020-05-14T11:15:36.620640000","lvl is 3","",""     
-open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T11:15:36.613725000"        
+log() about to write 33,"2020-05-14T17:21:33.451681000","lvl is 3","",,,,""     
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-14T17:21:33.445705000"        
 log() caller:  my_logger_level 3 p_log_level 4 g_job_log.log_level 3            
 log() skip p_log_level 4 my_logger_level 3                                      
 log() caller:  my_logger_level 3 p_log_level 5 g_job_log.log_level 3            

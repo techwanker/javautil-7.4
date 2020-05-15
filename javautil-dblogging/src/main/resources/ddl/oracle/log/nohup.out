@@ -1,0 +1,19 @@
+org.eclipse.m2e.logback.configuration: The org.eclipse.m2e.logback.configuration bundle was activated before the state location was initialized.  Will retry after the state location is initialized.
+org.eclipse.m2e.logback.configuration: Logback config file: /common/home/workspace/diamond-javautil-2020/.metadata/.plugins/org.eclipse.m2e.logback.configuration/logback.1.13.0.20190716-1624.xml
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [bundleresource://944.fwk409177037:1/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [bundleresource://944.fwk409177037:2/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [ch.qos.logback.classic.util.ContextSelectorStaticBinder]
+org.eclipse.m2e.logback.configuration: Initializing logback
+2020-05-15 07:55:36.831:INFO::Worker-13: Initialize: Logging initialized @17984ms
+May 15, 2020 7:55:37 AM org.glassfish.grizzly.nio.NIOTransport start
+INFO: Adjusting kernel thread pool to max size 9 to handle configured number of SelectorRunners
+May 15, 2020 7:55:37 AM org.glassfish.grizzly.http.server.NetworkListener start
+INFO: Started listener bound to [127.0.0.1:34709]
+May 15, 2020 7:55:37 AM org.glassfish.grizzly.http.server.HttpServer start
+INFO: [HttpServer] Started.
+May 15, 2020 7:55:37 AM org.glassfish.tyrus.server.Server start
+INFO: WebSocket Registered apps: URLs all start with ws://127.0.0.1:34709
+May 15, 2020 7:55:37 AM org.glassfish.tyrus.server.Server start
+INFO: WebSocket server started.

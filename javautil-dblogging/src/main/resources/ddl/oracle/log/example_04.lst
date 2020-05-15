@@ -1,0 +1,104 @@
+SQL> 
+SQL> create or replace
+  2  procedure example_04
+  3  is
+  4  	 token varchar(32);
+  5  begin
+  6  	 token := pllog.begin_job(p_process_name => 'example 03',
+  7  		       p_log_level	=> 3);
+  8  	 pllog.log('begins',4,$$PLS_UNIT,$$PLS_LINE);
+  9  	 for lvl in 1 .. 9
+ 10  	 loop
+ 11  	     pllog.log('lvl is ' || lvl,lvl,$$PLSQL_UNIT,$$PLSQL_LINE);
+ 12  	 end loop;
+ 13  	 pllog.end_job;
+ 14  end;
+ 15  /
+
+Procedure created.
+
+SQL> --#<
+SQL> exec example_04
+begin_job logfile_name "                                                        
+begin_log() logfile_name "2020-05-15T08:04:49.415910000-533.log"                
+log() caller:  line  my_logger_level 3 p_log_level 4 g_job_log.log_level 3      
+log() skip p_log_level 4 my_logger_level 3                                      
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 1                
+g_job_log.log_level 3                                                           
+log(): 11,"2020-05-15T08:04:49.432737000","lvl is 1","EXAMPLE_04",10,533,,""    
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:04:49.415910000-533.log"
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 2                
+g_job_log.log_level 3                                                           
+log(): 22,"2020-05-15T08:04:49.442159000","lvl is 2","EXAMPLE_04",10,533,,""    
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:04:49.415910000-533.log"
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 3                
+g_job_log.log_level 3                                                           
+log(): 33,"2020-05-15T08:04:49.444329000","lvl is 3","EXAMPLE_04",10,533,,""    
+open_log_file() dir: "JOB_MSG_DIR" file: "2020-05-15T08:04:49.415910000-533.log"
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 4                
+g_job_log.log_level 3                                                           
+log() skip p_log_level 4 my_logger_level 3                                      
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 5                
+g_job_log.log_level 3                                                           
+log() skip p_log_level 5 my_logger_level 3                                      
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 6                
+g_job_log.log_level 3                                                           
+log() skip p_log_level 6 my_logger_level 3                                      
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 7                
+g_job_log.log_level 3                                                           
+log() skip p_log_level 7 my_logger_level 3                                      
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 8                
+g_job_log.log_level 3                                                           
+log() skip p_log_level 8 my_logger_level 3                                      
+get_log_level()  p_logger_name *EXAMPLE_04 my_logger_name *EXAMPLE_04*          
+logger_dtls_to_str                                                              
+>>                                                                              
+logger not found EXAMPLE_04                                                     
+get_log_level() ====> EXAMPLE_04  retval 3                                      
+log() caller: EXAMPLE_04 line 10 my_logger_level 3 p_log_level 9                
+g_job_log.log_level 3                                                           
+log() skip p_log_level 9 my_logger_level 3                                      
+
+PL/SQL procedure successfully completed.
+
+SQL> exit

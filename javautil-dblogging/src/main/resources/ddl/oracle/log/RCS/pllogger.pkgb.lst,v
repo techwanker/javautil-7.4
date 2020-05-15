@@ -1,4 +1,26 @@
-SQL> CREATE OR REPLACE PACKAGE BODY pllogger
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.14.18.45.47;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@SQL> CREATE OR REPLACE PACKAGE BODY pllogger
   2  is
   3     g_job_msg_dir    varchar2 (32) := 'JOB_MSG_DIR';
   4     g_job_msg_id     pls_integer;
@@ -677,3 +699,4 @@ Package Body PLLOGGER compiled
 SQL> --#<
 SQL> show errors
 SQL> --#>
+@

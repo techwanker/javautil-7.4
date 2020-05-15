@@ -1,4 +1,26 @@
-SQL> create or replace PACKAGE pllog AS
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.14.18.45.47;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@SQL> create or replace PACKAGE pllog AS
   2  	 G_SEVERE	CONSTANT PLS_INTEGER := 1 ;
   3  	 G_WARNING	CONSTANT PLS_INTEGER := 2 ;
   4  	 G_INFO 	CONSTANT PLS_INTEGER := 4 ;
@@ -80,33 +102,26 @@ SQL> create or replace PACKAGE pllog AS
  80  	 function set_tracefile_identifier(p_job_nbr in number)
  81  	 return varchar;
  82  
- 83    procedure log (
- 84  	   -- TOD no database updates, no commit or autonomous required
- 85  
- 86  	   p_log_msg	  in   varchar,
- 87  	   p_log_level	  in   pls_integer default g_info,
- 88  	   p_caller_name  in   varchar default null,
- 89  	   p_line_number  in   pls_integer default null,
- 90  	   p_dump_stack   in   boolean default false
- 91  	);
- 92  /*
- 93    procedure log (
- 94  	   p_log_msg	  in   varchar,
- 95  	   p_log_level	  in   pls_integer default g_info,
- 96  	   p_job_log_id   in   pls_integer default null,
- 97  	   p_job_msg_id   in   pls_integer default null,
- 98  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
- 99  	   p_caller_name  in   varchar default null,
-100  	   p_line_number  in   pls_integer default null,
-101  	   p_dump_stack   in   boolean default false
-102  	);
-103  */
-104  
-105  END pllog ;
-106  /
+ 83  
+ 84    procedure log (
+ 85  	   -- TOD no database updates, no commit or autonomous required
+ 86  
+ 87  	   p_log_msg	  in   varchar,
+ 88  	   p_log_level	  in   pls_integer default g_info,
+ 89  	   p_caller_name  in   varchar default null,
+ 90  	   p_line_number  in   pls_integer default null,
+ 91  	   --p_job_log_id   in	 pls_integer default null,
+ 92  	   --p_job_msg_id   in	 pls_integer default null,
+ 93  	   --p_elapsed_time in	 INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
+ 94  	   p_dump_stack   in   boolean default false
+ 95  	);
+ 96  
+ 97  END pllog ;
+ 98  /
 
 Package created.
 
 SQL> show errors
 No errors.
 SQL> exit
+@
