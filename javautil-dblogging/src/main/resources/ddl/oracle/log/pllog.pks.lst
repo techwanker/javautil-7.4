@@ -95,21 +95,22 @@ SQL> create or replace PACKAGE pllog AS
  95  	   level       in   pls_integer default g_info
  96  	);
  97  
- 98  /*
- 99    procedure log (
-100  	   p_log_msg	  in   varchar,
-101  	   p_log_level	  in   pls_integer default g_info,
-102  	   p_job_log_id   in   pls_integer default null,
-103  	   p_job_msg_id   in   pls_integer default null,
-104  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
-105  	   p_caller_name  in   varchar default null,
-106  	   p_line_number  in   pls_integer default null,
-107  	   p_dump_stack   in   boolean default false
-108  	);
-109  */
-110  
-111  END pllog ;
-112  /
+ 98  	 procedure set_debug(debug boolean default true) ;
+ 99  /*
+100    procedure log (
+101  	   p_log_msg	  in   varchar,
+102  	   p_log_level	  in   pls_integer default g_info,
+103  	   p_job_log_id   in   pls_integer default null,
+104  	   p_job_msg_id   in   pls_integer default null,
+105  	   p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
+106  	   p_caller_name  in   varchar default null,
+107  	   p_line_number  in   pls_integer default null,
+108  	   p_dump_stack   in   boolean default false
+109  	);
+110  */
+111  
+112  END pllog ;
+113  /
 
 Package created.
 

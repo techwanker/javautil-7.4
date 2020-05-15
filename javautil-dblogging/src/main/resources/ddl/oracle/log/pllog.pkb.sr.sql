@@ -268,6 +268,12 @@ is
         set_action('abort_job complete');
     end abort_job;
 
+    procedure set_debug(debug boolean default true) 
+    is
+    begin
+        g_debug := debug;
+    end;
+
 
     procedure set_action ( p_action in varchar ) is
     begin
@@ -412,7 +418,7 @@ is
        DBMS_SESSION.RESET_PACKAGE;
     END prepare_connection;
     
-        procedure logger_dtls_to_str is
+    procedure logger_dtls_to_str is
         ndx varchar(64);
         dtl logger_dtl%rowtype;
         retval long := '';
@@ -427,9 +433,11 @@ is
             retval := retval || dtl.logger_nm  || ' ' || dtl.log_lvl || '\n';
             ndx := logger_dtls.next(ndx);
         end loop;
+        /*
         if (g_debug ) then
             dbms_output.put_line('>> ' || retval);
         end if;
+        */
        -- dbms_output.put_line('end logger_dtls_to_str');
     end logger_dtls_to_str;
     
@@ -489,9 +497,7 @@ is
    )
    is
       my_message   varchar2 (32767);
-      now          timestamp        := SYSDATE;
-      --pragma autonomous_transaction ;
-  --   
+      --now          timestamp        := SYSDATE;
       owner       varchar(64);
       name        varchar(64);
       line        number;
@@ -503,18 +509,16 @@ is
           OWA_UTIL.who_called_me (owner,name,line,caller_type);
           my_logger_level := get_log_level(name);
        
-      if p_log_level <= my_logger_level then
-          skip := '      ';
-      end if;
-
-      if (g_debug) then
-       dbms_output.put_line(
-          'log() ' ||  skip ||
-           'caller: ' || p_caller_name || 
-          ' line: ' || p_line_number ||  
-          ' my_logger_level: ' || to_char(my_logger_level) ||
-          ' p_log_level: '     || to_char(p_log_level) ||
-          ' g_job_log.log_level: '     || to_char(g_job_log.log_level));
+      if (g_debug) and p_log_level > my_logger_level then
+            skip := '      ';
+            dbms_output.put_line(
+              'log() ' ||  skip ||
+              'caller: ' || p_caller_name || 
+              ' line: ' || p_line_number ||  
+              ' my_logger_level: ' || to_char(my_logger_level) ||
+               ' p_log_level: '     || to_char(p_log_level));
+-- ||
+ --         ' g_job_log.log_level: '     || to_char(g_job_log.log_level));
       end if;      
       
       if p_log_level <= my_logger_level then
@@ -527,15 +531,15 @@ is
               line_number  => line,
               call_stack   => null
           );
-     	  --dbms_output.put_line('log(): ' || to_char(p_log_level) || my_message); 
-          
+          -- write to file       
           my_file_handle := open_log_file (g_job_log.directory_name,g_job_log.logfile_name); 
-          if (g_debug) then UTL_FILE.put_line (my_file_handle, my_message); end if;
-
+          UTL_FILE.put_line (my_file_handle, my_message); 
           utl_file.fclose(my_file_handle); 
+          --
+          if (g_debug) then
+     	     dbms_output.put_line('log(): ' || my_message); 
+          end if;
       end if;
-      
-      -- commit;
    end log;
 
 

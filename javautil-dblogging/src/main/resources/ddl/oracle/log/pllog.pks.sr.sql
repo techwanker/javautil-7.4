@@ -97,6 +97,7 @@ create or replace PACKAGE pllog AS
       level       in   pls_integer default g_info
    );
    
+    procedure set_debug(debug boolean default true) ;
 /*
   procedure log (
       p_log_msg      in   varchar,

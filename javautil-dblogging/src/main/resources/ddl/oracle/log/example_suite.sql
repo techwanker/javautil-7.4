@@ -46,6 +46,7 @@ declare
     token varchar(32);
     logname varchar(32) := to_char(job_log_id_seq.nextval) || '.log';
 begin
+   pllog.set_debug;
    pllog.begin_log(logfile_name => logname, p_log_level      => 3);
    example_01;
    example_04;
