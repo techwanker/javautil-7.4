@@ -15,13 +15,10 @@ create or replace PACKAGE pllog AS
     function format_time(p_timestamp in timestamp) 
     return varchar;
 
---    procedure set_logger_level (p_level in pls_integer);
-
     function get_new_job_log_id 
     return number;
 
-
-   procedure begin_log ( 
+    procedure begin_log ( 
         logfile_name   in varchar,
         logfile_directory in varchar default 'JOB_MSG_DIR',
         p_process_name in varchar default null,
@@ -82,20 +79,12 @@ create or replace PACKAGE pllog AS
     function set_tracefile_identifier(p_job_nbr in number) 
     return varchar;
 
-  procedure log (
-      -- TOD no database updates, no commit or autonomous required
-
+    procedure log (
       p_log_msg      in   varchar,
       p_log_level    in   pls_integer default g_info,
-      p_caller_name  in   varchar default null,
-      p_line_number  in   pls_integer default null,
       p_dump_stack   in   boolean default false
    );
    
-  procedure log2 (
-      message     in   varchar,
-      level       in   pls_integer default g_info
-   );
    
     procedure set_debug(debug boolean default true) ;
 

@@ -446,11 +446,11 @@ SQL> CREATE OR REPLACE PACKAGE BODY pllog
 445  	     retval number;
 446  	     was_not varchar(9) := ' was ';
 447  	 begin
-448  	      -- dbms_output.put_line('get_log_level()	p_logger_name *' || p_logger_name || ' my_logger_name *' || my_logger_name || '*');
-449  	      logger_dtls_to_str;
-450  
-451  	      begin
-452  		  my_log_dtl  := logger_dtls(my_logger_name);
+448  	      logger_dtls_to_str;
+449  	      if (g_debug) then dbms_output.put_line('get_log_level() my_logger_name: "' || my_logger_name || '"'); end if;
+450  	      begin
+451  		  my_log_dtl  := logger_dtls(my_logger_name);
+452  		  if (g_debug) then dbms_output.put_line('get_log_level() my_dtl_log: "' || my_logger_name || '"'); end if;
 453  		  retval := my_log_dtl.log_lvl;
 454  	      exception
 455  		 when no_data_found then
@@ -459,7 +459,7 @@ SQL> CREATE OR REPLACE PACKAGE BODY pllog
 458  	      end;
 459  
 460  	     if (g_debug) then
-461  	     dbms_output.put_line('get_log_level() ' ||
+461  		 dbms_output.put_line('get_log_level() ' ||
 462  		     ' logger: "'  || p_logger_name || '" ' ||
 463  		     was_not || ' found '  ||
 464  		     ' level '	 || to_char(my_log_dtl.log_lvl) ||
@@ -523,7 +523,7 @@ SQL> CREATE OR REPLACE PACKAGE BODY pllog
 522  	 end define_logger_level;
 523  
 524  
-525  
+525  /*
 526  	procedure log2(message in varchar,
 527  		       level   in pls_integer default g_info)
 528  	is
@@ -535,35 +535,35 @@ SQL> CREATE OR REPLACE PACKAGE BODY pllog
 534  	    OWA_UTIL.who_called_me (owner,name,line,caller_type);
 535  	    --dbms_output.put_line('name: ' || name || ' line: ' || line);
 536  	end log2;
-537  
+537   */
 538  
 539    procedure log (
 540  	   p_log_msg	  in   varchar,
 541  	   p_log_level	  in   pls_integer default g_info,
-542  	   p_caller_name  in   varchar default null,
-543  	   p_line_number  in   pls_integer default null,
-544  	   p_dump_stack   in   boolean default false
-545  	)
-546  	is
-547  	   my_message	varchar2 (32767);
-548  	   --now	  timestamp	   := SYSDATE;
-549  	   owner       varchar(64);
-550  	   name        varchar(64);
-551  	   line        number;
-552  	   caller_type varchar(64);
-553  	   my_logger_level number;
-554  	   my_file_handle utl_file.file_type;
-555  	   skip varchar(6) := ' skip ';
-556  	begin
-557  	       OWA_UTIL.who_called_me (owner,name,line,caller_type);
+542  	   p_dump_stack   in   boolean default false
+543  	)
+544  	is
+545  	   my_message	varchar2 (32767);
+546  	   owner       varchar(64);
+547  	   name        varchar(64);
+548  	   line        number;
+549  	   caller_type varchar(64);
+550  	   my_logger_level number;
+551  	   my_file_handle utl_file.file_type;
+552  	   skip varchar(6) := ' skip ';
+553  	begin
+554  	       OWA_UTIL.who_called_me (owner,name,line,caller_type);
+555  	       if name is null then
+556  		   name := 'anonymous';
+557  	       end if;
 558  	       my_logger_level := get_log_level(name);
 559  
 560  	   if (g_debug) and p_log_level > my_logger_level then
 561  		 skip := '	';
 562  		 dbms_output.put_line(
 563  		   'log() ' ||	skip ||
-564  		   'caller: ' || p_caller_name ||
-565  		   ' line: ' || p_line_number ||
+564  		   'caller: ' || name ||
+565  		   ' line: ' || line ||
 566  		   ' my_logger_level: ' || to_char(my_logger_level) ||
 567  		    ' p_log_level: '	 || to_char(p_log_level));
 568  -- ||

@@ -449,11 +449,11 @@ is
         retval number;
         was_not varchar(9) := ' was ';
     begin 
-         -- dbms_output.put_line('get_log_level()  p_logger_name *' || p_logger_name || ' my_logger_name *' || my_logger_name || '*');
          logger_dtls_to_str;
-         
+         if (g_debug) then dbms_output.put_line('get_log_level() my_logger_name: "' || my_logger_name || '"'); end if; 
          begin
              my_log_dtl  := logger_dtls(my_logger_name);
+             if (g_debug) then dbms_output.put_line('get_log_level() my_dtl_log: "' || my_logger_name || '"'); end if; 
              retval := my_log_dtl.log_lvl;
          exception 
             when no_data_found then
@@ -462,7 +462,7 @@ is
          end;
         
         if (g_debug) then 
-        dbms_output.put_line('get_log_level() ' ||
+            dbms_output.put_line('get_log_level() ' ||
                 ' logger: "'  || p_logger_name || '" ' ||
                 was_not || ' found '  ||
                 ' level '   || to_char(my_log_dtl.log_lvl) || 
@@ -526,7 +526,7 @@ is
     end define_logger_level;
     
 
-
+/*
    procedure log2(message in varchar,
                   level   in pls_integer default g_info) 
    is
@@ -538,18 +538,15 @@ is
        OWA_UTIL.who_called_me (owner,name,line,caller_type);
        --dbms_output.put_line('name: ' || name || ' line: ' || line);
    end log2;
-   
+ */  
    
   procedure log (
       p_log_msg      in   varchar,
       p_log_level    in   pls_integer default g_info,
-      p_caller_name  in   varchar default null,
-      p_line_number  in   pls_integer default null,
       p_dump_stack   in   boolean default false
    )
    is
       my_message   varchar2 (32767);
-      --now          timestamp        := SYSDATE;
       owner       varchar(64);
       name        varchar(64);
       line        number;
@@ -559,14 +556,17 @@ is
       skip varchar(6) := ' skip ';
    begin
           OWA_UTIL.who_called_me (owner,name,line,caller_type);
+          if name is null then
+              name := 'anonymous';
+          end if;
           my_logger_level := get_log_level(name);
        
       if (g_debug) and p_log_level > my_logger_level then
             skip := '      ';
             dbms_output.put_line(
               'log() ' ||  skip ||
-              'caller: ' || p_caller_name || 
-              ' line: ' || p_line_number ||  
+              'caller: ' || name || 
+              ' line: ' || line ||  
               ' my_logger_level: ' || to_char(my_logger_level) ||
                ' p_log_level: '     || to_char(p_log_level));
 -- ||
