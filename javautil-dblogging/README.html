@@ -1,0 +1,633 @@
+<h1 id="dblogging">dblogging</h1>
+<p>Application instrumentation is essential to performance monitoring, unfortunately this is often performed by throwing in some logging statements using a java logging framework or wrapper, such as slf,</p>
+<p>This however fails to capture any information essential to end-to-end monitoring as it omits what is generally the biggest source of latency, the relational database. What statements are being executed, how long do they take, which statements take up the bulk of the resources in aggregate (an under-performing statement invoked thousands of times an hour is not uncommon).</p>
+<p>Oracle provides, at great expense, the ASH subsystem and even that does not associated the sql statements to the application code.</p>
+<p>This utility provides a simple Application Program Interface to allow you to record performance information in a simple, low overhead fashion from any java program or any program that allows pl/sql calls.</p>
+<p>Thus a few judicious additions to an Oracle Form or a batch job can provide the foundation of information necessary to establish where database resources are being consumed.</p>
+<p>Resolution of these matters is a different matter and may involve gathering statistics, altering execution plans, creating or eliminating indexes or rewriting SQL.</p>
+<p>SGA parameters may have to be changed.</p>
+<h2 id="document-organization">Document Organization</h2>
+<p>We will introduce the types of logging, show examples of how to instrument your code and what type of output is generated.</p>
+<p>Then we will guide you through the installation and options.</p>
+<h2 id="overview-of-logging-types">Overview of logging types</h2>
+<h3 id="flat-file-logging">Flat file logging</h3>
+<p>Writes log messages to a text file on the database server.</p>
+<p>Includes:</p>
+<ul>
+<li>log_seq_nbr</li>
+<li>log_level<br /></li>
+<li>job_log_id<br /></li>
+<li>log_msg_id<br /></li>
+<li>line_number</li>
+<li>current_timestamp, 'YYYY-MM-DDTHH24:MI:SSXFF'</li>
+<li>log_msg<br /></li>
+<li>caller_name optional</li>
+<li>call_stack optional</li>
+</ul>
+<p>This will allow you to easily write log messages from pl/sql in stored procedures, functions, packages and with most of the flexibility and ease of using a java logging framework.</p>
+<h3 id="database-logging">Database Logging</h3>
+<p>Record jobs and their steps, how long each step took to execute and optionally extremely detailed information about every database operation as an oracle trace file may be parsed and stored in the log repository.</p>
+<p>The log repository may be on the same oracle database server, even the same schema using the same connection as it uses autonomous transactions, or in postgresql or h2.</p>
+<h3 id="oracle-trace-information">Oracle trace information</h3>
+<p>The third type of logging is an extension of database logging and stores oracle trace information a relational database.</p>
+<p>Oracle tracing is turned on and the trace files parsed and aggregated and stored in tables associated with the various job steps.</p>
+<ul>
+<li>oracle</li>
+<li>h2</li>
+<li>postgresql</li>
+</ul>
+<h2 id="logging-type-details">Logging type details</h2>
+<h3 id="flat-file-log">Flat file log</h3>
+<h4 id="flat-file-logging-example">Flat file logging example</h4>
+<p>Before diving into the details, here is a simple example of usage.</p>
+<h5 id="input">Input</h5>
+<pre><code>set serveroutput on 
+declare
+       long_msg clob := &#39;this is an absurdly long message, &#39; || 
+                &#39; exceeding the length of the log_msg field &#39; ||
+                &#39; The quick brown fox jumped over the lazy dog. &#39;; 
+    
+    my_log_file_name varchar(4096); 
+begin
+    my_log_file_name := pllogger.open_log_file(&#39;log_to_file_only.text&#39;);
+    pllogger.set_filter_level(9); -- all messages should go to log file
+    dbms_output.put_line(&#39;caller is anoymous&#39;);
+    pllogger.info(&#39;anonymous&#39;,$$PLSQL_LINE,&#39;begin loop&#39;);
+    pllogger.info($$PLSQL_UNIT,$$PLSQL_LINE,long_msg); 
+
+    for i in 1..10  
+    loop
+        pllogger.fine($$PLSQL_UNIT,$$PLSQL_LINE,&#39;i is &#39; || to_char(i));
+    end loop; 
+exception when others
+then
+    -- a severe condition is not necessarily fatal
+    pllogger.severe($$PLSQL_UNIT,$$PLSQL_LINE,sqlerrm);
+    pllogger.close_log_file();
+    raise;
+end;
+/</code></pre>
+<h4 id="the-log-file">The log file</h4>
+<p>The preceding will produce this Comma Separated Values (CSV) file...</p>
+<pre><code>&quot;log_level&quot;,&quot;job_log_id&quot;,&quot;job_msg_id&quot;,&quot;line_number&quot;,&quot;timestamp&quot;,&quot;log_msg&quot;,&quot;caller_name&quot;,&quot;call_stack&quot;
+4,,,17,&quot;2019-10-26T21:15:14.187497&quot;,&quot;begin loop&quot;,&quot;anonymous&quot;,&quot;&quot;
+4,,,18,&quot;2019-10-26T21:15:14.187652&quot;,&quot;this is an absurdly long message,  exceeding the length of the log_msg field  this should be inserted into the log_msg_clob column.   This message is part of  a unit test of from sample_job_02 of the logging package.   I am running out of  interesting stuff to say so I will just write meaningless  stuff for a little while.  The quick brown fox jumped over the lazy dog. &quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;
+7,,,22,&quot;2019-10-26T21:15:14.187723&quot;,&quot;i is 1&quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;
+7,,,22,&quot;2019-10-26T21:15:14.187782&quot;,&quot;i is 2&quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;
+7,,,22,&quot;2019-10-26T21:15:14.187837&quot;,&quot;i is 3&quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;</code></pre>
+<h3 id="formatting-the-log-file">Formatting the log file</h3>
+<p>The format of the log file is determined by the function logger_message_formatter.</p>
+<p>The default is CSV, Comma separated values as</p>
+<pre><code>my_log_entry :=
+    log_level   || &#39;,&quot;&#39; ||
+    job_log_id  || &#39;,&quot;&#39; || 
+    log_msg_id  || &#39;&quot;,&#39; ||
+    line_number || &#39;,&#39; ||
+    to_char (current_timestamp, &#39;YYYY-MM-DDTHH24:MI:SSXFF&#39;) || &#39;,&quot;&#39; ||
+    my_log_msg  || &#39;&quot;,&#39; ||
+    caller_name || &#39;&quot;,&#39; ||
+    call_stack;</code></pre>
+<h4 id="pllogger-package">pllogger package</h4>
+<p>This facility is provide for pl/sql programmers to provide the ability to write formatted trace messages including:</p>
+<ul>
+<li>log_level 0 to 9 also called:</li>
+<li>pllogger.G_SEVERE CONSTANT PLS_INTEGER := 1;</li>
+<li>pllogger.G_WARNING CONSTANT PLS_INTEGER := 2;</li>
+<li>pllogger.GA_INFO CONSTANT PLS_INTEGER := 4;</li>
+<li>pllogger.G_SNAP CONSTANT PLS_INTEGER := 5;</li>
+<li>pllogger.G_ENTERING CONSTANT PLS_INTEGER := 6;</li>
+<li>pllogger.G_EXITING CONSTANT PLS_INTEGER := 6;</li>
+<li>pllogger.G_FINE CONSTANT PLS_INTEGER := 7;</li>
+<li>pllogger.G_FINER CONSTANT PLS_INTEGER := 8;</li>
+<li>pllogger.G_FINEST CONSTANT PLS_INTEGER := 9;</li>
+<li>pllogger.G_NONE CONSTANT PLS_INTEGER := 10 ;</li>
+<li>log_msg_Id TODO if persisted what is this</li>
+<li>line number of caller</li>
+<li>a timestamp for the message in ISO-8601 date time format example 2008-09-15T15:53:00000 the log message</li>
+<li>the name of the invoker</li>
+<li>the pl/sql call stack</li>
+</ul>
+<h2 id="the-package">The package</h2>
+<p>.. code-block:: plsql</p>
+<pre><code>CREATE OR REPLACE PACKAGE pllogger AS
+--
+    G_SEVERE       CONSTANT PLS_INTEGER := 1 ;
+    G_WARNING      CONSTANT PLS_INTEGER := 2 ;
+    G_INFO         CONSTANT PLS_INTEGER := 4 ;
+    G_SNAP         CONSTANT PLS_INTEGER := 5 ;
+    G_ENTERING     CONSTANT PLS_INTEGER := 6 ;
+    G_EXITING      CONSTANT PLS_INTEGER := 6 ;
+    G_FINE         CONSTANT PLS_INTEGER := 7 ;
+    G_FINER        CONSTANT PLS_INTEGER := 8 ;
+    G_FINEST       CONSTANT PLS_INTEGER := 9 ;
+    G_NONE         CONSTANT PLS_INTEGER := 10 ;
+
+    -- setup must open_log_file, 
+    -- must close when done
+    FUNCTION open_log_file(p_file_name in varchar)  return varchar;
+    
+    PROCEDURE set_dbms_output_level(
+        p_level  IN        PLS_INTEGER ) ;
+   
+    PROCEDURE set_filter_level (  
+        p_level  IN PLS_INTEGER ) ;
+  
+    PROCEDURE set_record_level (
+        p_level  IN        PLS_INTEGER ) ;
+ 
+    -- Write messages
+    
+    PROCEDURE severe (
+        p_unit          IN VARCHAR2,
+        p_line          IN PLS_INTEGER,
+        p_log_msg       IN VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack  IN BOOLEAN DEFAULT FALSE ) ;
+        
+    PROCEDURE warning (
+        p_unit          IN        VARCHAR2,
+        p_line          IN        PLS_INTEGER,
+        p_log_msg       IN        VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack  IN        BOOLEAN DEFAULT FALSE ) ;
+        
+    PROCEDURE info (
+        p_unit          IN        VARCHAR2,
+        p_line          IN        PLS_INTEGER,
+        p_log_msg       IN        VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack  IN        BOOLEAN DEFAULT FALSE ) ;
+        
+    PROCEDURE entering (
+        p_unit         IN VARCHAR2,
+        p_line         IN PLS_INTEGER,
+        p_log_msg      IN VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack IN BOOLEAN DEFAULT FALSE,
+        p_set_action   IN BOOLEAN DEFAULT TRUE ) ;
+    --
+    PROCEDURE exiting (
+        p_unit         IN        VARCHAR2,
+        p_line         IN        PLS_INTEGER,
+        p_log_msg      IN        VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack IN        BOOLEAN DEFAULT FALSE ) ;
+    --
+    PROCEDURE fine (
+        p_unit         IN        VARCHAR2,
+        p_line         IN        PLS_INTEGER,
+        p_log_msg      IN        VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack IN        BOOLEAN DEFAULT FALSE ) ;
+    --
+    PROCEDURE finer (
+        p_unit         IN        VARCHAR2,
+        p_line         IN        PLS_INTEGER,
+        p_log_msg      IN        VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack IN        BOOLEAN DEFAULT FALSE ) ;
+    --
+    PROCEDURE finest (
+        p_unit         IN        VARCHAR2,
+        p_line         IN        PLS_INTEGER,
+        p_log_msg      IN        VARCHAR2 DEFAULT &#39;&#39;,
+        p_record_stack IN        BOOLEAN DEFAULT FALSE ) ;
+        
+    -- close when done
+    PROCEDURE close_log_file;
+        
+    function get_directory_path return varchar;
+
+    function basename (p_full_path in varchar2,
+                       p_suffix    in varchar2 default null,
+                       p_separator in char default &#39;/&#39;) return varchar2;
+    
+END pllogger ;
+/
+--#&lt;
+show errors
+--#&gt;</code></pre>
+<h2 id="database-logs">Database logs</h2>
+<p>We will start with an example program and show what is logged.</p>
+<h3 id="java-example">Java Example</h3>
+<p>.. code-block:: java</p>
+<pre><code>package org.javautil.dblogging;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import org.javautil.core.sql.Binds;
+import org.javautil.core.sql.ConnectionUtil;
+import org.javautil.core.sql.SqlStatement;
+import org.javautil.dblogging.logger.Dblogger;
+import org.javautil.util.NameValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DbloggerForOracleExample {
+
+    private Dblogger dblogger;
+    private Connection connection;
+    private String processName;
+    private boolean testAbort = false;
+    private int traceLevel;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public DbloggerForOracleExample(Connection connection, Dblogger dblogger, String processName, boolean testAbort,
+            int traceLevel) {
+        this.connection = connection;
+        this.dblogger = dblogger;
+        this.processName = processName;
+        this.testAbort = testAbort;
+        this.traceLevel = traceLevel;
+    }
+
+    public long process() throws SQLException {
+        dblogger.prepareConnection();
+        long id = 0;
+
+        try {
+            id = dblogger.startJobLogging(processName, getClass().getName(), &quot;ExampleLogging&quot;, null, 12);
+            logger.debug(&quot;============================jobId: {}&quot;, id);
+            limitedFullJoin();
+            fullJoin();
+            userTablesCount();
+            if (testAbort) {
+                int x = 1 / 0;
+            }
+            logger.debug(&quot;calling endJob&quot;);
+            dblogger.endJob();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            dblogger.abortJob(e);
+            throw e;
+        }
+        return id;
+    }
+
+    /**
+     * This will set the v$session.action
+     */
+    private void limitedFullJoin() throws SQLException {
+        logger.debug(&quot;limitedFullJoin =============&quot;);
+        dblogger.setAction(&quot;actionNoStep&quot;);
+        ConnectionUtil.exhaustQuery(connection, &quot;select * from user_tab_columns, user_tables where rownum &lt; 200&quot;);
+        dblogger.setAction(null);  // no longer performing that action, so clear 
+        logger.debug(&quot;limitedFullJoin complete =============&quot;);
+    }
+
+    private void fullJoin() throws SQLException {
+        logger.debug(&quot;fullJoinBegins =============&quot;);
+        // TODO insertStep should set the action 
+        dblogger.insertStep(&quot;fullJoin&quot;, &quot;fullJoin&quot;, getClass().getName());
+        ConnectionUtil.exhaustQuery(connection, &quot;select * from user_tab_columns, user_tables&quot;);
+        dblogger.finishStep();
+        logger.debug(&quot;fullJoin complete =============&quot;);
+    }
+
+    private void userTablesCount() throws SQLException {
+        dblogger.insertStep(&quot;count full&quot;, &quot;userTablesCount&quot;, getClass().getName());
+        ConnectionUtil.exhaustQuery(connection, &quot;select count(*) dracula from user_tables&quot;);
+        dblogger.finishStep();
+        // TODO support implicit finish step
+    }
+
+    NameValue getJobLog(Connection connection, long id) throws SQLException {
+        final String sql = &quot;select * from job_log &quot; + &quot;where job_log_id = :job_stat_id&quot;;
+        final SqlStatement ss = new SqlStatement(connection, sql);
+        Binds binds = new Binds();
+        binds.put(&quot;job_stat_id&quot;, id);
+        final NameValue retval = ss.getNameValue();
+        ss.close();
+        return retval;
+    }
+}</code></pre>
+<h3 id="job_tables">job_tables</h3>
+<p>In the interest of expediency we have a quick listing of the job tables.</p>
+<pre><code>SQL&gt; describe job_log
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ JOB_LOG_ID                                NOT NULL NUMBER(9)
+ SCHEMA_NAME                                        VARCHAR2(30)
+ PROCESS_NAME                                       VARCHAR2(128)
+ THREAD_NAME                                        VARCHAR2(128)
+ STATUS_MSG                                         VARCHAR2(256)
+ STATUS_TS                                          TIMESTAMP(9)
+ END_TS                                             TIMESTAMP(9)
+ ELAPSED_MILLIS                                     NUMBER(9)
+ SID                                                NUMBER
+ SERIAL_NBR                                         NUMBER
+ IGNORE_FLG                                         VARCHAR2(1)
+ MODULE_NAME                                        VARCHAR2(64)
+ CLASSNAME                                          VARCHAR2(255)
+ TRACEFILE_NAME                                     VARCHAR2(4000)
+ TRACEFILE_DATA                                     CLOB
+ TRACEFILE_JSON                                     CLOB
+ ABORT_STACKTRACE                                   CLOB
+
+SQL&gt; describe job_step
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ JOB_STEP_ID                               NOT NULL NUMBER(9)
+ JOB_LOG_ID                                         NUMBER(9)
+ STEP_NAME                                          VARCHAR2(64)
+ CLASSNAME                                          VARCHAR2(256)
+ STEP_INFO                                          VARCHAR2(2000)
+ START_TS                                           TIMESTAMP(9)
+ END_TS                                             TIMESTAMP(9)
+ DBSTATS                                            CLOB
+ STEP_INFO_JSON                                     CLOB
+ CURSOR_INFO_RUN_ID                                 NUMBER(9)
+ STACKTRACE                                         VARCHAR2(4000)
+
+SQL&gt; describe job_msg;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ JOB_MSG_ID                                         NUMBER(9)
+ JOB_LOG_ID                                NOT NULL NUMBER(9)
+ LOG_MSG_ID                                         VARCHAR2(8)
+ LOG_MSG                                            VARCHAR2(256)
+ LOG_MSG_CLOB                                       CLOB
+ LOG_MSG_TS                                         TIMESTAMP(9)
+ ELAPSED_TIME_MILLISECONDS                          NUMBER(9)
+ LOG_SEQ_NBR                               NOT NULL NUMBER(18)
+ CALLER_NAME                                        VARCHAR2(100)
+ LINE_NBR                                           NUMBER(5)
+ CALL_STACK                                         CLOB
+ LOG_LEVEL                                          NUMBER(2)</code></pre>
+<p>An ERD is near the end of this document.</p>
+<p>TODO run the python with the comments</p>
+<p>Each job has one job_log entry and one or more job_steps.</p>
+<p>Job steps may have associated log messages.</p>
+<h3 id="analyzing-the-logs">Analyzing the logs</h3>
+<p>Separate utilities are used to analyzed the logs. A very useful tool is javautil-condition-identification.</p>
+<p>Did any job abort?</p>
+<p>What is the trend on elapsed times?</p>
+<p>How do elapsed times vary based on time of day?</p>
+<p>Getting deeper, with trace information one can drill down to the details, we will cover that later.</p>
+<h2 id="tracefile-generation-and-persistence">Tracefile generation and persistence</h2>
+<p>This utility provides the information to the Oracle Performance specialist to identify the root cause of the problem, how to repair is another speciality.</p>
+<h1 id="installation-of-database-artifacts-for-oracle">Installation of database artifacts for oracle</h1>
+<p>These files may be found under <em>src/main/resources/ddl/oracle</em></p>
+<p>The script that runs them all is <em>install.sql</em></p>
+<pre><code>set echo on 
+@prepare_connection.sql
+@my_session_info.sql
+@dblogger_uninstall.sr.sql
+@logger_message_formatter.plsql.sr.sql
+@dblogger_install_tables.sr.sql
+@dblogger_install.pks.sr.sql
+@dblogger_install.pkb.sr.sql
+@logger_persistence.pks.sr.sql
+@logger_persistence.pkb.sr.sql</code></pre>
+<h2 id="prepare_connnection">prepare_connnection</h2>
+<p>prepare-connection provides one procedure.<br />This will call dbms_session.clear_context for each context variable, restoring the context for a connection returned from a connection_pool to the state the of an initially opened connection.</p>
+<p>Connection pools do not generally clear this information out as it is Oracle specific.</p>
+<h2 id="my_session_info.sql">my_session_info.sql</h2>
+<p>creates the view <em>my_session_info</em> to allow the connected user to obtain the v$session record for the current connection.</p>
+<h2 id="logger_message_formatter">logger_message_formatter</h2>
+<p>Provides the <em>logger_message_formatter</em> function, which creates a single string from all of the logging parameters and makes a call to dbms_output.put_line and then returns the formatted message.</p>
+<h2 id="dblogger_install_tables">dblogger_install_tables</h2>
+<p>Creates the job and job step tables and views</p>
+<h4 id="sequences">sequences</h4>
+<p>cursor_info_run_id_seq; cursor_info_id_seq; job_log_id_seq; job_msg_id_seq; job_step_id_seq;</p>
+<h4 id="tables">tables</h4>
+<ul>
+<li>cursor_explain_plan</li>
+<li>cursor_sql_text</li>
+<li>cursor_info_run</li>
+<li>cursor_info</li>
+<li>cursor_stat</li>
+<li>job_log<br /></li>
+<li>job_msg<br /></li>
+<li>job_step</li>
+</ul>
+<h4 id="views">views</h4>
+<ul>
+<li>cursor_info_vw<br /></li>
+<li>job_step_vw</li>
+<li>job_log_vw</li>
+</ul>
+<h2 id="job-logging">Job Logging</h2>
+<p>Logging information may be written to a text file, stored in a database and written to the oracle trace file.</p>
+<h3 id="steps-start-job-logging.">Steps start job logging.</h3>
+<pre><code>public long sampleUsage(Dblogger dblogger, Connection appConnection) throws SqlSplitterException, Exception {
+    dblogger.prepareConnection();
+    final String processName = &quot;Process Name&quot;;
+    // Start the job
+
+    final long logJobId = dblogger.startJobLogging(processName,getClass().getName(), null, null,  4);
+    dblogger.setModule(&quot;SplitLoggerTest&quot;, &quot;simple example&quot;);
+    dblogger.setAction(&quot;Some work&quot;);
+    dblogger.insertStep(&quot;Full join&quot;, &quot;Meaningless busy work&quot;, getClass().getName());
+    ConnectionUtil.exhaustQuery(appConnection, &quot;select * from user_tab_columns, user_tables where rownum &lt; 100&quot;);
+
+    dblogger.setAction(&quot;Another set of work&quot;);
+    ConnectionUtil.exhaustQuery(appConnection, &quot;select count(*) from all_tab_columns&quot;);
+    // End the job
+    dblogger.endJob();
+    return logJobId;
+}</code></pre>
+<p>job logging persistence has a bit of indirection</p>
+<h2 id="installation">Installation</h2>
+<h3 id="repositories">Repositories</h3>
+<p>RDBMS persistence support is provided for Oracle, H2 and postgresql</p>
+<p>H2 is a lightweight database and may be used to eliminate the need for support of another Oracle Database.</p>
+<p>Postgresql is a high end database that requires minimal installation and administration.</p>
+<p>You should probable not compound your problem with yet another Oracle install, but if your DBA will allow you a schema in your database for logging, you don't have to learn anything else.</p>
+<p>The Oracle database could be the same instance as the application being monitored, but this may raise some objections to the application DBA.</p>
+<h3 id="oracle-logging-repository">Oracle logging repository</h3>
+<p>If the logging data is to be persisted in Oracle, the tables must be created and some packages created.</p>
+<h4 id="job-log-tables">Job log tables</h4>
+<ol style="list-style-type: decimal">
+<li>job_log</li>
+<li>job_msg</li>
+<li>job step</li>
+</ol>
+<p>The granularity of job step is left to the invoker.<br />As the overhead is very low, there is no reason to be parsimonious with identification, it's a simple one line call in the user app.</p>
+<p>These records can be reviewed for job success or failure and form a historical basis of time elapsed.</p>
+<p>This may be used as a starting pointing in locating &quot;what processes are using the time?&quot;</p>
+<p>Additionally they constitute a base performance metric from which runtime degradation or periodic anomalous runs may be identified.</p>
+<p>Data is committed by calls from java to the package logger, provided here.</p>
+<p>The package creates autonomous commits and hence may be safely called using the same connection as the application.</p>
+<h3 id="logging-package">logging package</h3>
+<p>The logger package provides the following:</p>
+<pre><code>These primarily set information in the SGA and enable oracle session tracing.</code></pre>
+<p>begin_java_java</p>
+<h4 id="change-vsession-information">change v$session information</h4>
+<p>procedure prepare_connection;</p>
+<p>set_module set action</p>
+<h2 id="trace-repository">Trace Repository</h2>
+<h4 id="oracle-performance-tables">Oracle performance tables</h4>
+<ul>
+<li>cursor_explain_plan</li>
+<li>cursor_sql_text</li>
+<li>cursor_info_run</li>
+<li>cursor_info</li>
+<li>cursor_stat</li>
+</ul>
+<h2 id="logger_persistence-package">logger_persistence package</h2>
+<p>The logger persistence package provides an API for writing to various tables using autonomous transactions.</p>
+<pre><code>procedure save_job_log (
+    p_job_log_id   in number,
+    p_schema_name  in varchar2,
+    p_process_name in varchar2,
+    p_classname    in varchar2,
+    p_module_name  in varchar2,
+    p_status_msg   in varchar2,
+    p_thread_name  in varchar2,
+    p_trace_level  in pls_integer default logger.G_INFO,
+    p_tracefile_name in varchar2,
+    p_sid          in pls_integer
+);</code></pre>
+<p>The source of work is indentifable down to the java thread.</p>
+<pre><code>function save_job_step (
+    p_job_log_id  in pls_integer, 
+    p_step_name   in varchar, 
+    p_step_info   in varchar, 
+    p_classname   in varchar,     
+    p_start_ts    in timestamp,
+    p_stacktrace  in varchar</code></pre>
+<p>) return number;</p>
+<pre><code>procedure finish_step
+
+procedure end_job(p_elapsed_milliseconds in pls_integer)
+
+procedure abort_job(p_elapsed_milliseconds in pls_integer,p_stacktrace in varchar);</code></pre>
+<h3 id="install-oracle-jdbc">Install Oracle JDBC</h3>
+<p><a href="https://blogs.oracle.com/dev2dev/get-oracle-jdbc-drivers-and-ucp-from-oracle-maven-repository-without-ides">See this post</a> to use Oracle JDBC properly. Or, you could download the JAR file, and then execute this command:</p>
+<p>TODO the script to locatge <code>mvn install:install-file -DgroupId=com.oracle -DartifactId=oracle-jdbc8 -Dversion=12c -Dpackaging=jar -Dfile=&lt;THE_JDBC_JAR_LOCATION&gt;</code></p>
+<p>Notations in job .sql script used by sqlrunner.</p>
+<h1 id="security-in-production">Security in production</h1>
+<h1 id="user-priviliges">User priviliges</h1>
+<h1 id="performance">Performance</h1>
+<h1 id="tools-and-concepts">Tools and concepts</h1>
+<p>User should be familiar with v$ssession view, tkprof command line utility</p>
+<h1 id="connection-pools">Connection Pools</h1>
+<h2 id="after-getting-a-connection">After Getting a connection</h2>
+<h3 id="contexts">Contexts</h3>
+<p>If a session is being used as part of a connection pool and the state of its contexts are not reinitialized, this can lead to unexpected behavior.</p>
+<h3 id="packages">Packages</h3>
+<p>Sessions have the ability to alter package state by amending the values of package variables. If a session is being used as part of a connection pool and the state of its packages are not reinitialized, this can lead to unexpected behavior. To solve this, Oracle provides the dbms_session.reset_package procedure.</p>
+<p>The dbloggging provided procedure clears all context variables and resets package state.</p>
+<p>Connections must be reset immediately after being obtained from a connection pool</p>
+<p>In src/main/resources/ddl/oracle/prepare_connection</p>
+<h3 id="convenience-procedure">Convenience Procedure</h3>
+<pre><code>CREATE OR REPLACE PROCEDURE prepare_connection
+AS
+    context_info DBMS_SESSION.AppCtxTabTyp;
+    info_count PLS_INTEGER;
+    indx PLS_INTEGER;
+BEGIN
+    DBMS_SESSION.LIST_CONTEXT ( context_info, info_count);
+    indx := context_info.FIRST; 
+    LOOP
+        EXIT WHEN indx IS NULL;
+        DBMS_SESSION.CLEAR_CONTEXT(
+            context_info(indx).namespace,
+            context_info(indx).attribute,
+            null 
+        );
+        indx := context_info.NEXT (indx);
+    END LOOP;
+    DBMS_SESSION.RESET_PACKAGE; 
+END;</code></pre>
+<p>create public synonym prepare_connection for prepare_connection; grant execute on prepare_connection to public; ```</p>
+<h3 id="zaxxer">Zaxxer</h3>
+<p>TODO how to call this procedure in the connection pool</p>
+<h2 id="dbms_session">## DBMS_SESSION</h2>
+<h2 id="identifier">Identifier</h2>
+<p>SET_IDENTIFIER and CLEAR_IDENTIFIER procedures to allow the real user to be associated with a session, regardless of what database user was being used for the connection.</p>
+<h2 id="metrics">Metrics</h2>
+<dl>
+<dt>try {</dt>
+<dd><p>String e2eMetrics[] = new String[OracleConnection.END_TO_END_STATE_INDEX_MAX]; e2eMetrics[OracleConnection.END_TO_END_ACTION_INDEX] = null; e2eMetrics[OracleConnection.END_TO_END_MODULE_INDEX] = null; e2eMetrics[OracleConnection.END_TO_END_CLIENTID_INDEX] = null; ((OracleConnection) conn).setEndToEndMetrics(e2eMetrics, Short.MIN_VALUE);</p>
+</dd>
+<dt>} catch (SQLException sqle) {</dt>
+<dd><p>// Do something...</p>
+</dd>
+</dl>
+<p>}</p>
+<p>0 - No trace. Like switching sql_trace off. 2 - The equivalent of regular sql_trace. 4 - The same as 2, but with the addition of bind variable values. 8 - The same as 2, but with the addition of wait events. 12 - The same as 2, but with both bind variable values and wait events.</p>
+<p>Monitoring long running <a href="https://oracle-base.com/articles/11g/real-time-sql-monitoring-11gr1">https://oracle-base.com/articles/11g/real-time-sql-monitoring-11gr1</a></p>
+<h2 id="references">References</h2>
+<p><a href="https://oracle-base.com/articles/misc/dbms_session">https://oracle-base.com/articles/misc/dbms_session</a></p>
+<p><a href="https://oracle-base.com/articles/misc/sql-trace-10046-trcsess-and-tkprof">https://oracle-base.com/articles/misc/sql-trace-10046-trcsess-and-tkprof</a></p>
+<div class="figure">
+<img src="logger_tables.png" alt="logger_tables.png" /><p class="caption">logger_tables.png</p>
+</div>
+<h1 id="spring-developers">Spring Developers</h1>
+<p>Oracle tracing is a powerful tool that logs detailed information about all calls to the Oracle database.</p>
+<p>In order to use this :</p>
+<ul>
+<li>one must turn on tracing for the current connection</li>
+<li>set the log file</li>
+<li>stop tracing</li>
+<li><p>call a service to store the trace</p></li>
+<li>store the raw trace file</li>
+<li>analyze the trace file</li>
+<li><p>store the analyzed trace file</p></li>
+</ul>
+<h2 id="logging-to-flat-files">Logging to flat files</h2>
+<h3 id="overview">Overview</h3>
+<p>Logs messages using utl_file to a directory on the database server specified.</p>
+<p>First the database directory is created and oracle is granted permission to read and write it, then the ddl &quot;create directory....&quot; and &quot;grant read, write on directory...&quot;</p>
+<h3 id="examples">Examples</h3>
+<h4 id="log_to_file_only.proc.sr.sql">log_to_file_only.proc.sr.sql</h4>
+<h3 id="input-1">Input</h3>
+<pre><code>set serveroutput on
+set echo on
+create or replace procedure log_to_file_only is 
+       long_msg clob := &#39;this is an absurdly long message, &#39; || 
+                &#39; interesting stuff to say so I will just write meaningless &#39; ||
+                &#39; stuff for a little while. &#39; ||
+                &#39; The quick brown fox jumped over the lazy dog. &#39;; 
+    
+    my_log_file_name varchar(4096); 
+begin
+    my_log_file_name := pllogger.open_log_file(&#39;log_to_file_only.text&#39;);
+    pllogger.set_filter_level(9); -- all messages should go to log file
+    pllogger.info(&#39;anonymous&#39;,$$PLSQL_LINE,&#39;begin loop&#39;);
+    pllogger.info($$PLSQL_UNIT,$$PLSQL_LINE,long_msg); 
+    for i in 1..3  
+    loop
+        pllogger.fine($$PLSQL_UNIT,$$PLSQL_LINE,&#39;i is &#39; || to_char(i));
+    end loop; 
+    pllogger.close_log_file();
+exception when others then
+        -- a severe condition is not necessarily fatal
+    pllogger.severe($$PLSQL_UINIT,$$PLSQL_LINE,sqlerrm);
+    pllogger.close_log_file();
+    raise;
+end;
+/
+show errors
+
+exec log_to_file_only();</code></pre>
+<h5 id="output">Output</h5>
+<pre><code>&quot;log_level&quot;,&quot;job_log_id&quot;,&quot;job_msg_id&quot;,&quot;line_number&quot;,&quot;timestamp&quot;,&quot;log_msg&quot;,&quot;caller_name&quot;,&quot;call_stack&quot;
+4,,,17,&quot;2019-10-26T17:19:52.885607&quot;,&quot;begin loop&quot;,&quot;anonymous&quot;,&quot;&quot;
+4,,,18,&quot;2019-10-26T17:19:52.886020&quot;,&quot;this is an absurdly long message,  exceeding the length of the log_msg field  this should be inserted into the log_msg_clob column.   This message is part of  a unit test of from sample_job_02 of the logging package.   I am running out of  interesting stuff to say so I will just write meaningless  stuff for a little while.  The quick brown fox jumped over the lazy dog. &quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;
+7,,,22,&quot;2019-10-26T17:19:52.886197&quot;,&quot;i is 1&quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;
+7,,,22,&quot;2019-10-26T17:19:52.886357&quot;,&quot;i is 2&quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;
+7,,,22,&quot;2019-10-26T17:19:52.886502&quot;,&quot;i is 3&quot;,&quot;LOG_TO_FILE_ONLY&quot;,&quot;&quot;</code></pre>
+<h1 id="todo">TODO</h1>
+<p>Tracing should do the following</p>
+<ul>
+<li>Begin with any transaction as annotated by <span class="citation">@Transactional</span></li>
+</ul>
+<h1 id="install">Install</h1>
+<pre><code>cd src/main/resources/ddl/oracle
+
+sqlplus $ORACLE_UID @ pllogger.pkgs.sr.sql
+sqlplus $ORACLE_UID @ pllogger.pkgb.sr.sql</code></pre>
+<p>create directory job_msg_dir as '/common/scratch/ut_process_log_dir'; grant write on directory to sr;</p>
+<p>should be granted by user, not by role.</p>
+<ul>
+<li>Configuring to use your database</li>
+<li>Example schema</li>
+</ul>
+<h1 id="todo-1">TODO</h1>
+<ul>
+<li>security can't specify file name</li>
+<li>need an agent to get the log files for remote users</li>
+<li>TODO escape double quotes in text fields</li>
+<li>check for anomolous run-times using condition identification</li>
+<li>plot runtimes</li>
+<li>TODO describe microservices, multiple connections, tying them all together</li>
+<li>TODO describe using with spring</li>
+</ul>

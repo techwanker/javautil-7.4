@@ -1,4 +1,3 @@
-spool pllog.pks.lst
 set echo on
 create or replace PACKAGE pllog AS
     G_SEVERE       CONSTANT PLS_INTEGER := 1 ;

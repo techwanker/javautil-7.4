@@ -17,3 +17,5 @@ drop view job_log_vw;
 drop view job_step_vw;   
 /* application object */
 drop package logger;
+drop package pllogger;
+drop package pllog;

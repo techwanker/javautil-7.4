@@ -1,6 +1,6 @@
 --#<
 set echo on 
-spool pllog.pkb.lst
+--spool pllog.pkb.lst
 --#>
 CREATE OR REPLACE PACKAGE BODY pllog
 is
@@ -682,5 +682,4 @@ end;
 */
 --#<
 show errors
-exit
 --#>

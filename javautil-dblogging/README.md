@@ -1,4 +1,4 @@
-# dblogging 2019-10-16
+# dblogging 
 
 Application instrumentation is essential to performance monitoring, unfortunately this is often
 performed by throwing in some logging statements using a java logging framework or wrapper, such as slf,
@@ -20,6 +20,10 @@ Resolution of these matters is a different matter and may involve gathering stat
 altering execution plans, creating or eliminating indexes or rewriting SQL.  
 
 SGA parameters may have to be changed.
+
+# TODO
+
+
 
 ## Document Organization
 
