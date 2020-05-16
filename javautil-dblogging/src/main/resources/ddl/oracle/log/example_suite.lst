@@ -59,17 +59,11 @@ SQL> begin
   5  /
 get_log_level() my_logger_name: "ANONYMOUS"                                     
 get_log_level()  logger: "anonymous" was not found  level:  retval: 4           
-open_log_file() dir: "" file: ""                                                
-begin
-*
-ERROR at line 1:
-ORA-29280: invalid directory path 
-ORA-06512: at "SYS.UTL_FILE", line 41 
-ORA-06512: at "SYS.UTL_FILE", line 478 
-ORA-06512: at "SR.PLLOG", line 300 
-ORA-06512: at "SR.PLLOG", line 587 
-ORA-06512: at line 3 
+4,"2020-05-15T23:27:23.457488000","no logfile specified","anonymous",3,,,""     
+log(): 4,"2020-05-15T23:27:23.457488000","no logfile                            
+specified","anonymous",3,,,""                                                   
 
+PL/SQL procedure successfully completed.
 
 SQL> 
 SQL> --%# Example usage
@@ -99,19 +93,19 @@ SQL> declare
  11  end;
  12  --%```
  13  /
-begin_log() logfile_name "567.log"                                              
+begin_log() logfile_name "569.log"                                              
 get_log_level() my_logger_name: "EXAMPLE_01"                                    
 get_log_level()  logger: "EXAMPLE_01" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 1,"2020-05-15T21:57:11.931975000","severe","EXAMPLE_01",4,,,""           
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 1,"2020-05-15T23:27:23.463338000","severe","EXAMPLE_01",4,,,""           
 get_log_level() my_logger_name: "EXAMPLE_01"                                    
 get_log_level()  logger: "EXAMPLE_01" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 2,"2020-05-15T21:57:11.935657000","warning","EXAMPLE_01",5,,,""          
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 2,"2020-05-15T23:27:23.468348000","warning","EXAMPLE_01",5,,,""          
 get_log_level() my_logger_name: "EXAMPLE_01"                                    
 get_log_level()  logger: "EXAMPLE_01" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 3,"2020-05-15T21:57:11.937409000","undefined","EXAMPLE_01",6,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 3,"2020-05-15T23:27:23.470247000","undefined","EXAMPLE_01",6,,,""        
 get_log_level() my_logger_name: "EXAMPLE_01"                                    
 get_log_level()  logger: "EXAMPLE_01" was not found  level:  retval: 3          
 log()       caller: EXAMPLE_01 line: 7 my_logger_level: 3 p_log_level: 4        
@@ -126,16 +120,16 @@ get_log_level()  logger: "EXAMPLE_01" was not found  level:  retval: 3
 log()       caller: EXAMPLE_01 line: 10 my_logger_level: 3 p_log_level: 9       
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 1,"2020-05-15T21:57:11.946524000","severe 1","EXAMPLE_04",5,,,""         
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 1,"2020-05-15T23:27:23.479640000","severe 1","EXAMPLE_04",5,,,""         
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 2,"2020-05-15T21:57:11.948347000","warning 2","EXAMPLE_04",6,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 2,"2020-05-15T23:27:23.481317000","warning 2","EXAMPLE_04",6,,,""        
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 3,"2020-05-15T21:57:11.950106000","undefined 3","EXAMPLE_04",7,,,""      
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 3,"2020-05-15T23:27:23.482983000","undefined 3","EXAMPLE_04",7,,,""      
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
 log()       caller: EXAMPLE_04 line: 8 my_logger_level: 3 p_log_level: 4        
@@ -150,16 +144,16 @@ get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3
 log()       caller: EXAMPLE_04 line: 11 my_logger_level: 3 p_log_level: 9       
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 1,"2020-05-15T21:57:11.958222000","lvl is 1","EXAMPLE_04",14,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 1,"2020-05-15T23:27:23.490414000","lvl is 1","EXAMPLE_04",14,,,""        
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 2,"2020-05-15T21:57:11.959805000","lvl is 2","EXAMPLE_04",14,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 2,"2020-05-15T23:27:23.491917000","lvl is 2","EXAMPLE_04",14,,,""        
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 3,"2020-05-15T21:57:11.961336000","lvl is 3","EXAMPLE_04",14,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 3,"2020-05-15T23:27:23.493364000","lvl is 3","EXAMPLE_04",14,,,""        
 get_log_level() my_logger_name: "EXAMPLE_04"                                    
 get_log_level()  logger: "EXAMPLE_04" was not found  level:  retval: 3          
 log()       caller: EXAMPLE_04 line: 14 my_logger_level: 3 p_log_level: 4       
@@ -181,33 +175,33 @@ log()       caller: EXAMPLE_04 line: 14 my_logger_level: 3 p_log_level: 9
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 1,"2020-05-15T21:57:11.969439000","severe 1","EXAMPLE_05",4,,,""         
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 1,"2020-05-15T23:27:23.501682000","severe 1","EXAMPLE_05",4,,,""         
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 2,"2020-05-15T21:57:11.969547000","warning 2","EXAMPLE_05",5,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 2,"2020-05-15T23:27:23.501792000","warning 2","EXAMPLE_05",5,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 3,"2020-05-15T21:57:11.969639000","undefined 3","EXAMPLE_05",6,,,""      
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 3,"2020-05-15T23:27:23.501885000","undefined 3","EXAMPLE_05",6,,,""      
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 4,"2020-05-15T21:57:11.969725000","info 4","EXAMPLE_05",7,,,""           
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 4,"2020-05-15T23:27:23.501975000","info 4","EXAMPLE_05",7,,,""           
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 6,"2020-05-15T21:57:11.969814000","verbose 6","EXAMPLE_05",8,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 6,"2020-05-15T23:27:23.502061000","verbose 6","EXAMPLE_05",8,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 7,"2020-05-15T21:57:11.969898000","debug 7","EXAMPLE_05",9,,,""          
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 7,"2020-05-15T23:27:23.502146000","debug 7","EXAMPLE_05",9,,,""          
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
@@ -215,43 +209,43 @@ log()       caller: EXAMPLE_05 line: 10 my_logger_level: 8 p_log_level: 9
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 1,"2020-05-15T21:57:11.970004000","lvl is 1","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 1,"2020-05-15T23:27:23.502254000","lvl is 1","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 2,"2020-05-15T21:57:11.970086000","lvl is 2","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 2,"2020-05-15T23:27:23.502339000","lvl is 2","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 3,"2020-05-15T21:57:11.970169000","lvl is 3","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 3,"2020-05-15T23:27:23.502423000","lvl is 3","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 4,"2020-05-15T21:57:11.970251000","lvl is 4","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 4,"2020-05-15T23:27:23.502514000","lvl is 4","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 5,"2020-05-15T21:57:11.970332000","lvl is 5","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 5,"2020-05-15T23:27:23.502599000","lvl is 5","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 6,"2020-05-15T21:57:11.970443000","lvl is 6","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 6,"2020-05-15T23:27:23.502686000","lvl is 6","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 7,"2020-05-15T21:57:11.970555000","lvl is 7","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 7,"2020-05-15T23:27:23.502770000","lvl is 7","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           
-open_log_file() dir: "JOB_MSG_DIR" file: "567.log"                              
-log(): 8,"2020-05-15T21:57:11.970637000","lvl is 8","EXAMPLE_05",13,,,""        
+open_log_file() dir: "JOB_MSG_DIR" file: "569.log"                              
+log(): 8,"2020-05-15T23:27:23.502854000","lvl is 8","EXAMPLE_05",13,,,""        
 get_log_level() my_logger_name: "EXAMPLE_05"                                    
 get_log_level() my_dtl_log: "EXAMPLE_05"                                        
 get_log_level()  logger: "EXAMPLE_05"  was  found  level: 8 retval: 8           

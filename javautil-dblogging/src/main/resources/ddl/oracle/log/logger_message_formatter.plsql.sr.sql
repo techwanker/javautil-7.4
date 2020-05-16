@@ -9,7 +9,8 @@ set echo on
       log_level     in   pls_integer,
       caller_name   in   varchar default null,
       line_number   in   pls_integer default null,
-      call_stack    in   boolean default false
+      call_stack    in   boolean default false,
+      separator     in   varchar default ','
    ) return varchar 
    is
        my_log_msg  varchar2(32767) := REPLACE (log_msg, '"', '""');
@@ -25,13 +26,13 @@ set echo on
       end if;
       --      dbms_output.put_line('my_timestamp '||  my_timestamp);
       my_log_entry :=
-           log_level    || ',' || 
-           '"' ||my_timestamp || '",' || 
-           '"' || my_log_msg   || '",' ||
-           '"' || caller_name  || '",' || 
-           line_number  || ','  || 
-           job_log_id   || ',' || 
-           job_msg_id   || ',' || 
+           log_level    || separator ||
+           '"' ||my_timestamp  || '"' || separator ||
+           '"' || my_log_msg   || '"' || separator ||
+           '"' || caller_name  || '"' || separator ||
+           line_number  || separator  ||
+           job_log_id   || separator ||
+           job_msg_id   || separator ||
            '"' || stack || '"';
 	 -- dbms_output.put_line('log entry: ' || my_log_entry);
          return my_log_entry;
