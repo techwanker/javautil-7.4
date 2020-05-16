@@ -12,11 +12,14 @@ create or replace PACKAGE pllog AS
     G_FINEST       CONSTANT PLS_INTEGER := 9 ;
     G_NONE         CONSTANT PLS_INTEGER := 10 ;
 
+
     function format_time(p_timestamp in timestamp) 
     return varchar;
 
     function get_new_job_log_id 
     return number;
+
+--%# Specify log destination 
 
     procedure begin_log ( 
         logfile_name   in varchar,
@@ -44,10 +47,21 @@ create or replace PACKAGE pllog AS
         p_trace_level  in pls_integer default G_INFO)
         return varchar;
 
+--%# Filter
+    procedure set_caller_level(name in varchar ,  
+                              level in pls_integer);
+--%# Log
+    procedure log (
+      p_log_msg      in   varchar,
+      p_log_level    in   pls_integer default g_info,
+      p_dump_stack   in   boolean default false
+   );
+--%# Finish job
     procedure end_job;
 
     procedure abort_job(p_stacktrace in varchar default null);
 
+--%# Finish job
     procedure set_action (p_action in        varchar) ;
 
     procedure set_module (
@@ -55,18 +69,24 @@ create or replace PACKAGE pllog AS
         p_action_name in   varchar
     );
 
-    function get_my_tracefile 
-    return clob ;
-
     function get_directory_path 
     return varchar;
 
+--%# sql trace
     function get_tracefile(p_file_name in varchar) 
     return clob;
 
     function get_my_tracefile_name 
     return varchar;
 
+    function set_tracefile_identifier(p_job_nbr in number) 
+    return varchar;
+
+    function get_my_tracefile 
+    return clob ;
+
+
+--%# misc
     function basename (p_full_path in varchar,
                        p_suffix    in varchar default null,
                        p_separator in char default '/') 
@@ -76,31 +96,20 @@ create or replace PACKAGE pllog AS
 
     procedure trace_step(p_step_name in varchar, p_job_step_id in number);
 
-    function set_tracefile_identifier(p_job_nbr in number) 
-    return varchar;
+   function job_step_insert (
+        p_step_name   in varchar, 
+        p_step_info   in varchar, 
+        p_classname   in varchar,     
+        p_stacktrace  in varchar
+   ) return number;
 
-    procedure log (
-      p_log_msg      in   varchar,
-      p_log_level    in   pls_integer default g_info,
-      p_dump_stack   in   boolean default false
-   );
+
+   procedure job_step_finish (step_id in number);
+
+
    
    
     procedure set_debug(debug boolean default true) ;
-
-    procedure set_caller_level(name in varchar ,  level in pls_integer);
-/*
-  procedure log (
-      p_log_msg      in   varchar,
-      p_log_level    in   pls_integer default g_info,
-      p_job_log_id   in   pls_integer default null,
-      p_job_msg_id   in   pls_integer default null,
-      p_elapsed_time in   INTERVAL DAY TO SECOND DEFAULT NULL, -- TODO not recorded at this time
-      p_caller_name  in   varchar default null,
-      p_line_number  in   pls_integer default null,
-      p_dump_stack   in   boolean default false
-   );
-*/
 
 END pllog ;
 /

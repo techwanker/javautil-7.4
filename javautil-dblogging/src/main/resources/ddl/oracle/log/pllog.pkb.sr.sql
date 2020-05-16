@@ -108,7 +108,8 @@ is
         return get_my_tracefile_name;
     end set_tracefile_identifier;
 
-     
+    --%# Job DML 
+    --%# job_msg
     
     procedure job_msg_insert (
                p_job_log_id in pls_integer,
@@ -142,6 +143,8 @@ is
       end if;
    end;
 
+    --%# job_log
+
     procedure job_log_insert(rec in job_log%rowtype) is
     begin
        insert into job_log (    
@@ -157,6 +160,32 @@ is
    );
 
     end;
+
+   function job_step_insert (
+        p_step_name   in varchar, 
+        p_step_info   in varchar, 
+        p_classname   in varchar,     
+        p_stacktrace  in varchar
+   ) return number
+   is 
+      my_job_step_id number;
+   begin
+      insert into job_step (
+        job_step_id,   job_log_id, step_name, step_info, 
+        classname,     start_ts,   stacktrace
+      ) values (
+        job_step_id_seq.nextval, g_job_log.job_log_id, p_step_name, p_step_info, 
+        p_classname,   current_timestamp,   p_stacktrace
+      ) returning job_step_id into my_job_step_id;
+      return my_job_step_id;
+   end job_step_insert;
+   
+   procedure job_step_finish (step_id in number) is 
+    begin
+       update job_step 
+       set end_ts = systimestamp
+       where job_step_id = step_id;
+    end job_step_finish;
 
    procedure begin_log ( 
         logfile_name   in varchar,
