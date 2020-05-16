@@ -457,7 +457,11 @@ is
              retval := my_log_dtl.log_lvl;
          exception 
             when no_data_found then
-              retval := g_job_log.log_level;
+              if g_job_log.log_level is null then
+                  retval := g_info;
+              else 
+                  retval := g_job_log.log_level;
+              end if;
               was_not := 'was not';
          end;
         
@@ -465,8 +469,8 @@ is
             dbms_output.put_line('get_log_level() ' ||
                 ' logger: "'  || p_logger_name || '" ' ||
                 was_not || ' found '  ||
-                ' level '   || to_char(my_log_dtl.log_lvl) || 
-                ' retval ' || to_char(retval));
+                ' level: '   || to_char(my_log_dtl.log_lvl) || 
+                ' retval: ' || to_char(retval));
         end if;
         return retval;
             
