@@ -43,7 +43,7 @@ create table job_step (
     end_ts  		    timestamp(9),
     dbstats                 clob,
     step_info_json          clob,
-    cursor_info_run_id      number(9) references cursor_info_run,
+    --cursor_info_run_id      number(9) references cursor_info_run,
     stacktrace              varchar(4000),
     constraint job_step_pk primary key (job_step_id),
     constraint step_status_fk

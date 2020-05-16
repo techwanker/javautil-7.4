@@ -12,16 +12,16 @@ procedure example_04
 is
     token varchar(32);
 begin
-    pllog.log('severe 1',1);
-    pllog.log('warning 2',2);
-    pllog.log('undefined 3',3);
-    pllog.log('info 4',4);
-    pllog.log('verbose 6',6);
-    pllog.log('debug 7',7);
-    pllog.log('trace 8',9);
+    logger.log('severe 1',1);
+    logger.log('warning 2',2);
+    logger.log('undefined 3',3);
+    logger.log('info 4',4);
+    logger.log('verbose 6',6);
+    logger.log('debug 7',7);
+    logger.log('trace 8',9);
     for lvl in 1 .. 9
     loop
-    	pllog.log('lvl is ' || lvl,lvl);
+    	logger.log('lvl is ' || lvl,lvl);
     end loop;
 end;
 --%```
@@ -34,29 +34,29 @@ procedure example_job_05
 is
     lines number := 0;
 begin
-    pllog.log('severe 1',1);
-    pllog.log('warning 2',2);
-    pllog.log('undefined 3',3);
-    pllog.log('info 4',4);
-    pllog.log('verbose 6',6);
-    pllog.log('debug 7',7);
-    pllog.log('trace 8',9);
+    logger.log('severe 1',1);
+    logger.log('warning 2',2);
+    logger.log('undefined 3',3);
+    logger.log('info 4',4);
+    logger.log('verbose 6',6);
+    logger.log('debug 7',7);
+    logger.log('trace 8',9);
     for lvl in 1 .. 9
     loop
-    	pllog.log('lvl is ' || lvl,lvl);
+    	logger.log('lvl is ' || lvl,lvl);
     end loop;
     for rec in select * from all_source
     loop
        lines := lines + 1;
     end loop;
-    pllog.end_job;
+    logger.end_job;
 end;
 --%```
 /
 
 begin
-  pllog.set_debug;
-  pllog.log('no logfile specified');
+  logger.set_debug;
+  logger.log('no logfile specified');
 end;
 /
 
@@ -79,23 +79,23 @@ declare
     --logname varchar(32) := to_char(job_log_id_seq.nextval) || '.log';
     my_job_step_id number;
 begin
-   pllog.set_debug;
-   token := pllog.begin_job(p_process_name => 'example_job');
-   pllog.set_caller_level('example_05',8);
-   my_job_step_id := pllog.job_step_insert('example_01','no parms');
-   example_01;
-   pllog.job_step_finish(my_job_step_id);
+   logger.set_debug;
+   token := logger.begin_job(p_process_name => 'example_job');
+   logger.set_caller_level('example_05',8);
+   --my_job_step_id := logger.job_step_insert('example_01','no parms');
+   --example_01;
+   --logger.job_step_finish(my_job_step_id);
    
-   my_job_step_id := pllog.job_step_insert(p_step_name => 'example_04',
+   my_job_step_id := logger.job_step_insert(p_step_name => 'example_04',
                         p_step_info => 'no parms');
    example_04;
-   pllog.job_step_finish(my_job_step_id);
+   logger.job_step_finish(my_job_step_id);
 
-   my_job_step_id := pllog.job_step_insert('example_05');
+   my_job_step_id := logger.job_step_insert('example_05');
    example_05;
-   pllog.job_step_finish(my_job_step_id);
+   logger.job_step_finish(my_job_step_id);
 exception when others then
-   pllog.abort_job;
+   logger.abort_job;
 end;
 --%```
 /

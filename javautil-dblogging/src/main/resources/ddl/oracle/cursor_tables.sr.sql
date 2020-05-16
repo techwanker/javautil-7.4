@@ -145,3 +145,8 @@ alter table cursor_stat add constraint
 cursor_stat_cursor_info_fk foreign key
 (cursor_info_id) references
 cursor_info;
+
+alter table job_step add cursor_info_run_id number(9);
+
+alter table job_step add constraint job_step_cursor_info_run_fk
+foreign key cursor_info_run_id references cursor_info_run;

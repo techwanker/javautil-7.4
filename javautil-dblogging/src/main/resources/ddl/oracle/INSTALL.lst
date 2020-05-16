@@ -1,12 +1,18 @@
 SQL> @ dblogger_uninstall.sr.sql
 SQL> /* logger objects */
 SQL> drop sequence cursor_info_id_seq;
+drop sequence cursor_info_id_seq
+              *
+ERROR at line 1:
+ORA-02289: sequence does not exist 
 
-Sequence dropped.
 
 SQL> drop sequence cursor_info_run_id_seq;
+drop sequence cursor_info_run_id_seq
+              *
+ERROR at line 1:
+ORA-02289: sequence does not exist 
 
-Sequence dropped.
 
 SQL> drop sequence job_log_id_seq;
 
@@ -21,28 +27,46 @@ SQL> drop sequence job_step_id_seq;
 Sequence dropped.
 
 SQL> drop table cursor_explain_plan cascade constraint;
+drop table cursor_explain_plan cascade constraint
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
 
-Table dropped.
 
 SQL> drop table cursor_info cascade constraint;
+drop table cursor_info cascade constraint
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
 
-Table dropped.
 
 SQL> drop table cursor_info_run cascade constraint;
+drop table cursor_info_run cascade constraint
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
 
-Table dropped.
 
 SQL> drop table cursor_sql_text cascade constraint;
+drop table cursor_sql_text cascade constraint
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
 
-Table dropped.
 
 SQL> drop table cursor_stat cascade constraint;
+drop table cursor_stat cascade constraint
+           *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
 
-Table dropped.
 
 SQL> drop view cursor_info_vw;
+drop view cursor_info_vw
+*
+ERROR at line 1:
+ORA-00942: table or view does not exist 
 
-View dropped.
 
 SQL> drop table job_log cascade constraint;
 
@@ -66,11 +90,8 @@ View dropped.
 
 SQL> /* application object */
 SQL> drop package logger;
-drop package logger
-*
-ERROR at line 1:
-ORA-04043: object LOGGER does not exist 
 
+Package dropped.
 
 SQL> drop package pllogger;
 drop package pllogger
@@ -80,207 +101,11 @@ ORA-04043: object PLLOGGER does not exist
 
 
 SQL> drop package pllog;
+drop package pllog
+*
+ERROR at line 1:
+ORA-04043: object PLLOG does not exist 
 
-Package dropped.
-
-SQL> @ cursor_tables.sr.sql
-SQL> 
-SQL> /* Explain Plan */
-SQL> create table cursor_explain_plan (
-  2  	 explain_plan_hash  varchar(44) not null,
-  3  	 explain_plan	    clob not null
-  4  );
-
-Table created.
-
-SQL> 
-SQL> alter table cursor_explain_plan
-  2  add constraint cursor_explain_plan_pk
-  3  primary key (explain_plan_hash);
-
-Table altered.
-
-SQL> 
-SQL> /* SQL */
-SQL> create table cursor_sql_text (
-  2  	     sql_text_hash varchar (44) not null,
-  3  	     sql_text	   clob 	not null
-  4  );
-
-Table created.
-
-SQL> 
-SQL> 
-SQL> alter table cursor_sql_text
-  2  add constraint cursor_text_pk
-  3  primary key (sql_text_hash);
-
-Table altered.
-
-SQL> 
-SQL> /* Run */
-SQL> create sequence cursor_info_run_id_seq;
-
-Sequence created.
-
-SQL> create table cursor_info_run(
-  2  	 cursor_info_run_id    number(9) not null,
-  3  	 cursor_info_run_descr clob
-  4  );
-
-Table created.
-
-SQL> 
-SQL> 
-SQL> alter table cursor_info_run
-  2  add constraint cursor_info_run_id
-  3  primary key (cursor_info_run_id);
-
-Table altered.
-
-SQL> 
-SQL> 
-SQL> create sequence cursor_info_id_seq;
-
-Sequence created.
-
-SQL> create table cursor_info (
-  2  	     cursor_info_id	     number(9) not null,
-  3  	 cursor_info_run_id	 number(9),
-  4  	     sql_text_hash	     varchar(44),
-  5  	 parse_cpu_micros	 number(9),
-  6  	     parse_elapsed_micros    number(9),
-  7  	     parse_blocks_read	     number(9),
-  8  	     parse_consistent_blocks number(9),
-  9  	     parse_current_blocks    number(9),
- 10  	     parse_lib_miss	     number(9),
- 11  	     parse_row_count	     number(9),
- 12  	 exec_cpu_micros	 number(9),
- 13  	     exec_elapsed_micros     number(9),
- 14  	     exec_blocks_read	     number(9),
- 15  	     exec_consistent_blocks  number(9),
- 16  	     exec_current_blocks     number(9),
- 17  	     exec_lib_miss	     number(9),
- 18  	     exec_row_count	     number(9),
- 19  	 fetch_cpu_micros	 number(9),
- 20  	     fetch_elapsed_micros    number(9),
- 21  	     fetch_blocks_read	     number(9),
- 22  	     fetch_consistent_blocks number(9),
- 23  	     fetch_current_blocks    number(9),
- 24  	     fetch_lib_miss	     number(9),
- 25  	     fetch_row_count	     number(9),
- 26  	     explain_plan_hash	     varchar(44)
- 27  );
-
-Table created.
-
-SQL> 
-SQL> 
-SQL> alter table cursor_info
-  2  add constraint cursor_info_pk
-  3  primary key (cursor_info_id);
-
-Table altered.
-
-SQL> 
-SQL> alter table cursor_info
-  2  add constraint cursor_info_text_fk
-  3  foreign key (sql_text_hash)
-  4  references cursor_sql_text;
-
-Table altered.
-
-SQL> 
-SQL> alter table cursor_info
-  2  add constraint cursor_info_plan_fk
-  3  foreign key (explain_plan_hash)
-  4  references cursor_explain_plan;
-
-Table altered.
-
-SQL> 
-SQL> alter table cursor_info add constraint
-  2  cursor_info_run_fk foreign key (cursor_info_run_id)
-  3  references cursor_info_run;
-
-Table altered.
-
-SQL> 
-SQL> create or replace view  cursor_info_vw as
-  2  select
-  3  	     cursor_info.cursor_info_id,
-  4  	 cursor_sql_text.sql_text,
-  5  	 explain_plan,
-  6  	 parse_cpu_micros,
-  7  	 parse_elapsed_micros,
-  8  	 parse_blocks_read,
-  9  	 parse_consistent_blocks,
- 10  	 parse_current_blocks,
- 11  	 parse_lib_miss,
- 12  	 parse_row_count,
- 13  	 exec_cpu_micros,
- 14  	 exec_elapsed_micros,
- 15  	 exec_blocks_read,
- 16  	 exec_consistent_blocks,
- 17  	 exec_current_blocks,
- 18  	 exec_lib_miss,
- 19  	 exec_row_count,
- 20  	 fetch_cpu_micros,
- 21  	 fetch_elapsed_micros,
- 22  	 fetch_blocks_read,
- 23  	 fetch_consistent_blocks,
- 24  	 fetch_current_blocks,
- 25  	 fetch_lib_miss,
- 26  	 fetch_row_count,
- 27  	 parse_cpu_micros + exec_cpu_micros + fetch_cpu_micros cpu_micros ,
- 28  	 parse_elapsed_micros + exec_elapsed_micros + fetch_elapsed_micros elapsed_micros ,
- 29  	 parse_blocks_read + exec_blocks_read + fetch_blocks_read blocks_read ,
- 30  	 parse_consistent_blocks + exec_consistent_blocks + fetch_consistent_blocks consistent_blocks ,
- 31  	 parse_current_blocks + exec_current_blocks + fetch_current_blocks current_blocks ,
- 32  	 parse_lib_miss + exec_lib_miss + fetch_lib_miss lib_miss ,
- 33  	 parse_row_count + exec_row_count + fetch_row_count row_count
- 34  from cursor_info,
- 35  	  cursor_sql_text,
- 36  	  cursor_explain_plan
- 37   where cursor_info.sql_text_hash = cursor_sql_text.sql_text_hash and
- 38  	    cursor_info.explain_plan_hash = cursor_explain_plan.explain_plan_hash;
-
-View created.
-
-SQL> 
-SQL> 
-SQL> create table cursor_stat (
-  2  	 cursor_info_id   number(9) not null,
-  3  	 seq_nbr	  number(3) not null,
-  4  	 operation_depth  number(2) not null,
-  5  	 operation	  varchar(100),
-  6  	 consistent_reads number(9),
-  7  	 physical_reads   number(9),
-  8  	 physical_writes  number(9),
-  9  	 elapsed_millis   number(12)
- 10  );
-
-Table created.
-
-SQL> 
-SQL> 
-SQL> 
-SQL> alter table cursor_stat add
-  2  constraint cursor_stat_pk
-  3  primary key (cursor_info_id, seq_nbr);
-
-Table altered.
-
-SQL> 
-SQL> 
-SQL> 
-SQL> 
-SQL> alter table cursor_stat add constraint
-  2  cursor_stat_cursor_info_fk foreign key
-  3  (cursor_info_id) references
-  4  cursor_info;
-
-Table altered.
 
 SQL> @ job_tables.sr.sql
 SQL> create sequence job_log_id_seq;
@@ -340,7 +165,7 @@ SQL> create table job_step (
   8  	 end_ts 		 timestamp(9),
   9  	 dbstats		 clob,
  10  	 step_info_json 	 clob,
- 11  	 cursor_info_run_id	 number(9) references cursor_info_run,
+ 11  	 --cursor_info_run_id	   number(9) references cursor_info_run,
  12  	 stacktrace		 varchar(4000),
  13  	 constraint job_step_pk primary key (job_step_id),
  14  	 constraint step_status_fk
@@ -428,9 +253,9 @@ SQL> create or replace view job_log_vw as
 View created.
 
 SQL> 
-SQL> @ pllog.pks.sr.sql
+SQL> @ logger.pks.sr.sql
 SQL> set echo on
-SQL> create or replace PACKAGE pllog AS
+SQL> create or replace PACKAGE logger AS
   2  	 G_SEVERE	CONSTANT PLS_INTEGER := 1 ;
   3  	 G_WARNING	CONSTANT PLS_INTEGER := 2 ;
   4  	 G_INFO 	CONSTANT PLS_INTEGER := 4 ;
@@ -542,19 +367,19 @@ SQL> create or replace PACKAGE pllog AS
 110  
 111  	 procedure set_debug(debug boolean default true) ;
 112  
-113  END pllog ;
+113  END logger;
 114  /
 
 Package created.
 
 SQL> show errors
 No errors.
-SQL> @ pllog.pkb.sr.sql
+SQL> @ logger.pkb.sr.sql
 SQL> --#<
 SQL> set echo on
 SQL> --spool pllog.pkb.lst
 SQL> --#>
-SQL> CREATE OR REPLACE PACKAGE BODY pllog
+SQL> CREATE OR REPLACE PACKAGE BODY logger
   2  is
   3  	 g_debug		 boolean := false;
   4  	 g_job_msg_dir		 varchar (32) := 'JOB_MSG_DIR';
@@ -1223,7 +1048,7 @@ SQL> CREATE OR REPLACE PACKAGE BODY pllog
 667  begin
 668  	dbms_output.ENABLE(1000000) ;
 669    -- set_context;
-670  end pllog;
+670  end logger;
 671  /
 
 Package body created.
@@ -1240,4 +1065,5 @@ SQL> show errors
 No errors.
 SQL> --#>
 SQL> 
+SQL> --@ cursor_tables.sr.sql
 SQL> exit

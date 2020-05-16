@@ -2,7 +2,7 @@
 set echo on 
 --spool pllog.pkb.lst
 --#>
-CREATE OR REPLACE PACKAGE BODY pllog
+CREATE OR REPLACE PACKAGE BODY logger
 is
     g_debug                 boolean := false;
     g_job_msg_dir           varchar (32) := 'JOB_MSG_DIR';
@@ -671,7 +671,7 @@ is
 begin
    dbms_output.ENABLE(1000000) ;
   -- set_context;
-end pllog;
+end logger;
 /
 
 /*

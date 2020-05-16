@@ -12,17 +12,13 @@ procedure example_04
 is
     token varchar(32);
 begin
-    pllog.log('severe 1',1);
-    pllog.log('warning 2',2);
-    pllog.log('undefined 3',3);
-    pllog.log('info 4',4);
-    pllog.log('verbose 6',6);
-    pllog.log('debug 7',7);
-    pllog.log('trace 8',9);
-    for lvl in 1 .. 9
-    loop
-    	pllog.log('lvl is ' || lvl,lvl);
-    end loop;
+    logger.log('severe 1',1);
+    logger.log('warning 2',2);
+    logger.log('undefined 3',3);
+    logger.log('info 4',4);
+    logger.log('verbose 6',6);
+    logger.log('debug 7',7);
+    logger.log('trace 8',8);
 end;
 --%```
 /
@@ -33,25 +29,18 @@ create or replace
 procedure example_05
 is
 begin
-    pllog.log('severe 1',1);
-    pllog.log('warning 2',2);
-    pllog.log('undefined 3',3);
-    pllog.log('info 4',4);
-    pllog.log('verbose 6',6);
-    pllog.log('debug 7',7);
-    pllog.log('trace 8',9);
     for lvl in 1 .. 9
     loop
-    	pllog.log('lvl is ' || lvl,lvl);
+    	logger.log('lvl is ' || lvl,lvl);
     end loop;
-    pllog.end_job;
+    logger.end_job;
 end;
 --%```
 /
 
 begin
-  pllog.set_debug;
-  pllog.log('no logfile specified');
+  logger.set_debug;
+  logger.log('no logfile specified');
 end;
 /
 
@@ -73,10 +62,9 @@ declare
     token varchar(32);
     logname varchar(32) := to_char(job_log_id_seq.nextval) || '.log';
 begin
-   pllog.set_debug;
-   pllog.begin_log(logfile_name => logname, p_log_level => 3);
-   pllog.set_caller_level('example_05',8);
-   example_01;
+   logger.set_debug;
+   logger.begin_log(logfile_name => logname, p_log_level => 3);
+   logger.set_caller_level('example_05',8);
    example_04;
    example_05;
 end;

@@ -1,5 +1,5 @@
 set echo on
-create or replace PACKAGE pllog AS
+create or replace PACKAGE logger AS
     G_SEVERE       CONSTANT PLS_INTEGER := 1 ;
     G_WARNING      CONSTANT PLS_INTEGER := 2 ;
     G_INFO         CONSTANT PLS_INTEGER := 4 ;
@@ -111,6 +111,6 @@ create or replace PACKAGE pllog AS
    
     procedure set_debug(debug boolean default true) ;
 
-END pllog ;
+END logger;
 /
 show errors
