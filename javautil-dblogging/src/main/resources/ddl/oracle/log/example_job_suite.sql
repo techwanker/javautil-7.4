@@ -1,6 +1,6 @@
 set serveroutput on
 set echo on
-spool example_suite.lst
+spool example_log_suite.lst
 
 --%## Define some procedures
 --%```
@@ -30,8 +30,9 @@ end;
 --%### example_05
 --%```
 create or replace 
-procedure example_05
+procedure example_job_05
 is
+    lines number := 0;
 begin
     pllog.log('severe 1',1);
     pllog.log('warning 2',2);
@@ -43,6 +44,10 @@ begin
     for lvl in 1 .. 9
     loop
     	pllog.log('lvl is ' || lvl,lvl);
+    end loop;
+    for rec in select * from all_source
+    loop
+       lines := lines + 1;
     end loop;
     pllog.end_job;
 end;
@@ -71,14 +76,26 @@ end;
 --%```
 declare
     token varchar(32);
-    logname varchar(32) := to_char(job_log_id_seq.nextval) || '.log';
+    --logname varchar(32) := to_char(job_log_id_seq.nextval) || '.log';
+    my_job_step_id number;
 begin
    pllog.set_debug;
-   pllog.begin_log(logfile_name => logname, p_log_level => 3);
+   token := pllog.begin_job(p_process_name => 'example_job');
    pllog.set_caller_level('example_05',8);
+   my_job_step_id := pllog.job_step_insert('example_01','no parms');
    example_01;
+   pllog.job_step_finish(my_job_step_id);
+   
+   my_job_step_id := pllog.job_step_insert(p_step_name => 'example_04',
+                        p_step_info => 'no parms');
    example_04;
+   pllog.job_step_finish(my_job_step_id);
+
+   my_job_step_id := pllog.job_step_insert('example_05');
    example_05;
+   pllog.job_step_finish(my_job_step_id);
+exception when others then
+   pllog.abort_job;
 end;
 --%```
 /

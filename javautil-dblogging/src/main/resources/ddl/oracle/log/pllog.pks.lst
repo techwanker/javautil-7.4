@@ -57,60 +57,61 @@ SQL> create or replace PACKAGE pllog AS
  57  --%# Finish job
  58  	 procedure end_job;
  59  
- 60  	 procedure abort_job(p_stacktrace in varchar default null);
- 61  
- 62  --%# Finish job
- 63  	 procedure set_action (p_action in	  varchar) ;
- 64  
- 65  	 procedure set_module (
- 66  	     p_module_name in	     varchar,
- 67  	     p_action_name in	varchar
- 68  	 );
- 69  
- 70  	 function get_directory_path
- 71  	 return varchar;
- 72  
- 73  --%# sql trace
- 74  	 function get_tracefile(p_file_name in varchar)
- 75  	 return clob;
- 76  
- 77  	 function get_my_tracefile_name
- 78  	 return varchar;
- 79  
- 80  	 function set_tracefile_identifier(p_job_nbr in number)
- 81  	 return varchar;
- 82  
- 83  	 function get_my_tracefile
- 84  	 return clob ;
- 85  
+ 60  	 procedure abort_job(exception_msg in varchar default null,
+ 61  		     stacktrace in varchar default null);
+ 62  
+ 63  --%# Finish job
+ 64  	 procedure set_action (p_action in	  varchar) ;
+ 65  
+ 66  	 procedure set_module (
+ 67  	     p_module_name in	     varchar,
+ 68  	     p_action_name in	varchar
+ 69  	 );
+ 70  
+ 71  	 function get_directory_path
+ 72  	 return varchar;
+ 73  
+ 74  --%# sql trace
+ 75  	 function get_tracefile(p_file_name in varchar)
+ 76  	 return clob;
+ 77  
+ 78  	 function get_my_tracefile_name
+ 79  	 return varchar;
+ 80  
+ 81  	 function set_tracefile_identifier(p_job_nbr in number)
+ 82  	 return varchar;
+ 83  
+ 84  	 function get_my_tracefile
+ 85  	 return clob ;
  86  
- 87  --%# misc
- 88  	 function basename (p_full_path in varchar,
- 89  			    p_suffix	in varchar default null,
- 90  			    p_separator in char default '/')
- 91  	 return varchar;
- 92  
- 93  	 procedure prepare_connection;
- 94  
- 95  	 procedure trace_step(p_step_name in varchar, p_job_step_id in number);
- 96  
- 97  	function job_step_insert (
- 98  	     p_step_name   in varchar,
- 99  	     p_step_info   in varchar,
-100  	     p_classname   in varchar,
-101  	     p_stacktrace  in varchar
-102  	) return number;
-103  
+ 87  
+ 88  --%# misc
+ 89  	 function basename (p_full_path in varchar,
+ 90  			    p_suffix	in varchar default null,
+ 91  			    p_separator in char default '/')
+ 92  	 return varchar;
+ 93  
+ 94  	 procedure prepare_connection;
+ 95  
+ 96  	 procedure trace_step(p_step_name in varchar, p_job_step_id in number);
+ 97  
+ 98  	function job_step_insert (
+ 99  	     p_step_name   in varchar,
+100  	     p_step_info   in varchar default null,
+101  	     p_classname   in varchar default null,
+102  	     p_stacktrace  in varchar default null
+103  	) return number;
 104  
-105  	procedure job_step_finish (step_id in number);
-106  
+105  
+106  	procedure job_step_finish (step_id in number);
 107  
 108  
 109  
-110  	 procedure set_debug(debug boolean default true) ;
-111  
-112  END pllog ;
-113  /
+110  
+111  	 procedure set_debug(debug boolean default true) ;
+112  
+113  END pllog ;
+114  /
 
 Package created.
 

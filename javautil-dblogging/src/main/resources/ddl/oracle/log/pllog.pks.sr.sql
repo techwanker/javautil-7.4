@@ -59,7 +59,8 @@ create or replace PACKAGE pllog AS
 --%# Finish job
     procedure end_job;
 
-    procedure abort_job(p_stacktrace in varchar default null);
+    procedure abort_job(exception_msg in varchar default null,
+		stacktrace in varchar default null);
 
 --%# Finish job
     procedure set_action (p_action in        varchar) ;
@@ -98,9 +99,9 @@ create or replace PACKAGE pllog AS
 
    function job_step_insert (
         p_step_name   in varchar, 
-        p_step_info   in varchar, 
-        p_classname   in varchar,     
-        p_stacktrace  in varchar
+        p_step_info   in varchar default null, 
+        p_classname   in varchar default null,     
+        p_stacktrace  in varchar default null
    ) return number;
 
 
