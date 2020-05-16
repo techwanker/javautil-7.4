@@ -472,6 +472,61 @@ is
             
     end get_log_level;
 
+  --
+  --  Logger hdr and dtl
+  --
+
+    procedure create_set (p_set_nm    in varchar,
+                        p_default_level     in number)
+    is
+    begin
+        insert into logger_hdr (logger_hdr_id, logger_set_nm, default_lvl)
+        values (logger_hdr_id_seq.nextval, upper(p_set_nm), p_default_level);
+     end create_set;
+
+    procedure set_caller_level(name in varchar ,  level in pls_integer)
+    is
+        dtl  logger_dtl%rowtype;
+    begin
+	    dtl.logger_nm := upper(name);
+	    dtl.log_lvl := level;
+	    logger_dtls(dtl.logger_nm) := dtl;
+	end;
+	    
+    procedure define_logger_level(p_set_nm    in varchar,
+                        p_logger_nm in varchar,
+                        p_level     in number)
+    is 
+        logger_rec logger_hdr%rowtype;
+    
+    begin
+      
+             insert into logger_dtl (logger_dtl_id, logger_hdr_id, 
+                     logger_nm, log_lvl)
+             select logger_dtl_id_seq.nextval, 
+                    logger_hdr.logger_hdr_id,
+                    upper(p_logger_nm), p_level
+             from   logger_hdr 
+             where 
+                   logger_set_nm = upper(p_set_nm);
+            
+             exception when dup_val_on_index 
+             then
+                 update logger_dtl 
+                 set  log_lvl =  p_level
+                 where logger_hdr_id =  (
+                         select logger_hdr_id 
+                         from   logger_hdr
+                         where logger_set_nm = upper(p_set_nm) 
+			)
+                         and logger_nm = upper(p_logger_nm);
+                   
+             
+             
+    end define_logger_level;
+    
+
+
    procedure log2(message in varchar,
                   level   in pls_integer default g_info) 
    is

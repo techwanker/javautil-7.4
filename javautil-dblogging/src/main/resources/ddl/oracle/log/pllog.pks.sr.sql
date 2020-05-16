@@ -98,6 +98,8 @@ create or replace PACKAGE pllog AS
    );
    
     procedure set_debug(debug boolean default true) ;
+
+    procedure set_caller_level(name in varchar ,  level in pls_integer);
 /*
   procedure log (
       p_log_msg      in   varchar,
