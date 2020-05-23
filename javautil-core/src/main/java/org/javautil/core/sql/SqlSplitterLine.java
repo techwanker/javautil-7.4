@@ -3,7 +3,7 @@ package org.javautil.core.sql;
 public class SqlSplitterLine {
 	private final int                 lineNumber;
 
-	private int                       statementNumber;
+	private int                       blockNumber = -1;
 
 	private int                       statementLineNumber;
 
@@ -25,12 +25,12 @@ public class SqlSplitterLine {
 		return lineNumber;
 	}
 
-	public int getStatementNumber() {
-		return statementNumber;
+	public int getBlockNumber() {
+		return blockNumber;
 	}
 
-	public void setStatementNumber(int statementNumber) {
-		this.statementNumber = statementNumber;
+	public void setBlockNumber(int blockNumber) {
+		this.blockNumber = blockNumber;
 	}
 
 	public int getStatementLineNumber() {
@@ -56,7 +56,9 @@ public class SqlSplitterLine {
 
 	@Override
 	public String toString() {
-		return String.format(" %5d %4d %4d %-16s %-16s %s", lineNumber, statementNumber, statementLineNumber, type,
+		//return String.format("ssl: %5d %4d %4d %-22s %-22s %s", 
+	return String.format("%5d %4d %4d %-22s %-22s %s", 
+				lineNumber, blockNumber, statementLineNumber, type,
 		    blockType, text);
 	}
 

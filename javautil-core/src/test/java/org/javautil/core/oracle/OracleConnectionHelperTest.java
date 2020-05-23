@@ -15,6 +15,7 @@ import org.javautil.oracle.OracleConnectionHelper;
 import org.javautil.util.ListOfNameValue;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,8 @@ public class OracleConnectionHelperTest {
 		}
 	}
 
+	// TODO choose a file and select one in file system at runtime
+	@Ignore
 	@Test
 	public void getTextFromRdbmsFile() throws SQLException, IOException {
 		logger.info("hasOracle {}", hasOracle);
@@ -77,6 +80,7 @@ public class OracleConnectionHelperTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void getMyTraceFile() throws SQLException, IOException {
 		if (hasOracle) {

@@ -17,20 +17,21 @@ public class NamedSqlStatementTest {
 	@Test
 	public void testAnnotatedName() throws IOException, SqlSplitterException {
 		final SqlSplitter sr = new SqlSplitter(this, "testsr/etl_persistence.named.sr.sql");
-		sr.setTraceState(0);
-		sr.analyze();
+		sr.setTraceState(1);
+		sr.process();
 		final SqlStatements ss = sr.getSqlStatements();
 
 		final NamedSqlStatements named = new NamedSqlStatements(ss);
 		final SqlStatement custInsert = named.getSqlStatement("etl_customer_tot_insert");
 		assertNotNull(custInsert);
+		logger.info("custInsert: {}",custInsert);
 		final String custInsertSql = custInsert.getSql();
 		final int index = custInsertSql.indexOf(":ETL_FILE_ID,  :LINE_NUMBER, :CUSTOMER_COUNT");
 		assertTrue(index > -1);
 
 	}
 
-	@Test
+	//@Test
 	public void testAnnotatedNameShort() throws IOException, SqlSplitterException {
 		String resourceName = "testsr/etl_persistence.named.sr.sql";
 		final NamedSqlStatements named = NamedSqlStatements.getNameSqlStatementsFromSqlSplitterResource(this, resourceName);

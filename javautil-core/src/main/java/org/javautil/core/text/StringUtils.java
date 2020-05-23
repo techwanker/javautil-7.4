@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -50,6 +52,44 @@ public class StringUtils {
 
 	private StringUtils() {
 		// prevent instantiation
+	}
+	
+	static public String stripTrailing(String text, Character[] strip) {
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final HashSet<Character> stripset = new HashSet(Arrays.asList(strip));
+		int i = text.length() - 1;
+		out:
+			for ( ; i > 0; i--) {
+				Character c = text.charAt(i); 
+				int  cInt =c;
+				if (! stripset.contains(c)) { 
+					logger.debug("stripTrailing breakout i {} c '{}' {}",i, cInt); 
+					break out;
+				}
+			}
+		String retval = text.substring(0, i + 1);
+		return retval;
+	}
+
+	static public String stripLeading(String text, Character[] strip) {
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final HashSet<Character> stripset = new HashSet(Arrays.asList(strip));
+		int i = 0;
+		int stop = text.length();
+		char [] chars = text.toCharArray();
+		out:
+			for ( ; i < stop; i++) {
+				Character c = text.charAt(i);
+				int cInt = c;
+				if (! stripset.contains(c)) {
+					logger.debug("stripLeading breakout i {} c {}",i,cInt); 
+					break out;
+				}
+			}
+		String retval = text.substring(i, stop);
+		return retval;
 	}
 
 	/**

@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.javautil.core.text.StringUtils;
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public class SqlSplitter {
-	private final static Logger               logger            = LoggerFactory.getLogger(SqlSplitter.class);
+	private final Logger               logger            = LoggerFactory.getLogger(this.getClass());
 
 	private LineNumberReader                   reader;
 	private boolean                            traceAnalyze      = false;
@@ -57,7 +56,7 @@ public class SqlSplitter {
 	private int                        traceState        = 1;
 	private final static Pattern       annotationPattern = Pattern.compile("^ *--@.*");
 	private boolean                    trace             = false;
-	private int                        blockNumber = -1;
+    private int                        blockNumber = 0;
 	private boolean                    proceduresOnly;
 	private ArrayList<String>          statements = new ArrayList<String>();
 	/**
@@ -65,17 +64,13 @@ public class SqlSplitter {
 	 */
 	private TreeMap<Integer,Integer>   blockIndex = new TreeMap<>();
 	private TreeMap<Integer,SqlSplitterBlockType>   blockTypeMap = new TreeMap<>();
-
-	private String regex = "([.|\\n]*)(;)([\\s|\\n]*)";
-	private Pattern semicolonPattern = Pattern.compile(regex);
 	//private TreeMap<Integer,Integer>   sqlLastIndex = new TreeMap<>();
-
 	
+
 	public SqlSplitter() {
 
 	}
 
-	// TODO accept a String Constructor
 	public SqlSplitter(Object instantiator, String resourceName) throws FileNotFoundException {
 		this.inputName = resourceName;
 		this.inputType = "resource";
@@ -106,28 +101,14 @@ public class SqlSplitter {
 	public void process() {
 		processLines();
 		analyze();
-		if (traceState > 0) {
-			logger.info("\n{}",formatLines());
-		}
-		// TODO need to close the files
 	}
-	
-	public static String trimSql(String text) {
-		logger.info("trimming '{}'",text);
-		Character[] whiteCruft = {'\t','\n','\r',' '};
+	public int getVerbosity() {
+		return verbosity;
+	}
 
-		String leading = StringUtils.stripTrailing(text,whiteCruft);
-		logger.info("leading: '{}'", leading);
-
-		Character[] semi = {';'};
-		String noSemi = StringUtils.stripTrailing(leading, semi);
-		logger.info("noSemi '{}'",noSemi);
-
-		String trimmed = StringUtils.stripLeading(noSemi,whiteCruft);
-
-		logger.info("trimmed '{}'",trimmed);
-		return trimmed;
-
+	public SqlSplitter setVerbosity(int verbosity) {
+		this.verbosity = verbosity;
+		return this;
 	}
 
 	public String lineInfo() {
@@ -148,50 +129,51 @@ public class SqlSplitter {
 			throw new RuntimeException(e);
 		}
 	}
-/**
- * 
- * @param linesIndex block start linesIndex
- * @return index of last line in block
- */
+
+//	String stateDescription(int n) {
+//		switch (n) {
+//		case 0:
+//			return "NO_BLOCK ";
+//		case 1:
+//			return "SQL_BlOCK";
+//		case 2:
+//			return "COMMENT  ";
+//		case 3:
+//			return "PROCEDURE";
+//		}
+//		throw new IllegalStateException();
+//	}
 
 	int processBlock(int linesIndex) {
-		blockNumber++;
 		SqlSplitterLine line = lines.get(linesIndex);
 		//	logger.debug("processBlock lineIndex: {} line: {}",linesIndex, line);
 		SqlSplitterLineType type = line.getType() ;
 		SqlSplitterLineType blockEnd = type.getEndType();
 		SqlSplitterBlockType blockType = type.getBlockType();
 		int		statementLineNumber = 1;
-		switch (type) {
-		case STATEMENT_NAME:
-		    line.setBlockNumber(blockNumber);
-			line.setBlockType(SqlSplitterBlockType.STATEMENT);
-			break;
-		default:
-			line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
-		}
+		line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
 		log("processBlock",linesIndex,line);
 		linesIndex++;
 		blockIndex.put(blockNumber, linesIndex);
 		blockTypeMap.put(blockNumber,blockType);
-
+		
 		boolean done = false;
 		while (linesIndex < lines.size() && ! done) {
 			line = lines.get(linesIndex);
 			//logger.debug("processBlock() lineIndex: {} line: {}",linesIndex, srl);
 			if (line.getType() == blockEnd) {
-     			blockNumber++;
 				line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
 				done = true;
 			} else {
 				line.setBlockType(blockType);
+				line.setBlockNumber(blockNumber);
 				line.setStatementLineNumber(statementLineNumber++);
 			}
-     			line.setBlockNumber(blockNumber);
 			log("processBlock",linesIndex,line);
 			linesIndex++;
 		}
-		return --linesIndex;
+		blockNumber++;
+		return linesIndex;
 	}
 	/**
 	 * A very simple finite state machine.
@@ -220,15 +202,53 @@ public class SqlSplitter {
 		//	for (final SqlSplitterLine srl : lines) {
 		while (linesIndex < lines.size())  {
 			SqlSplitterLine srl = lines.get(linesIndex);
+			//			logger.debug("linesIndex {} line: {}",linesIndex,srl);
+			/*
+			if (traceState > 3) {
+				logger.debug("state " + state);
+				logger.debug(srl.toString("analyze"));
+			}
+			 */
 
+			/*
+			if (state == IN_COMMENT_BLOCK) {
+				if (srl.getType().equals(SqlSplitterLineType.COMMENT_BLOCK_END)) {
+					state = NO_BLOCK;
+					srl.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+				} else {
+					srl.setBlockType(SqlSplitterBlockType.COMMENT);
+				}
+			if (state == IN_PROCEDURE_BLOCK) {
+				if (srl.getType().equals(SqlSplitterLineType.PROCEDURE_BLOCK_END)) {
+					state = NO_BLOCK;
+					srl.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+				} else {
+					srl.setBlockType(SqlSplitterBlockType.PROCEDURE);
+				}
+			}
+			} else {
+			 */
+			// TODO should not be able to nest 
 			switch (srl.getType()) {
 			case MARKDOWN_BLOCK_BEGIN:
 			case PROCEDURE_BLOCK_START:
 			case COMMENT_BLOCK_BEGIN:   // if (trimmed.startsWith("--#<"))
-			case STATEMENT_NAME:
 				linesIndex = processBlock(linesIndex);
 				break;
 
+				//			case PROCEDURE_BLOCK_START:
+				//				state = IN_PROCEDURE_BLOCK;
+				//				statementLineNumber = 1;
+				//				statementNumber++;
+				//				break;
+				//			case COMMENT_BLOCK_BEGIN:   // if (trimmed.startsWith("--#<"))
+				//				srl.setBlockType(SqlSplitterBlockType.COMMENT);
+				//				state = IN_COMMENT_BLOCK;
+				//				break;
+				//			case COMMENT_BLOCK_END:    // (trimmed.startsWith("--#>"))
+				//				state = NO_BLOCK;
+				//				srl.setBlockType(SqlSplitterBlockType.COMMENT);
+				//				break;
 			case COMMENT:               // (trimmed.startsWith("--#"))
 				srl.setBlockType(SqlSplitterBlockType.COMMENT);
 				break;
@@ -236,7 +256,11 @@ public class SqlSplitter {
 				if (state == IN_SQL_BLOCK) {
 					state = NO_BLOCK;
 				}
+				// TODO break?
 				state = NO_BLOCK;
+				//			case PROCEDURE_BLOCK_END:
+				//				srl.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+				//				break;
 			case SQL_WITH_SEMICOLON:
 				if (state == NO_BLOCK) {
 					statementLineNumber = 1;
@@ -255,7 +279,6 @@ public class SqlSplitter {
 				srl.setBlockNumber(blockNumber);
 
 				break;
-				/*
 			case STATEMENT_NAME:
 				switch (state) {
 				case IN_SQL_BLOCK:
@@ -266,9 +289,22 @@ public class SqlSplitter {
 					throw new SqlSplitterException(srl, message);
 
 				}
-				 */
 			case INDETERMINATE:
 				switch (state) {
+				//				case IN_COMMENT_BLOCK:
+				//					srl.setBlockType(SqlSplitterBlockType.COMMENT);
+				//					break;
+				//
+				//				case IN_PROCEDURE_BLOCK:
+				//					srl.setBlockType(SqlSplitterBlockType.PROCEDURE);
+				//					srl.setStatementLineNumber(statementLineNumber++);
+				//					srl.setBlockNumber(statementNumber);
+				//					break;
+				//				case IN_SQL_BLOCK:
+				//					srl.setBlockType(SqlSplitterBlockType.SQL);
+				//					srl.setStatementLineNumber(statementLineNumber++);
+				//					srl.setBlockNumber(statementNumber);
+				//					break;
 				case NO_BLOCK:
 					if (srl.getText().trim().length() == 0) {
 						srl.setBlockType(SqlSplitterBlockType.IGNORED);
@@ -288,33 +324,28 @@ public class SqlSplitter {
 
 				}
 				break;
-				/*
-			case STMT_END:
+			case STMT_END_NO_SQL:
 				state = NO_BLOCK;
 				srl.setBlockType(SqlSplitterBlockType.DIRECTIVE);
 				break;
-				*/
+				//			case MARKDOWN_BLOCK_BEGIN:
+				//				break;
+				//			case MARKDOWN_BLOCK_END:
+				//				break;
+				//		case PROCEDURE_BLOCK_START:
+				//				break;
 			case SQL:
 				break;
 			default:
 				break;
 			}
-			log("analyzed",linesIndex,lines.get(linesIndex));
+			log("analyze",linesIndex,srl);
 			linesIndex++;	
 		}
 		lineNumber++;
 		analyzed = true;
 	}
 
-	public ArrayList<String>  getBlockText(int blockIndex) {
-		ArrayList<String> retval = new ArrayList<>();
-		for (SqlSplitterLine line : lines) {
-			if (line.getBlockNumber() == blockIndex)  {
-				retval.add(line.getText() );
-			}
-		}
-		return retval;
-	}
 	public static String stripAnnotations(String in) {
 		String[] lines = StringUtils.getLines(in);
 		StringBuilder sb = new StringBuilder();
@@ -368,7 +399,6 @@ public class SqlSplitter {
 		}
 		return stmtLines;
 	}
-
 
 	@SuppressWarnings("incomplete-switch")
 	String getSqlText(ArrayList<SqlSplitterLine> lines) {
@@ -454,12 +484,11 @@ public class SqlSplitter {
 
 	private void log(String caller, int lineIndex, SqlSplitterLine line) {
 		if (traceState > 0) {
-			//String msg = String.format("%-14s %4d %s",caller,lineIndex + 1,line);
-			String msg = String.format("%-14s %s",caller,line);
+			String msg = String.format("%-14s %4d %s",caller,lineIndex + 1,line);
 			logger.info(msg);
 		}
 	}
-
+	
 	public String formatLines() {
 		StringBuilder sb = new StringBuilder();
 		for (SqlSplitterLine line : lines) {
@@ -532,12 +561,5 @@ public class SqlSplitter {
 	public TreeMap<Integer, SqlSplitterBlockType> getBlockTypeMap() {
 		return blockTypeMap;
 	}
-	public int getVerbosity() {
-		return verbosity;
-	}
 
-	public SqlSplitter setVerbosity(int verbosity) {
-		this.verbosity = verbosity;
-		return this;
-	}
 }

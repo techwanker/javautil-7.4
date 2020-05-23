@@ -10,33 +10,17 @@
 			<param name="ConversionPattern" value="%-5p %c{1} - %m%n" />
 		</layout>
 	</appender>
-	<logger name="org.hibernate.tool">
-		<level value="info" />
-	</logger>
-	<logger name="org.javautil.lang.IntrospectiveMapConstructor">
-		<level value="info" />
-	</logger>
-	<logger name="org.javautil.lang.reflect">
-		<level value="info" />
-	</logger>
-	<logger name="org.hibernate.tools.test.util">
-		<level value="info" />
-	</logger>
-	<logger name="org.javautil.core.sql.SqlStatements">
-		<level value="info" />
-	</logger>
-	<logger name="org.javautil.core.sql.DataSourceFactory">
-		<level value="info" />
-	</logger>
-	<logger name="org.javautil.core.workbook">
-		<level value="info" />
-	</logger>
-	<logger name="org.javautil.dataset.csv">
-		<level value="info" />
-	</logger>
-		<logger name="org.javautil.core.collections.MapOfProperties">
-		<level value="debug" />
-	</logger>
+	<logger name="org.hibernate.tool">                                <level value="info"  /> </logger>
+	<logger name="org.javautil.lang.IntrospectiveMapConstructor">     <level value="info"  /> </logger>
+	<logger name="org.javautil.lang.reflect">                         <level value="info"  /> </logger>
+	<logger name="org.hibernate.tools.test.util">                     <level value="info"  /> </logger>
+    <logger name="org.javautil.core.sql.SqlSplitter">                 <level value="debug" /> </logger>
+	<logger name="org.javautil.core.sql.SqlSplitterTest2">            <level value="debug" /> </logger>
+	<logger name="org.javautil.core.sql.SqlStatements">               <level value="info"  /> </logger>
+	<logger name="org.javautil.core.sql.DataSourceFactory">           <level value="info"  /> </logger>
+	<logger name="org.javautil.core.workbook">                        <level value="info"  /> </logger>
+	<logger name="org.javautil.dataset.csv">                          <level value="info"  /> </logger>
+		<logger name="org.javautil.core.collections.MapOfProperties"> <level value="debug" /> </logger>
 	<root>
 		<priority value="info" />
 		<appender-ref ref="console" />

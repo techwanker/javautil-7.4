@@ -54,27 +54,23 @@ select org_id from org where org_cd = :ORG_CD
 ;--
 --@NAME etl_sale_insert
         insert into ETL_SALE (
-            ETL_FILE_ID, 
-            LINE_NUMBER,
-            DISTRIB_ID, MFR_ID,
+            ETL_FILE_ID, LINE_NUMBER, DISTRIB_ID, MFR_ID,
             MFR_PRODUCT_ID, SHIP_TO_CUST_ID, INVOICE_CD, INVOICE_DT,
-            SHIP_DT, EXTENDED_NET_AMT,
-            DISTRIB_PRODUCT_REF,
+            SHIP_DT, EXTENDED_NET_AMT, DISTRIB_PRODUCT_REF,
             PRODUCT_DESCR, CASES_SHIPPED, BOXES_SHIPPED, UNITS_SHIPPED,
             CASE_GTIN
         ) values (
-            :ETL_FILE_ID, :LINE_NUMBER,
-            :DISTRIB_ID, :MFR_ID,
-            :MFR_PRODUCT_ID, :SHIP_TO_CUST_ID, :INVOICE_CD, :INVOICE_DT,
-            :SHIP_DT, :EXTENDED_NET_AMT,
-            :DISTRIB_PRODUCT_REF,
-            :PRODUCT_DESCR, :CASES_SHIPPED, :BOXES_SHIPPED, :UNITS_SHIPPED,
+            :ETL_FILE_ID,     :LINE_NUMBER,     :DISTRIB_ID,    :MFR_ID,
+            :MFR_PRODUCT_ID,  :SHIP_TO_CUST_ID, :INVOICE_CD,    :INVOICE_DT,
+            :SHIP_DT,         :EXTENDED_NET_AMT,:DISTRIB_PRODUCT_REF,
+            :PRODUCT_DESCR,   :CASES_SHIPPED,   :BOXES_SHIPPED, :UNITS_SHIPPED,
             :CASE_GTIN
         )
 ;--
 --@NAME etl_customer_tot_insert
     insert into etl_customer_tot (
-         etl_file_id,       line_number,    customer_count
+         etl_file_id,  line_number,   customer_count
     ) values (
         :ETL_FILE_ID,  :LINE_NUMBER, :CUSTOMER_COUNT
     )
+;--
