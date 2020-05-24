@@ -21,14 +21,14 @@ public class SqlSplitterTest2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 
-	//@Test
+	@Test
 	public void test_01() {
 		String input = "select 'x' from dual; ";
 		String expected = "select 'x' from dual";
 		assertEquals(expected,SqlSplitter.trimSql(input));
 	}
 
-	//@Test
+	@Test
 	public void test_02() {
 		String input =    "select 'y' from dual  \n;  \n";
 		String expected = "select 'y' from dual  \n";
@@ -38,7 +38,7 @@ public class SqlSplitterTest2 {
 		assertEquals(expected,actual);
 	}
 
-	//@Test
+	@Test
 	public void testBig() throws IOException, SqlSplitterException {
 		SqlSplitter sr = new SqlSplitter(this, "testsr/dblogger_install.pks.sr.sql").setProceduresOnly(true);
 		sr.process();
@@ -63,19 +63,32 @@ public class SqlSplitterTest2 {
 		logger.debug("formatLines:\n{}",sr.formatLines());
 		logger.debug("blockIndex: {}",sr.getBlockIndex());
 		logger.debug("blockMap {}",sr.getBlockTypeMap());
+		
+		int stmt0firstIndex = sr.getStatementIndex().get(0);
+		assertEquals(5,stmt0firstIndex);
+		ArrayList<SqlSplitterLine> stmtLines = sr.getStatementLines(0);
+		//logger.debug("stmtLines:\n{}",stmtLines);
+		assertEquals(10,stmtLines.size());
+		assertEquals("--%```",stmtLines.get(0).getText());
+		assertEquals("END logger;",stmtLines.get(9).getText());
+		
+		
 		List<String> texts  = sr.getSqlTexts();
-		int stmtNbr = 0;
-		for (String text : texts ) {
-			logger.info("===> {}\n{}",stmtNbr++,text);
-		}
+		assertEquals(1,texts.size());
+		String stmt0 = texts.get(0);
+		logger.debug("stmt0\n{}",stmt0);
+		
+		
+		
+//		int stmtNbr = 0;
+//		for (String text : texts ) {
+//			logger.info("===> {}\n{}",stmtNbr++,text);
+//		}
 		ArrayList<String> text = sr.getBlockText(1);
-		logger.info("text '{}'",text);
+		logger.info("text ==-\n{}'",text);
 		assertNotNull(text);
 		assertEquals(1,text.size());
-		assertEquals("create or replace package logger as",text.get(1));
-		
-
-
+//		assertEquals("create or replace package logger as",text.get(1));
 	}
 
 	//@Test
@@ -83,17 +96,20 @@ public class SqlSplitterTest2 {
 		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger.pks.sr.sql")).setProceduresOnly(true);
 		List<String> texts  = sr.getSqlTexts();
 		int stmtNbr = 0;
+		ArrayList<SqlSplitterLine> lines = sr.getStatementLines(0);
+		logger.debug("lines {}",lines);
+		assertEquals(10,lines.size());
 		for (String text : texts ) {
 			logger.info("===> {}\n{}",stmtNbr++,text);
 		}
 		//logger.info("lineState:\n{}",sr.lineState());
 		String sql = sr.getSqlStatements().get(1).getSql();
-		String trimmed = sql.trim();
-		String lines[]  = trimmed.split("\n");
+		//String trimmed = sql.trim();
+		//lines[]  = trimmed.split("\n");
 		
-		assertEquals("--%```",lines[0]);
+		//assertEquals("--%```",lines[0]);
 		//assertEquals("create or replace package logger",lines[0]);
-		assertEquals("end logger;",lines[lines.length -1]);
+		//assertEquals("end logger;",lines[lines.length -1]);
 
 	}
 	// @Test
@@ -105,7 +121,7 @@ public class SqlSplitterTest2 {
 
 	}
 
-    //@Test
+    @Test
 	public void testSkipBlockIncr() throws IOException, SqlSplitterException {
 
 		SqlSplitter runner = new SqlSplitter(this, "testsr/skip_block.sr.sql").setVerbosity(9);

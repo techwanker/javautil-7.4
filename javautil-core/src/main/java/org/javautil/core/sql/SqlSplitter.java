@@ -433,52 +433,46 @@ public class SqlSplitter {
 	}
 
 
-	@SuppressWarnings("incomplete-switch")
-	String getSqlText(ArrayList<SqlSplitterLine> lines) {
-		if (lines.size() == 0) {
-			throw new IllegalArgumentException("no lines");
-		}
-		final SqlSplitterBlockType blockType = lines.get(0).getBlockType();
-		// logger.debug("blockType " + blockType + " line " + lines.get(0));
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < (lines.size() - 1); i++) {
-			sb.append(lines.get(i).getText());
-			sb.append("\n");
-		}
-		final String lastLine = lines.get(lines.size() - 1).getText();
-		switch (blockType) {
+//	@SuppressWarnings("incomplete-switch")
+//	String getSqlText(ArrayList<SqlSplitterLine> lines) {
+//		if (lines.size() == 0) {
+//			throw new IllegalArgumentException("no lines");
+//		}
+//		final SqlSplitterBlockType blockType = lines.get(0).getBlockType();
+//		// logger.debug("blockType " + blockType + " line " + lines.get(0));
+//		final StringBuilder sb = new StringBuilder();
+//		for (int i = 0; i < (lines.size() - 1); i++) {
+//			sb.append(lines.get(i).getText());
+//			sb.append("\n");
+//		}
+//		final String lastLine = lines.get(lines.size() - 1).getText();
+//		switch (blockType) {
+//
+//		case SQL:
+//			// logger.debug("is SQL");
+//			final int semiIndex = lastLine.indexOf(";");
+//			if (semiIndex > -1) {
+//				sb.append(lastLine, 0, semiIndex);
+//			} else {
+//				sb.append(lastLine);
+//			}
+//			break;
+//		case PROCEDURE:
+//			// logger.debug("is procedure");
+//			sb.append(lastLine);
+//		}
+//		final String retval = sb.toString();
+//		return retval;
+//
+//	}
 
-		case SQL:
-			// logger.debug("is SQL");
-			final int semiIndex = lastLine.indexOf(";");
-			if (semiIndex > -1) {
-				sb.append(lastLine, 0, semiIndex);
-			} else {
-				sb.append(lastLine);
-			}
-			break;
-		case PROCEDURE:
-			// logger.debug("is procedure");
-			sb.append(lastLine);
-		}
-		final String retval = sb.toString();
-		return retval;
+//	void dumpLines(ArrayList<SqlSplitterLine> lines) {
+//		for (final SqlSplitterLine line : lines) {
+//			logger.debug(line.toString());
+//		}
+//	}
 
-	}
-
-	void dumpLines(ArrayList<SqlSplitterLine> lines) {
-		for (final SqlSplitterLine line : lines) {
-			logger.debug(line.toString());
-		}
-	}
-
-	String getSqlText(int stmtNumber) throws SqlSplitterException {
-		final ArrayList<SqlSplitterLine> lines = getStatementLines(stmtNumber);
-		String retval = getSqlText(lines);
-		logger.debug("returning {}\n{}", stmtNumber, retval);
-		return retval;
-	}
-
+	
 	int getStatementCount() {
 		if (statementIndex.size() == 0) {
 			logger.debug("statementIndex.size(): 0");
@@ -517,6 +511,13 @@ public class SqlSplitter {
 			sb.append("\n");
 		}
 		return sb.toString();
+	}
+	
+	String getSqlText(int stmtNumber) throws SqlSplitterException {
+		final ArrayList<SqlSplitterLine> lines = getStatementLines(stmtNumber);
+		String retval = asSqlString(lines);
+		logger.debug("returning {}\n{}", stmtNumber, retval);
+		return retval;
 	}
 
 	@SuppressWarnings("incomplete-switch")
