@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,17 +61,24 @@ public class SqlSplitter {
 	private int                        blockNumber = -1;
 	private boolean                    proceduresOnly;
 	private ArrayList<String>          statements = new ArrayList<String>();
-	/**
-	 * k - block number (relative 0), v lines index (relative 0)
-	 */
 	private TreeMap<Integer,Integer>   blockIndex = new TreeMap<>();
 	private TreeMap<Integer,SqlSplitterBlockType>   blockTypeMap = new TreeMap<>();
-
-	private String regex = "([.|\\n]*)(;)([\\s|\\n]*)";
-	private Pattern semicolonPattern = Pattern.compile(regex);
+	private int statementNumber = -1;
+	/**
+	 * k - statement number (relative 0), v lines index (relative 0) 
+	 * for blocks of statement
+	 */
+	private TreeMap<Integer,Integer>   statementIndex = new TreeMap<>();
+	
+	//private String regex = "([.|\\n]*)(;)([\\s|\\n]*)";
+	//private Pattern semicolonPattern = Pattern.compile(regex);
 	//private TreeMap<Integer,Integer>   sqlLastIndex = new TreeMap<>();
 
 	
+	public TreeMap<Integer, Integer> getStatementIndex() {
+		return statementIndex;
+	}
+
 	public SqlSplitter() {
 
 	}
@@ -162,11 +170,18 @@ public class SqlSplitter {
 		SqlSplitterLineType blockEnd = type.getEndType();
 		SqlSplitterBlockType blockType = type.getBlockType();
 		int		statementLineNumber = 1;
+		
 		switch (type) {
 		case STATEMENT_NAME:
 		    line.setBlockNumber(blockNumber);
 			line.setBlockType(SqlSplitterBlockType.STATEMENT);
+			line.setStatementLineNumber(statementLineNumber++);
+			line.setStatementNumber(++statementNumber);
+			statementIndex.put(statementNumber,linesIndex);
 			break;
+		case PROCEDURE_BLOCK_START:
+			line.setStatementNumber(++statementNumber);
+			statementIndex.put(statementNumber,linesIndex + 1);
 		default:
 			line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
 		}
@@ -184,6 +199,7 @@ public class SqlSplitter {
 				line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
 				done = true;
 			} else {
+			line.setStatementNumber(statementNumber);
 				line.setBlockType(blockType);
 				line.setStatementLineNumber(statementLineNumber++);
 			}
@@ -315,6 +331,7 @@ public class SqlSplitter {
 		}
 		return retval;
 	}
+	
 	public static String stripAnnotations(String in) {
 		String[] lines = StringUtils.getLines(in);
 		StringBuilder sb = new StringBuilder();
@@ -358,18 +375,38 @@ public class SqlSplitter {
 		return sb.toString();
 	}
 
-	public ArrayList<SqlSplitterLine> getStatement(int statementNumber) throws SqlSplitterException {
+	public ArrayList<SqlSplitterLine> getStatementLines(int statementNumber) throws SqlSplitterException {
 		analyze();
 		final ArrayList<SqlSplitterLine> stmtLines = new ArrayList<>();
-		for (final SqlSplitterLine srl : lines) {
-			if (srl.getBlockNumber() == statementNumber) {
-				stmtLines.add(srl);
-			}
+		Integer index = statementIndex.get(statementNumber);
+		if (index == null) {
+			throw new IllegalArgumentException(String.format("no such statementNumber %d in %s",statementNumber,statementIndex));
+		}
+		SqlSplitterLine ssl = lines.get(index);
+		int blockNumber = ssl.getBlockNumber();
+		while (ssl.getBlockNumber() == blockNumber) {
+				stmtLines.add(ssl);
+				ssl = lines.get(++index);
 		}
 		return stmtLines;
 	}
 
 
+	String asSqlString(List<SqlSplitterLine> lines) {
+		final StringBuilder sb = new StringBuilder();
+		int lastIndex = lines.size() - 1;
+		for (int i = 0; i <= lastIndex; i++) {
+			sb.append(lines.get(i).getText());
+			if (i < lastIndex) {
+			 sb.append("\n");
+			}
+		}
+		String retval = sb.toString();
+		logger.debug("lines:\n{}\nreturn:{}",lines,retval);
+		return retval;
+	}
+	
+	
 	@SuppressWarnings("incomplete-switch")
 	String getSqlText(ArrayList<SqlSplitterLine> lines) {
 		if (lines.size() == 0) {
@@ -410,39 +447,20 @@ public class SqlSplitter {
 	}
 
 	String getSqlText(int stmtNumber) throws SqlSplitterException {
-		final ArrayList<SqlSplitterLine> lines = getStatement(stmtNumber);
-		// dumpLines(lines);
-		final boolean isSql = lines.get(0).getBlockType().equals(SqlSplitterLineType.SQL);
-		if (lines.size() == 0) {
-			throw new IllegalArgumentException("no lines for statement " + stmtNumber);
-		}
+		final ArrayList<SqlSplitterLine> lines = getStatementLines(stmtNumber);
 		String retval = getSqlText(lines);
-		if (isSql) {
-			logger.debug("trimming ';' from " + retval);
-			retval = retval.replace(";", "");
-		}
 		logger.debug("returning {}\n{}", stmtNumber, retval);
 		return retval;
 	}
 
 	int getStatementCount() {
-		int i = lines.size() - 1;
-		int statementCount = 0;
-		while (i >= 0) {
-			statementCount = lines.get(i).getBlockNumber();
-			if (statementCount > 0) {
-				break;
-			}
-			i--;
-		}
-		return statementCount;
+		return statementIndex.lastKey();
 	}
 
 	public ArrayList<String> getSqlTexts() throws SqlSplitterException {
-		processLines();
-
-		analyze();
+		process();
 		final ArrayList<String> sqlTexts = new ArrayList<>();
+		
 		final int statementCount = getStatementCount();
 		logger.debug("statement count: {}", statementCount);
 		for (int i = 0; i < getStatementCount(); i++) {
@@ -468,31 +486,69 @@ public class SqlSplitter {
 		}
 		return sb.toString();
 	}
-	public ArrayList<SqlStatement> getSqlStatementList() throws SqlSplitterException {
-		final ArrayList<SqlStatement> statements = new ArrayList<>();
-
-		ArrayList<String> sqlTexts = getSqlTexts();
-		logger.debug("getSqlStatementList {} {}", "getSqlTexts returned ", sqlTexts.size());
-		for (final String sqlText : getSqlTexts()) {
-			final String sqlTextLines[] = sqlText.split("\n");
-			String name = null;
-			for (final String textLine : sqlTextLines) {
-				if (textLine.toUpperCase().contains("@NAME ")) {
+	
+	@SuppressWarnings("incomplete-switch")
+	public SqlStatement getSqlStatement(List<SqlSplitterLine> lines) {
+		String sql = asSqlString(lines);
+		SqlStatement ss = new SqlStatement(sql);
+		String name = null;
+		for (SqlSplitterLine line : lines) {
+			switch (line.getType()) {
+			case STATEMENT_NAME:
+				   
+				    String upperText = line.getText().toUpperCase();
+					final int index = upperText.indexOf("@NAME ");
 					if (name != null) {
-						throw new IllegalStateException("@NAME already specified for " + sqlText);
+						String message = String.format("Duplicate @NAME found on %d and %d,",
+								 lines.get(0).getLineNumber(),
+								 line.getLineNumber());
+						throw new IllegalArgumentException(message);
 					}
-					final int index = textLine.toUpperCase().indexOf("@NAME ");
-					name = textLine.substring(index + "@NAME ".length()).trim();
-				}
-			}
-			final SqlStatement ss = new SqlStatement(sqlText);
-			ss.setName(name);
-			statements.add(ss);
+					name = upperText.substring(index + "@NAME ".length()).trim();
+					ss.setName(name);
+				 }
 		}
-		logger.debug("getSqlStatementList: size() {}", statements.size());
-		return statements;
+		return ss;
 	}
-
+	
+    public SqlStatement getSqlStatement(int statementNumber) {
+    	return getSqlStatement(getStatementLines(statementNumber));
+    	
+    }
+    
+	public ArrayList<SqlStatement> getSqlStatementList() throws SqlSplitterException {
+         final ArrayList<SqlStatement> statements = new ArrayList<>();
+         for (int stmtNbr : statementIndex.keySet()) {
+        	 statements.add(getSqlStatement(stmtNbr));
+         }
+	     	return statements;
+		
+	}
+//	public ArrayList<SqlStatement> getSqlStatementList() throws SqlSplitterException {
+//		kkfinal ArrayList<SqlStatement> statements = new ArrayList<>();
+//
+//		ArrayList<String> sqlTexts = getSqlTexts();
+//		logger.debug("getSqlStatementList {} {}", "getSqlTexts returned ", sqlTexts.size());
+//		for (final String sqlText : getSqlTexts()) {
+//			final String sqlTextLines[] = sqlText.split("\n");
+//			String name = null;
+//			for (final String textLine : sqlTextLines) {
+//				if (textLine.toUpperCase().contains("@NAME ")) {
+//					if (name != null) {
+//						throw new IllegalStateException("@NAME already specified for " + sqlText);
+//					}
+//					final int index = textLine.toUpperCase().indexOf("@NAME ");
+//					name = textLine.substring(index + "@NAME ".length()).trim();
+//				}
+//			}
+//			final SqlStatement ss = new SqlStatement(sqlText);
+//			ss.setName(name);
+//			statements.add(ss);
+//		}
+//		logger.debug("getSqlStatementList: size() {}", statements.size());
+//		return statements;
+//	}
+//
 	public SqlStatements getSqlStatements() throws SqlSplitterException {
 		final SqlStatements sqlStatements = new SqlStatements(getSqlStatementList());
 		return sqlStatements;

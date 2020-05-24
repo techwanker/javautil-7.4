@@ -19,15 +19,21 @@ public class NamedSqlStatementTest {
 		final SqlSplitter sr = new SqlSplitter(this, "testsr/etl_persistence.named.sr.sql");
 		sr.setTraceState(1);
 		sr.process();
+		logger.info("statementIndex {}", sr.getStatementIndex());
+		assertEquals(0,sr.getStatementIndex().get(0).intValue());
+		assertEquals(69,sr.getStatementIndex().get(8).intValue());
+		String sql1 = sr.getSqlText(0);
+		logger.info("sql:\n{}",sql1);
 		final SqlStatements ss = sr.getSqlStatements();
-
-		final NamedSqlStatements named = new NamedSqlStatements(ss);
-		final SqlStatement custInsert = named.getSqlStatement("etl_customer_tot_insert");
-		assertNotNull(custInsert);
-		logger.info("custInsert: {}",custInsert);
-		final String custInsertSql = custInsert.getSql();
-		final int index = custInsertSql.indexOf(":ETL_FILE_ID,  :LINE_NUMBER, :CUSTOMER_COUNT");
-		assertTrue(index > -1);
+		assertNotNull(ss);
+		assertEquals(9,ss.size());
+//
+//		final NamedSqlStatements named = new NamedSqlStatements(ss);
+//		final SqlStatement custInsert = named.getSqlStatement("etl_customer_tot_insert");
+//		assertNotNull(custInsert);
+//		logger.info("custInsert: {}",custInsert);
+//		final int index = custInsertSql.indexOf(":ETL_FILE_ID,  :LINE_NUMBER, :CUSTOMER_COUNT");
+//		assertTrue(index > -1);
 
 	}
 

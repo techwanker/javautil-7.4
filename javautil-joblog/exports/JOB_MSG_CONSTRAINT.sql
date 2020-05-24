@@ -1,0 +1,10 @@
+--------------------------------------------------------
+--  Constraints for Table JOB_MSG
+--------------------------------------------------------
+
+  ALTER TABLE "JOB_MSG" MODIFY ("JOB_MSG_ID" NOT NULL ENABLE);
+  ALTER TABLE "JOB_MSG" MODIFY ("JOB_LOG_ID" NOT NULL ENABLE);
+  ALTER TABLE "JOB_MSG" MODIFY ("LOG_MSG_ID" NOT NULL ENABLE);
+  ALTER TABLE "JOB_MSG" MODIFY ("LOG_SEQ_NBR" NOT NULL ENABLE);
+  ALTER TABLE "JOB_MSG" ADD CONSTRAINT "JOB_MSG_PK" PRIMARY KEY ("JOB_LOG_ID", "LOG_SEQ_NBR")
+  USING INDEX  ENABLE;

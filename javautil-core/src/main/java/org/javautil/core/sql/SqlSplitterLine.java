@@ -4,6 +4,8 @@ public class SqlSplitterLine {
 	private final int                 lineNumber;
 
 	private int                       blockNumber = -1;
+	
+	private int statementNumber = -1;
 
 	private int                       statementLineNumber;
 
@@ -57,8 +59,8 @@ public class SqlSplitterLine {
 	@Override
 	public String toString() {
 		//return String.format("ssl: %5d %4d %4d %-22s %-22s %s", 
-	return String.format("%5d %4d %4d %-22s %-22s %s", 
-				lineNumber, blockNumber, statementLineNumber, type,
+	return String.format("%5d %4d %4d %4d %-22s %-22s %s", 
+				lineNumber, blockNumber, statementNumber, statementLineNumber, type,
 		    blockType, text);
 	}
 
@@ -69,5 +71,13 @@ public class SqlSplitterLine {
 	public void setBlockType(SqlSplitterBlockType blockType) {
 		this.blockType = blockType;
 		// logger.info("setBlockType: " + this.toString());
+	}
+
+	public int getStatementNumber() {
+		return statementNumber;
+	}
+
+	public void setStatementNumber(int statementNumber) {
+		this.statementNumber = statementNumber;
 	}
 }

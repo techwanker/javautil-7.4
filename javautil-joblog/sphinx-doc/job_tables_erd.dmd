@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="job_tables_erd" id="FE57318D-F9E3-ACDD-C5B5-9099A90F6818" version="3.5">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:44:18 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>FE57318D-F9E3-ACDD-C5B5-9099A90F6818</designId>
+<usedDesignStorageDescriptors>
+<designDescr class="oracle.dbtools.crest.model.design.Design$DesignStorageDesc" id="62CC3032-9E32-ED6D-BA4F-05DD2E8FB18B">
+<designStoragePath>/</designStoragePath>
+</designDescr>
+</usedDesignStorageDescriptors>
+</OSDM_Design>

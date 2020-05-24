@@ -1,0 +1,233 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D027137C-9ECB-8C8A-CA6B-B89A5319D47A" schemaObject="AD5682B3-3406-2317-FEAC-0F9D8AD4B6DF" name="JOB_STEP">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>JOB_STEP</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:53 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="JOB_STEP_ID" id="536244B4-5A21-8E9C-8D9C-0614EB08FAF1">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>JOB_STEP_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="JOB_LOG_ID" id="90113C62-F36A-F528-0076-3B0ACBE6112C">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>JOB_LOG_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8A949F1C-6E4E-D0C7-24F6-1AB0858BB221" referredColumn="FFAD04C7-C3F8-7D83-83DC-696B81A6B485"/>
+</associations>
+</Column>
+<Column name="STEP_NAME" id="49CFA581-AA95-AA64-8B1A-1C3C05F658A7">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>STEP_NAME</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>64 BYTE</dataTypeSize>
+<ownDataTypeParameters>64 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CLASSNAME" id="AB4DD296-A800-166B-8E80-951D6B0D6A37">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>CLASSNAME</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>256 BYTE</dataTypeSize>
+<ownDataTypeParameters>256 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STEP_INFO" id="194D55A6-C83D-0A1B-FAD1-47FC67D81229">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>STEP_INFO</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>2000 BYTE</dataTypeSize>
+<ownDataTypeParameters>2000 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="START_TS" id="7625C9AC-E795-1EAC-F17C-C493C772D3A6">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>START_TS</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT015</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<ownDataTypeParameters>,9,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="END_TS" id="3B2C2D58-E65E-1CF4-FF9B-A74433ABE592">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>END_TS</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT015</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<ownDataTypeParameters>,9,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DBSTATS" id="364F2BC3-4F87-1CFA-3902-D22748C86124">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>DBSTATS</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<dataTypeSize>4000</dataTypeSize>
+<ownDataTypeParameters>4000,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STEP_INFO_JSON" id="15CCD164-2209-BE17-44DD-8AA857F519FE">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>STEP_INFO_JSON</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<dataTypeSize>4000</dataTypeSize>
+<ownDataTypeParameters>4000,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CURSOR_INFO_RUN_ID" id="234B14E3-9C5A-30E6-D77D-ABC45EDC3E9B">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>CURSOR_INFO_RUN_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STACKTRACE" id="DDE94E3F-9CAF-59CD-D59D-6E59E1E74023">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_STEP</sourceObjSchema>
+<sourceObjName>STACKTRACE</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>4000 BYTE</dataTypeSize>
+<ownDataTypeParameters>4000 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="090131D6-DF3B-E8BB-511C-9F0F4703455A" name="JOB_STEP_PK">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>JOB_STEP_PK</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="536244B4-5A21-8E9C-8D9C-0614EB08FAF1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BAE6636E-3C9E-BBBB-BCFC-3E8BBDF99949" schemaObject="AD5682B3-3406-2317-FEAC-0F9D8AD4B6DF" name="JOB_STEP_PK">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>JOB_STEP_PK</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="536244B4-5A21-8E9C-8D9C-0614EB08FAF1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="99D88DCD-3B43-581A-E373-A8C201881CCC" name="STEP_STATUS_FK">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="90113C62-F36A-F528-0076-3B0ACBE6112C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D60BE549-2890-384E-870E-E78A96CDCCC3" name="SYS_C0096817">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="234B14E3-9C5A-30E6-D77D-ABC45EDC3E9B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

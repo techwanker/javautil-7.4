@@ -1,0 +1,270 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="E0496553-4779-E64E-F7A3-3D30A2DA4E8D" schemaObject="AD5682B3-3406-2317-FEAC-0F9D8AD4B6DF" name="JOB_MSG">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>JOB_MSG</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:53 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="JOB_MSG_ID" id="8A376905-812F-03D3-4C5E-72F38EDFF2FB">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>JOB_MSG_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="JOB_LOG_ID" id="C1205671-BF30-43F5-AB91-8341EC650684">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>JOB_LOG_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E656E09F-A39E-5A51-C3DC-B4964352940B" referredColumn="FFAD04C7-C3F8-7D83-83DC-696B81A6B485"/>
+</associations>
+</Column>
+<Column name="JOB_STEP_ID" id="D52384CF-345D-510F-D904-2F498F3A0258">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>JOB_STEP_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 23:12:09 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<importedID>189C3F9D-8373-68A5-048F-CEEE7826ED5A</importedID>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="7573D292-BC3F-3009-5725-FA9495969EC0" referredColumn="536244B4-5A21-8E9C-8D9C-0614EB08FAF1"/>
+</associations>
+</Column>
+<Column name="LOG_MSG_ID" id="FA1C8385-5AC6-E3B7-716F-1E2CCF4C8305">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LOG_MSG_ID</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>8 BYTE</dataTypeSize>
+<ownDataTypeParameters>8 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOG_MSG" id="C1CE27EB-19BF-729C-92A9-C7B44B208FB8">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LOG_MSG</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>256 BYTE</dataTypeSize>
+<ownDataTypeParameters>256 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOG_MSG_CLOB" id="E9ECF4EA-75AB-ED27-3BCD-D69980B0E476">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LOG_MSG_CLOB</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<dataTypeSize>4000</dataTypeSize>
+<ownDataTypeParameters>4000,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOG_MSG_TS" id="960ABA7F-EB3F-8333-5842-A8EBE095C7A9">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LOG_MSG_TS</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT015</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<ownDataTypeParameters>,9,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ELAPSED_TIME_MILLISECONDS" id="A6FB08C7-D9F5-F646-1758-AA7CC8A10A29">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>ELAPSED_TIME_MILLISECONDS</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>9</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,9,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOG_SEQ_NBR" id="B5634E40-BB1D-D5BD-8A7A-2E1374554087">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LOG_SEQ_NBR</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>18</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,18,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CALLER_NAME" id="88F537D5-36CC-F050-0640-E4014AA8AA8D">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>CALLER_NAME</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 BYTE</dataTypeSize>
+<ownDataTypeParameters>100 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LINE_NBR" id="3F8955F2-AE29-F855-1DFE-7813B81B1C38">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LINE_NBR</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,5,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CALL_STACK" id="08775EB2-A2EC-90F4-22A0-D6F42A67B586">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>CALL_STACK</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<dataTypeSize>4000</dataTypeSize>
+<ownDataTypeParameters>4000,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOG_LEVEL" id="E86758D0-D1D0-0A31-9AE6-AB6D2DDD1FC1">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>JOB_MSG</sourceObjSchema>
+<sourceObjName>LOG_LEVEL</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>2</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,2,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="93D0FC09-060E-68F0-872E-EC2C3E31873E" name="JOB_MSG_PK">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>JOB_MSG_PK</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:55 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C1205671-BF30-43F5-AB91-8341EC650684"/>
+<colUsage columnID="B5634E40-BB1D-D5BD-8A7A-2E1374554087"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="584ACD37-CAD7-5DCB-5022-6C31F46511B6" schemaObject="AD5682B3-3406-2317-FEAC-0F9D8AD4B6DF" name="JOB_MSG_PK">
+<sourceConnName>pdssr</sourceConnName>
+<sourceObjSchema>SR</sourceObjSchema>
+<sourceObjName>JOB_MSG_PK</sourceObjName>
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 20:46:54 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C1205671-BF30-43F5-AB91-8341EC650684"/>
+<colUsage columnID="B5634E40-BB1D-D5BD-8A7A-2E1374554087"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="861D3609-181E-3EA0-133D-77689415D6FD" name="JOB_FK">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 23:12:09 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D52384CF-345D-510F-D904-2F498F3A0258"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6BFD03EF-C909-74EC-75CF-1830EDDCD38F" name="JOB_MSG_JOB_LOG_FK">
+<createdBy>jjs</createdBy>
+<createdTime>2019-10-26 23:12:09 UTC</createdTime>
+<ownerDesignName>job_tables_erd</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C1205671-BF30-43F5-AB91-8341EC650684"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

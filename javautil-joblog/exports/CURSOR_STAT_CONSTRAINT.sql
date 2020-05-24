@@ -1,0 +1,9 @@
+--------------------------------------------------------
+--  Constraints for Table CURSOR_STAT
+--------------------------------------------------------
+
+  ALTER TABLE "CURSOR_STAT" MODIFY ("CURSOR_INFO_ID" NOT NULL ENABLE);
+  ALTER TABLE "CURSOR_STAT" MODIFY ("SEQ_NBR" NOT NULL ENABLE);
+  ALTER TABLE "CURSOR_STAT" MODIFY ("OPERATION_DEPTH" NOT NULL ENABLE);
+  ALTER TABLE "CURSOR_STAT" ADD CONSTRAINT "CURSOR_STAT_PK" PRIMARY KEY ("CURSOR_INFO_ID", "SEQ_NBR")
+  USING INDEX  ENABLE;

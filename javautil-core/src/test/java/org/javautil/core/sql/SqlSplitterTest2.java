@@ -126,7 +126,7 @@ public class SqlSplitterTest2 {
 		splitter.processLines();
 		splitter.analyze();
 		// logger.debug(splitter.formatLines());
-		ArrayList<SqlSplitterLine> splitterLines = splitter.getStatement(1);
+		ArrayList<SqlSplitterLine> splitterLines = splitter.getStatementLines(1);
 		assertEquals(1, splitterLines.size());
 		logger.debug("splitterLines");
 
