@@ -3,6 +3,7 @@ package org.javautil.core.sql;
 import java.util.regex.Pattern;
 
 public enum SqlSplitterLineType {
+	BLANK,
 	INDETERMINATE, 
 	SQL, 
 	STATEMENT_NAME, STATEMENT_END, 
@@ -46,11 +47,14 @@ public enum SqlSplitterLineType {
 		if (trimmed.toUpperCase().startsWith("--@NAME")) {
 			return STATEMENT_NAME;
 		}
+		if (trimmed.length() == 0) {
+			return BLANK;
+		}
 		/*
 		if (trimmed.toUpperCase().startsWith("--@END_NAME")) {
 			return END_NAME;
 		}
-		*/
+		 */
 		if (trimmed.endsWith(";")) {
 			if (trimmed.length() == 1) {
 				return SEMICOLON;
@@ -65,22 +69,54 @@ public enum SqlSplitterLineType {
 		return INDETERMINATE;
 	}
 
-    SqlSplitterBlockType getBlockType() {
-    	
+	SqlSplitterBlockType getBlockType() {
+
 		switch (this) {
 		case MARKDOWN_BLOCK_BEGIN:
 			return SqlSplitterBlockType.MARKDOWN;
-		case PROCEDURE_BLOCK_START:
-			return SqlSplitterBlockType.PROCEDURE;
 		case COMMENT_BLOCK_BEGIN:
 			return SqlSplitterBlockType.COMMENT;
+		case PROCEDURE_BLOCK_START:
 		case STATEMENT_NAME:
+		case INDETERMINATE:
 			return SqlSplitterBlockType.STATEMENT;
 		default:
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Unsupported block type "  + this);
 		}
-    }
-	SqlSplitterLineType getEndType() {
+	}
+
+	boolean isBlockEnd(SqlSplitterLineType sentinel) {
+		switch (this) {
+		case INDETERMINATE:
+			switch (sentinel) {
+			case SQL_WITH_SEMICOLON:
+			case STATEMENT_END:
+			case PROCEDURE_BLOCK_START:
+			case STATEMENT_NAME:
+				return true;
+			case COMMENT:
+			case COMMENT_BLOCK_BEGIN:
+			case COMMENT_BLOCK_END:
+			case INDETERMINATE:
+			case MARKDOWN_BLOCK_BEGIN:
+			case MARKDOWN_BLOCK_END:
+			case PROCEDURE_BLOCK_END:
+			case SEMICOLON:
+			case SQL:
+				return false;
+			}
+			return false;
+		case COMMENT_BLOCK_BEGIN:
+			return sentinel.equals(COMMENT_BLOCK_END);
+		case MARKDOWN_BLOCK_BEGIN:
+			return sentinel.equals(MARKDOWN_BLOCK_END);
+		case PROCEDURE_BLOCK_START:
+			return sentinel.equals(PROCEDURE_BLOCK_END);
+		default:
+			throw new IllegalStateException();
+		}
+
+	} SqlSplitterLineType getEndType() {
 		switch (this) {
 		case MARKDOWN_BLOCK_BEGIN:
 			return MARKDOWN_BLOCK_END;
@@ -94,7 +130,7 @@ public enum SqlSplitterLineType {
 			throw new IllegalArgumentException(this.name());
 		}
 	}
-	
+
 	boolean isBegin() {
 		boolean retval = false;
 		switch (this) {
@@ -123,6 +159,6 @@ public enum SqlSplitterLineType {
 		return retval;		
 
 	}
-	
-	
+
+
 }

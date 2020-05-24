@@ -37,6 +37,7 @@ public class SqlRunner {
 	private boolean       showSql;
 
 	private boolean       commitOrRollbackEveryStatement;
+	private int           sqlSplitterTrace;
 
 	public boolean isShowSql() {
 		return showSql;
@@ -54,16 +55,19 @@ public class SqlRunner {
 	public SqlRunner(Object instantiator, String resourceName) throws IOException, SqlSplitterException {
 		splitterInputStream = ResourceHelper.getResourceAsInputStream(instantiator, resourceName);
 		splitter = new SqlSplitter(splitterInputStream);
+		splitter.setTraceState(sqlSplitterTrace);
 	}
 
 	public SqlRunner(InputStream inputStream) {
 		splitterInputStream = inputStream;
 		splitter = new SqlSplitter(splitterInputStream);
+		splitter.setTraceState(sqlSplitterTrace);
 	}
 
 	public SqlRunner(File inputFile) throws IOException, SqlSplitterException {
 		splitterInputStream = new FileInputStream(inputFile);
 		splitter = new SqlSplitter(splitterInputStream);
+		splitter.setTraceState(sqlSplitterTrace);
 	}
 
 	public SqlRunner(Connection connection, SqlStatements sqlStatements) {
@@ -247,6 +251,11 @@ public class SqlRunner {
 		SqlRunnerArgs arguments = new SqlRunnerArgs();
 		new CommandLineHandler(arguments).evaluateArguments(args);
 		invocation.process(arguments);
+	}
+
+	public SqlRunner setSqlSplitterTrace(int sqlSplitterTrace) {
+		this.sqlSplitterTrace = sqlSplitterTrace; 
+		return null;
 	}
 
 }

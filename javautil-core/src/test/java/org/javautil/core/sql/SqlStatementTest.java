@@ -218,7 +218,8 @@ public class SqlStatementTest {
 		if (connection == null) {
 			throw new IllegalStateException("connection is null");
 		}
-		final SqlRunner runner = new SqlRunner(this, ddlResourceName).setCommit(false).setConnection(connection);
+		final SqlRunner runner = new SqlRunner(this, ddlResourceName).setCommit(false).
+				setConnection(connection).setShowSql(true).setSqlSplitterTrace(1);
 		runner.process();
 	}
 
