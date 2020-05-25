@@ -15,6 +15,7 @@
 	<logger name="org.javautil.lang.IntrospectiveMapConstructor">     <level value="info"  /> </logger>
 	<logger name="org.javautil.lang.reflect">                         <level value="info"  /> </logger>
 	<logger name="org.hibernate.tools.test.util">                     <level value="info"  /> </logger>
+    <logger name="org.javautil.core.sql.NamedSqlStatements">                 <level value="debug" /> </logger>
     <logger name="org.javautil.core.sql.SqlSplitter">                 <level value="debug" /> </logger>
 	<logger name="org.javautil.core.sql.SqlSplitterTest2">            <level value="debug" /> </logger>
 	<logger name="org.javautil.core.sql.SqlStatements">               <level value="info"  /> </logger>

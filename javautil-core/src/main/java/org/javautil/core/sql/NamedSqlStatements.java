@@ -23,7 +23,7 @@ public class NamedSqlStatements extends SqlStatements implements Iterable<SqlSta
 	// private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private Map<String, SqlStatement> sqlStatementByName = null;
-	Logger                            logger             = LoggerFactory.getLogger(getClass());
+	private static transient Logger  logger  = LoggerFactory.getLogger(NamedSqlStatements.class);
 
 	public NamedSqlStatements(Connection conn) {
 		super(conn);
@@ -96,6 +96,11 @@ public class NamedSqlStatements extends SqlStatements implements Iterable<SqlSta
 	    throws IOException, SqlSplitterException {
 		final SqlSplitter sr = new SqlSplitter(caller, resourceName);
 		final SqlStatements ss = sr.getSqlStatements();
+		if (logger.isDebugEnabled()) {
+			for (SqlStatement s : ss) {
+				logger.info("SqlStatement: {}",s);
+			}
+		}
 		final NamedSqlStatements named = new NamedSqlStatements(ss);
 		return named;
 	}

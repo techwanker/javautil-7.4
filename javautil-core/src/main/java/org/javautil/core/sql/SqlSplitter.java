@@ -195,17 +195,27 @@ public class SqlSplitter {
 			blockType = SqlSplitterBlockType.STATEMENT; 
 			type = line.getType();
 			break;
+		case SQL_WITH_SEMICOLON:
 		case INDETERMINATE:
+			line.setBlockNumber(blockNumber);
+			line.setBlockType(SqlSplitterBlockType.STATEMENT);
+			line.setStatementLineNumber(statementLineNumber++);
+			line.setStatementNumber(++statementNumber);
+			blockType = SqlSplitterBlockType.STATEMENT; 
+			statementIndex.put(statementNumber,linesIndex);
 			break;
 		default:
 			line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+		}
+		if ((traceFlags & traceBlock) != 0) {
+			log("processBlock 2",linesIndex,line);
 		}
 		linesIndex++;
 		blockIndex.put(blockNumber, linesIndex);
 		blockTypeMap.put(blockNumber,blockType);
 		boolean done = false;
 		if ((traceFlags & traceBlock) != 0) {
-			log("processBlock",linesIndex,line);
+			log("processBlock 3",linesIndex,line);
 		}
 		while (linesIndex < lines.size() && ! done) {
 			line = lines.get(linesIndex);
@@ -265,9 +275,9 @@ public class SqlSplitter {
 			case COMMENT_BLOCK_BEGIN:   // if (trimmed.startsWith("--#<"))
 			case STATEMENT_NAME:
 			case INDETERMINATE:
+			case SQL_WITH_SEMICOLON:
 				linesIndex = processBlock(linesIndex);
 				break;
-
 			case BLANK:
 				srl.setBlockType(SqlSplitterBlockType.IGNORED);
 			    break;	
@@ -275,28 +285,29 @@ public class SqlSplitter {
 				srl.setBlockType(SqlSplitterBlockType.COMMENT);
 				break;
 			case SEMICOLON:
-				if (state == IN_SQL_BLOCK) {
-					state = NO_BLOCK;
-				}
-				state = NO_BLOCK;
-			case SQL_WITH_SEMICOLON:
-				if (state == NO_BLOCK) {
-					statementLineNumber = 1;
-					blockNumber++;
-					srl.setBlockType(SqlSplitterBlockType.SQL);
-					state = NO_BLOCK;
-				}
-				if (state == IN_SQL_BLOCK) {
-					srl.setBlockType(SqlSplitterBlockType.SQL);
-					state = NO_BLOCK;
-				}
-				if (state == IN_PROCEDURE_BLOCK) {
-					srl.setBlockType(SqlSplitterBlockType.PROCEDURE);
-				}
-				srl.setStatementLineNumber(statementLineNumber++);
-				srl.setBlockNumber(blockNumber);
-
-				break;
+				throw new IllegalStateException();
+//				if (state == IN_SQL_BLOCK) {
+//					state = NO_BLOCK;
+//				}
+//				state = NO_BLOCK;
+//			case SQL_WITH_SEMICOLON:
+//				if (state == NO_BLOCK) {
+//					statementLineNumber = 1;
+//					blockNumber++;
+//					srl.setBlockType(SqlSplitterBlockType.STATEMENT);
+//					state = NO_BLOCK;
+//				}
+//				if (state == IN_SQL_BLOCK) {
+//					srl.setBlockType(SqlSplitterBlockType.STATEMENT);
+//					state = NO_BLOCK;
+//				}
+//				if (state == IN_PROCEDURE_BLOCK) {
+//					srl.setBlockType(SqlSplitterBlockType.STATEMENT);
+//				}
+//				srl.setStatementLineNumber(statementLineNumber++);
+//				srl.setBlockNumber(blockNumber);
+//
+//				break;
 				/*
 			case STATEMENT_NAME:
 				switch (state) {
@@ -412,6 +423,9 @@ public class SqlSplitter {
 		int blockNumber = ssl.getBlockNumber();
 		while (ssl.getBlockNumber() == blockNumber) {
 			stmtLines.add(ssl);
+			if (index == (lines.size() - 1)) {
+				break;
+			}
 			ssl = lines.get(++index);
 		}
 		return stmtLines;
@@ -427,7 +441,7 @@ public class SqlSplitter {
 				sb.append("\n");
 			}
 		}
-		String retval = sb.toString();
+		String retval = trimSql(sb.toString());
 		logger.debug("lines:\n{}\nreturn:{}",lines,retval);
 		return retval;
 	}
@@ -537,7 +551,8 @@ public class SqlSplitter {
 							line.getLineNumber());
 					throw new IllegalArgumentException(message);
 				}
-				name = upperText.substring(index + "@NAME ".length()).trim();
+				//name = upperText.substring(index + "@NAME ".length()).trim();
+				name = line.getText().substring(index + "@NAME ".length()).trim();
 				ss.setName(name);
 			}
 		}
@@ -550,6 +565,7 @@ public class SqlSplitter {
 	}
 
 	public ArrayList<SqlStatement> getSqlStatementList() throws SqlSplitterException {
+		process();
 		final ArrayList<SqlStatement> statements = new ArrayList<>();
 		for (int stmtNbr : statementIndex.keySet()) {
 			statements.add(getSqlStatement(stmtNbr));

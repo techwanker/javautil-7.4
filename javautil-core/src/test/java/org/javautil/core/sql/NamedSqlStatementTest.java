@@ -37,10 +37,14 @@ public class NamedSqlStatementTest {
 
 	}
 
-	//@Test
+	@Test
 	public void testAnnotatedNameShort() throws IOException, SqlSplitterException {
 		String resourceName = "testsr/etl_persistence.named.sr.sql";
 		final NamedSqlStatements named = NamedSqlStatements.getNameSqlStatementsFromSqlSplitterResource(this, resourceName);
+		logger.info("named size {}", named.size());
+		for (SqlStatement ss : named) {
+			logger.info("name {}", ss.getName());
+		}
 		final SqlStatement custTotInsert = named.getSqlStatement("etl_customer_tot_insert");
 		assertNotNull(custTotInsert);
 		final String custTotInsertSql = custTotInsert.getSql();
