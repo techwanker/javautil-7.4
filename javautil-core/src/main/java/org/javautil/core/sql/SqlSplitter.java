@@ -169,7 +169,7 @@ public class SqlSplitter {
 			blockBegin.setBlockType(SqlSplitterBlockType.DIRECTIVE);
 			blockNumber++;
 			if (blockBegin.getType().equals(SqlSplitterLineType.PROCEDURE_BLOCK_START)) {
-				statementIndex.put(++statementNumber, linesIndex );
+				statementIndex.put(++statementNumber, linesIndex + 1 );
 			}
 		} else {
 			blockBegin.setBlockType(SqlSplitterBlockType.STATEMENT);
@@ -193,6 +193,8 @@ public class SqlSplitter {
 						logger.debug("isStatementEnd {}",line.getType());
 						break loop;
 					}
+				case STATEMENT_BLOCK:
+					line.setStatementLineNumber(blockLineNbr++);
 				default:
 					line.setBlockType(blockType);
 					if (	blockBegin.getType().isEndType(line.getType())) {

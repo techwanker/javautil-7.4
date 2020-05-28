@@ -22,14 +22,15 @@ public class SqlSplitterTest2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 
-	@Ignore
+	//@Ignore
+	
 	@Test
 	public void test_01() {
 		String input = "select 'x' from dual; ";
 		String expected = "select 'x' from dual";
 		assertEquals(expected,SqlSplitter.trimSql(input));
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void test_02() {
 		String input =    "select 'y' from dual  \n;  \n";
@@ -50,18 +51,18 @@ public class SqlSplitterTest2 {
 		assertEquals(1,texts.size());
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
 	public void testShort() throws IOException, SqlSplitterException {
 		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger_short.sql")).setProceduresOnly(true);
 		sr.setTraceState(1);
-
 		sr.process();
 		
 		int stmt0firstIndex = sr.getStatementIndex().get(0);
 		assertEquals(5,stmt0firstIndex);
 		ArrayList<SqlSplitterLine> stmtLines = sr.getStatementLines(0);
 		//logger.debug("stmtLines:\n{}",stmtLines);
+		logger.info("\n{}",sr.formatLines());
 		assertEquals(10,stmtLines.size());
 		assertEquals("--%```",stmtLines.get(0).getText());
 		assertEquals("END logger;",stmtLines.get(9).getText());
@@ -76,7 +77,7 @@ public class SqlSplitterTest2 {
 				,text.size());
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
 	public void testLogger() throws IOException, SqlSplitterException {
 		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger.pks.sr.sql")).setProceduresOnly(true);
@@ -100,7 +101,7 @@ public class SqlSplitterTest2 {
 		assertEquals(6, sqls.size());
 	}
     
-	@Ignore
+	//@Ignore
     @Test
 	public void testSkipBlockIncr() throws IOException, SqlSplitterException {
 
