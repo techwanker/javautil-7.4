@@ -11,7 +11,7 @@ public class SqlSplitterLine {
 
 	private final SqlSplitterLineType type;
 
-	private SqlSplitterBlockType      blockType = SqlSplitterBlockType.INDETERMINATE;
+	private SqlSplitterBlockType      blockType = SqlSplitterBlockType.UNKNOWN;
 
 	private final String              text;
 

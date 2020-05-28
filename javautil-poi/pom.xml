@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.javautil</groupId>
 			<artifactId>javautil-core</artifactId>
-			<version>${org.javautil.version}</version>
+			<version>VER-7.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.javautil</groupId>

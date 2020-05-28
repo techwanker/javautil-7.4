@@ -255,7 +255,7 @@ public class SqlRunner {
 
 	public SqlRunner setSqlSplitterTrace(int sqlSplitterTrace) {
 		this.sqlSplitterTrace = sqlSplitterTrace; 
-		return null;
+		return this;
 	}
 
 }

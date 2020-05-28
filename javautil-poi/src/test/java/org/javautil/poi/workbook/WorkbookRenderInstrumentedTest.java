@@ -42,13 +42,14 @@ public class WorkbookRenderInstrumentedTest {
 		DataSource jobDatasource = DataSourceFactory.getH2Permanent("./target/joblogging", "sa", "tutorial");
 	  loggingConnection = jobDatasource.getConnection();	
 	  
-		DataSourceFactory dataSourceFactory = new DataSourceFactory();
-		dataSource = dataSourceFactory.getDatasource("integration_postgres");
-		conn = dataSource.getConnection();
 		
 		H2Install installer = new H2Install(loggingConnection);
 		installer.dropObjects();
 		installer.process();
+		
+		DataSourceFactory dataSourceFactory = new DataSourceFactory();
+		dataSource = dataSourceFactory.getDatasource("integration_postgres");
+		conn = dataSource.getConnection();
 	}
 	
 	@Test

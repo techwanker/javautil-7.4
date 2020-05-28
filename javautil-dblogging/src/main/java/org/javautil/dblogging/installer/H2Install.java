@@ -52,11 +52,11 @@ public class H2Install extends AbstractDbloggerDatabaseObjectsInstaller implemen
 	@Override
 	public void dropObjects() throws SQLException {
 
+		logger.info("connection is {}",connection);
 		final Statement dropAll = connection.createStatement();
-		System.out.println("drop everything");
 		logger.info("drop everything");
 		dropAll.execute("DROP ALL OBJECTS");
-		System.out.println("All objects  dropped not datafile!!!!");
+		logger.warn("All objects  dropped not datafile!!!!");
 
 	}
 

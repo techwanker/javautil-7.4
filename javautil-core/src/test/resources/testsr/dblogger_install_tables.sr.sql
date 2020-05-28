@@ -2,7 +2,7 @@
 /* Explain Plan */
 create table cursor_explain_plan (
     explain_plan_hash  varchar(44) not null,
-    explain_plan       clob -- not null
+    explain_plan       clob not null
 );
 
 alter table cursor_explain_plan 

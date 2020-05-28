@@ -1,11 +1,15 @@
 package org.javautil.core.sql;
 
 public enum SqlSplitterBlockType {
-	COMMENT, PROCEDURE, SQL, 
-	MARKDOWN, MARKDOWN_DIRECTIVE, COMMENT_DIRECTIVE, INDETERMINATE, 
-	IGNORED, DIRECTIVE, STATEMENT;
+	SQL, 
+	MARKDOWN,   MARKDOWN_DIRECTIVE, 
+	COMMENT, 	COMMENT_DIRECTIVE, 
+	STATEMENT_BLOCK, STATEMENT_DIRECTIVE, 
+	UNKNOWN,
+	
+	IGNORED, DIRECTIVE, STATEMENT  ;
 	
 	public boolean isSQL() {
-		return (this == SQL || this == PROCEDURE || this == STATEMENT);
+		return (this == SQL || this == STATEMENT_BLOCK|| this == STATEMENT);
 	}
 }

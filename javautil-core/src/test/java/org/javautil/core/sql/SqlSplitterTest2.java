@@ -40,7 +40,7 @@ public class SqlSplitterTest2 {
 		assertEquals(expected,actual);
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
 	public void testBig() throws IOException, SqlSplitterException {
 		SqlSplitter sr = new SqlSplitter(this, "testsr/dblogger_install.pks.sr.sql").setProceduresOnly(true);
@@ -48,13 +48,6 @@ public class SqlSplitterTest2 {
 		List<String> texts = sr.getSqlTexts();
 		assertNotNull(texts);
 		assertEquals(1,texts.size());
-		
-//		List<String> sss = sr.getSqlStatements();
-//		String sql = sr.getSqlStatements().get(0).getSql();
-//		String trimmed = sql.trim();
-//		assertTrue(trimmed.startsWith("CREATE OR REPLACE PACKAGE logger AS"));
-//		assertTrue(trimmed.endsWith("END logger ;"));
-
 	}
 
 	@Ignore
@@ -64,9 +57,6 @@ public class SqlSplitterTest2 {
 		sr.setTraceState(1);
 
 		sr.process();
-		logger.debug("formatLines:\n{}",sr.formatLines());
-		logger.debug("blockIndex: {}",sr.getBlockIndex());
-		logger.debug("blockMap {}",sr.getBlockTypeMap());
 		
 		int stmt0firstIndex = sr.getStatementIndex().get(0);
 		assertEquals(5,stmt0firstIndex);
@@ -75,24 +65,15 @@ public class SqlSplitterTest2 {
 		assertEquals(10,stmtLines.size());
 		assertEquals("--%```",stmtLines.get(0).getText());
 		assertEquals("END logger;",stmtLines.get(9).getText());
-		
-		
 		List<String> texts  = sr.getSqlTexts();
 		assertEquals(1,texts.size());
 		String stmt0 = texts.get(0);
 		logger.debug("stmt0\n{}",stmt0);
-		
-		
-		
-//		int stmtNbr = 0;
-//		for (String text : texts ) {
-//			logger.info("===> {}\n{}",stmtNbr++,text);
-//		}
 		ArrayList<String> text = sr.getBlockText(1);
 		logger.info("text ==-\n{}'",text);
 		assertNotNull(text);
-		assertEquals(1,text.size());
-//		assertEquals("create or replace package logger as",text.get(1));
+		assertEquals(11
+				,text.size());
 	}
 
 	@Ignore
@@ -117,9 +98,8 @@ public class SqlSplitterTest2 {
 		SqlStatements sqls = sr.getSqlStatements();
 		// sr.formatLines();
 		assertEquals(6, sqls.size());
-
 	}
-
+    
 	@Ignore
     @Test
 	public void testSkipBlockIncr() throws IOException, SqlSplitterException {
@@ -138,8 +118,33 @@ public class SqlSplitterTest2 {
 		assertEquals("select 'y' from dual", sqls.get(1).getSql().trim());
 		assertEquals("select 'z' from dual", sqls.get(2).getSql().trim());
 	}
+	
+	@Ignore
+    @Test
+	public void testSqlWithSemicolon() throws IOException, SqlSplitterException {
 
-	// @Test
+		SqlSplitter runner = new SqlSplitter(this, "testsr/dblogger_install_tables.sr.sql").setVerbosity(9);
+		runner.setTraceState(1);
+		runner.process();
+		
+		ArrayList<SqlSplitterLine> stmt2lines = runner.getStatementLines(2);
+		assertNotNull(stmt2lines);
+		logger.debug("stmt2lines {}",stmt2lines);
+		
+		SqlStatements sqls = runner.getSqlStatements();
+		assertEquals(21,sqls.size());
+		int ssndx = 0;
+		for (SqlStatement ss : sqls) {
+			logger.info("ssndx {} {}",ssndx++,ss);
+		}
+	}
+	
+	
+	
+	
+	
+	@Ignore
+	 @Test
 	public void testSkipBlock() throws IOException, SqlSplitterException {
 
 		SqlStatements sqls = new SqlSplitter(this, "testsr/skip_block.sr.sql").getSqlStatements();
@@ -150,7 +155,8 @@ public class SqlSplitterTest2 {
 		assertEquals(3, sqls.size());
 	}
 
-	// @Test
+	 @Ignore
+	 @Test
 	public void test2() throws IOException, SqlSplitterException {
 
 		SqlSplitter splitter = new SqlSplitter(this, "testsr/install_sales_reporting_tables.sr.sql");
@@ -163,18 +169,8 @@ public class SqlSplitterTest2 {
 
 	}
 
-//	@Test
-//	public void testProcedures() throws IOException, SqlSplitterException {
-//		SqlSplitter sr = new SqlSplitter(this, "testsr/logger_message_formatter.plsql.sr.sql").setProceduresOnly(true).setTraceState(0);
-//		sr.analyze();
-////		logger.debug(sr.snapshot());
-//		List<String> sqls = sr.getSqlTexts();
-//		for (String sql : sqls) {
-//			logger.debug(sql);
-//		}
-//	}
-
-	// @Test
+	 @Ignore
+	@Test
 	public void test3() throws IOException, SqlSplitterException {
 
 		SqlStatements sqls = new SqlSplitter(this, "testsr/dblogger_install_tables.sr.sql").getSqlStatements();

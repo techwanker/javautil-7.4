@@ -1,4 +1,27 @@
-package org.javautil.core.sql;
+head	1.1;
+access;
+symbols;
+locks
+	jjs:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.26.19.55.14;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@package org.javautil.core.sql;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,7 +83,7 @@ public class SqlSplitter {
 	private ArrayList<SqlSplitterLine> lines;
 	private boolean                    analyzed          = false;
 	private int                        traceState        = 1;
-	private final static Pattern       annotationPattern = Pattern.compile("^ *--@.*");
+	private final static Pattern       annotationPattern = Pattern.compile("^ *--@@.*");
 	private boolean                    trace             = false;
 	private int                        blockNumber = -1;
 	private boolean                    proceduresOnly;
@@ -73,6 +96,11 @@ public class SqlSplitter {
 	 * for blocks of statement
 	 */
 	private TreeMap<Integer,Integer>   statementIndex = new TreeMap<>();
+
+	//private String regex = "([.|\\n]*)(;)([\\s|\\n]*)";
+	//private Pattern semicolonPattern = Pattern.compile(regex);
+	//private TreeMap<Integer,Integer>   sqlLastIndex = new TreeMap<>();
+
 
 	public TreeMap<Integer, Integer> getStatementIndex() {
 		return statementIndex;
@@ -124,19 +152,19 @@ public class SqlSplitter {
 	}
 
 	public static String trimSql(String text) {
-		//logger.info("trimming '{}'",text);
+		logger.info("trimming '{}'",text);
 		Character[] whiteCruft = {'\t','\n','\r',' '};
 
 		String leading = StringUtils.stripTrailing(text,whiteCruft);
-		//logger.info("leading: '{}'", leading);
+		logger.info("leading: '{}'", leading);
 
 		Character[] semi = {';'};
 		String noSemi = StringUtils.stripTrailing(leading, semi);
-		//logger.info("noSemi '{}'",noSemi);
+		logger.info("noSemi '{}'",noSemi);
 
 		String trimmed = StringUtils.stripLeading(noSemi,whiteCruft);
 
-		//logger.info("trimmed '{}'",trimmed);
+		logger.info("trimmed '{}'",trimmed);
 		return trimmed;
 
 	}
@@ -159,54 +187,158 @@ public class SqlSplitter {
 			throw new RuntimeException(e);
 		}
 	}
-
-	int processDelimitedBlock(int linesIndex ) {
+	
+	void processCommentBlock(int linesIndex) {
 		SqlSplitterLine blockBegin = lines.get(linesIndex);
-		SqlSplitterBlockType blockType = blockBegin.getType().getBlockType();
-		SqlSplitterLine line;
-		int blockLineNbr = 1;
-		if (blockBegin.getType().isBlockStart()) {
-			blockBegin.setBlockType(SqlSplitterBlockType.DIRECTIVE);
-			blockNumber++;
-			if (blockBegin.getType().equals(SqlSplitterLineType.PROCEDURE_BLOCK_START)) {
-				statementIndex.put(++statementNumber, linesIndex );
-			}
-		} else {
-			blockBegin.setBlockType(SqlSplitterBlockType.STATEMENT);
-			statementIndex.put(++statementNumber, linesIndex );
+	   	log("processCommentBlock",linesIndex,blockBegin);
+		SqlSplitterLine blockEnd = null;
+		if (! blockBegin.getType().equals(SqlSplitterLineType.COMMENT_BLOCK_BEGIN)) {
+			throw new IllegalArgumentException("line is not a comment block begin");
 		}
-
-		logtext("\n\ndelimitedBlock begin ==<",linesIndex,blockBegin,"");
-
-		logger.debug("initial preloop blockBegin {} ", blockBegin);
-		loop:
-			while (linesIndex < lines.size() ) {
-				line = lines.get(++linesIndex);
-				logtext(" loop top ",linesIndex,line,"");
-				line.setBlockNumber(blockNumber);
-			//	logger.debug("blockBegin type {} {}",blockBegin.getType(),blockBegin);
-				switch (blockBegin.getBlockType()) {
-				case STATEMENT:
-					line.setBlockType(SqlSplitterBlockType.STATEMENT);
-					line.setStatementLineNumber(blockLineNbr++);
-					if(	blockBegin.getType().isStatementEnd()) {
-						logger.debug("isStatementEnd {}",line.getType());
-						break loop;
-					}
-				default:
-					line.setBlockType(blockType);
-					if (	blockBegin.getType().isEndType(line.getType())) {
-						line.setBlockType(SqlSplitterBlockType.DIRECTIVE );
-						break loop;
-					}
-				}
-				logtext(" loop bottom",linesIndex,line,"");
-			}
-		logtext("delimitedBlock end ==>",linesIndex,lines.get(linesIndex),"\n");
-		logger.debug("\n");
+		blockBegin.setBlockType(SqlSplitterBlockType.COMMENT_DIRECTIVE);
+	    log("commentBlockstart",linesIndex,blockBegin);
+				
+		linesIndex++;
+		while (linesIndex < lines.size() ) {
+			SqlSplitterLine line = lines.get(linesIndex++);
+	      	log("commentBlockLoop1",linesIndex,line);
+	      	if ( line.getType().equals(SqlSplitterLineType.COMMENT_BLOCK_END)) {
+	      		blockEnd = line;
+	      		line.setBlockType(SqlSplitterBlockType.COMMENT_DIRECTIVE);
+	      		break;
+         	   // log("commentBlockEnd",linesIndex,blockEnd);
+	      	} else {
+	      		line.setBlockType(SqlSplitterBlockType.COMMENT);
+	      	    log("commentBlockLoop2",linesIndex,line);
+	      	}
+		}
+	    log("commentBlockEnd",linesIndex,blockEnd);
+		logger.debug("Comment block starts {} and ends {}",blockBegin.getLineNumber(),blockEnd.getLineNumber());
+	}
+	
+	int processDelimitedBlock(int linesIndex, 
+			SqlSplitterLineType start,
+			SqlSplitterLineType end,
+			SqlSplitterBlockType blockType 
+		
+			) {
+		SqlSplitterLine blockBegin = lines.get(linesIndex);
+	   	log("delimitedBlock",linesIndex,blockBegin);
+		SqlSplitterLine blockEnd = null;
+		if (! blockBegin.getType().equals(start)) {
+			throw new IllegalArgumentException("line is not a " + start + " block begin");
+		}
+		//
+		blockBegin.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+	    log("commentBlockstart",linesIndex,blockBegin);
+				
+		linesIndex++;
+		while (linesIndex < lines.size() ) {
+			// TODO set block numbers
+			SqlSplitterLine line = lines.get(linesIndex++);
+	      	//log("delimitedBlock Loop1",linesIndex,line);
+	      	if ( line.getType().equals(end)) {
+	      		blockEnd = line;
+	      		line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+	      		break;
+         	   // log("commentBlockEnd",linesIndex,blockEnd);
+	      	} else {
+	      		line.setBlockType(blockType);
+	      	    log(" delimited Loop2",linesIndex,line);
+	      	}
+		}
+	    log("delimited",linesIndex,blockEnd);
+		logger.debug("delimited block starts {} and ends {}",blockBegin.getLineNumber(),blockEnd.getLineNumber());
 		return linesIndex;
 	}
+	/**
+	 * 
+	 * @@param linesIndex block start linesIndex
+	 * @@return index of last line in block
+	 */
 
+	int processBlock(int linesIndex) {
+		blockNumber++;
+		SqlSplitterLine line = lines.get(linesIndex);
+		if ((traceFlags & traceBlock) != 0) {
+			log("processBlock begin",linesIndex,line);
+		}
+		SqlSplitterLineType type = line.getType() ;
+		SqlSplitterBlockType blockType = type.getBlockType();
+		int		statementLineNumber = 1;
+		boolean multistatement = false;
+		switch (type) {
+		case STATEMENT_NAME:
+			line.setBlockNumber(blockNumber);
+			line.setBlockType(SqlSplitterBlockType.STATEMENT);
+			line.setStatementLineNumber(statementLineNumber++);
+			line.setStatementNumber(++statementNumber);
+			statementIndex.put(statementNumber,linesIndex);
+			break;
+		case PROCEDURE_BLOCK_START:
+			multistatement = true;
+			logger.debug("multistatement start {}",linesIndex);
+			line.setStatementNumber(++statementNumber);
+			line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+			statementIndex.put(statementNumber,linesIndex + 1);
+			blockType = SqlSplitterBlockType.STATEMENT; 
+			type = line.getType();
+			break;
+		case SQL_WITH_SEMICOLON:
+		case INDETERMINATE:
+			line.setBlockNumber(blockNumber);
+			line.setBlockType(SqlSplitterBlockType.STATEMENT);
+			line.setStatementLineNumber(statementLineNumber++);
+			line.setStatementNumber(++statementNumber);
+			blockType = SqlSplitterBlockType.STATEMENT; 
+			statementIndex.put(statementNumber,linesIndex);
+			break;
+		default:
+			line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+		}
+		if ((traceFlags & traceBlock) != 0) {
+			log("processBlock 2",linesIndex,line);
+		}
+		linesIndex++;
+		blockIndex.put(blockNumber, linesIndex);
+		blockTypeMap.put(blockNumber,blockType);
+		boolean done = false;
+		while (linesIndex < lines.size() && ! done) {
+			line = lines.get(linesIndex);
+		if ((traceFlags & traceBlock) != 0) {
+			log("pBlock looptop",linesIndex,line);
+	}
+			if (multistatement) {
+				if ( type.isMultistatementBlockEnd(line.getType())) {
+					line.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+					blockNumber++;
+				} }
+			else {
+				logger.debug("lineIndex {} type {} lineType {}",linesIndex,type,line.getType());
+			    if (type.isBlockEnd(line.getType())) {
+			    	logger.info("block ending with {}", line.getText());
+			    }
+				if (type.isStatementEnd(line.getType())) {
+					line.setBlockType(SqlSplitterBlockType.STATEMENT);
+					done = true;
+					if ((traceFlags & traceBlock) != 0) {
+						log("processBlock end",linesIndex,line);
+					}
+					//				processBlock(linesIndex);  // recursive 
+				} else {
+					line.setStatementNumber(statementNumber);
+					line.setBlockType(blockType);
+					line.setStatementLineNumber(statementLineNumber++);
+				}
+			}
+			line.setBlockNumber(blockNumber);
+			if ((traceFlags & traceBlock) != 0) {
+				log("processBlock 4",linesIndex,line);
+			}
+			linesIndex++;
+		}
+		return --linesIndex;
+	}
 	/**
 	 * A very simple finite state machine.
 	 * 
@@ -225,24 +357,36 @@ public class SqlSplitter {
 		int statementLineNumber = 1;
 		// TODO test name no sql
 		// TODO exception with line
+		int lineNumber = 1;
 		logger.debug("SqlSplitter:analyze traceState:{} ", traceState);
 		int linesIndex = 0;
 		//	for (final SqlSplitterLine srl : lines) {
 		while (linesIndex < lines.size())  {
 			SqlSplitterLine srl = lines.get(linesIndex);
 
-			logtext("analyze loop",linesIndex,lines.get(linesIndex),"");
+			log("analyze loop",linesIndex,lines.get(linesIndex));
 			switch (srl.getType()) {
 			case COMMENT_BLOCK_BEGIN:   // if (trimmed.startsWith("--#<"))
-			case PROCEDURE_BLOCK_START:
-				linesIndex = processDelimitedBlock(linesIndex);
+				linesIndex = processDelimitedBlock(linesIndex,
+						SqlSplitterLineType.COMMENT_BLOCK_BEGIN,
+						SqlSplitterLineType.COMMENT_BLOCK_END,
+						SqlSplitterBlockType.COMMENT
+						);
+				//processCommentBlock(linesIndex);
 				break;
-
+			case PROCEDURE_BLOCK_START:
+				linesIndex = processDelimitedBlock(linesIndex,
+						SqlSplitterLineType.PROCEDURE_BLOCK_START,
+						SqlSplitterLineType.PROCEDURE_BLOCK_END,
+						SqlSplitterBlockType.STATEMENT
+						);
+				break;
+				
 			case MARKDOWN_BLOCK_BEGIN:
 			case STATEMENT_NAME:
 			case INDETERMINATE:
 			case SQL_WITH_SEMICOLON:
-				linesIndex = processDelimitedBlock(linesIndex);
+				linesIndex = processBlock(linesIndex);
 				break;
 			case BLANK:
 				srl.setBlockType(SqlSplitterBlockType.IGNORED);
@@ -252,13 +396,17 @@ public class SqlSplitter {
 				break;
 			case SEMICOLON:
 				throw new IllegalStateException();
+			
+			case SQL:
+				break;
 			default:
 				break;
 			}
 			logger.info("linesIndex {}",linesIndex);
-			logtext("analyzed",linesIndex,lines.get(linesIndex),"");
+			log("analyzed",linesIndex,lines.get(linesIndex));
 			linesIndex++;	
 		}
+		lineNumber++;
 		analyzed = true;
 	}
 
@@ -345,12 +493,12 @@ public class SqlSplitter {
 			}
 		}
 		String retval = trimSql(sb.toString());
-		//logger.debug("lines:\n{}\nreturn:{}",lines,retval);
+		logger.debug("lines:\n{}\nreturn:{}",lines,retval);
 		return retval;
 	}
 
 
-	//	@SuppressWarnings("incomplete-switch")
+	//	@@SuppressWarnings("incomplete-switch")
 	//	String getSqlText(ArrayList<SqlSplitterLine> lines) {
 	//		if (lines.size() == 0) {
 	//			throw new IllegalArgumentException("no lines");
@@ -408,22 +556,15 @@ public class SqlSplitter {
 		for (int i = 0; i < getStatementCount(); i++) {
 			final String sql = getSqlText(i);
 			sqlTexts.add(sql);
-		//	logger.debug("sqlText # {}\n{}",i,sql);
+			logger.debug("sqlText # {}\n{}",i,sql);
 		}
 		return sqlTexts;
 	}
-//
-//	private void log(String caller, int lineIndex, SqlSplitterLine line) {
-//			logtext(caller,lineIndex,line,"\n");
-//	}
-//
-//	private void lognewline(String caller, int lineIndex, SqlSplitterLine line) {
-//			logtext(caller,lineIndex,line,"");
-//	}
-	
-	private void logtext(String caller, int lineIndex, SqlSplitterLine line, String newline) {
+
+	private void log(String caller, int lineIndex, SqlSplitterLine line) {
 		if (traceFlags > 0) {
-			String msg = String.format("%-20s %s %s",caller,line, newline);
+			//String msg = String.format("%-14s %4d %s",caller,lineIndex + 1,line);
+			String msg = String.format("%-20s %s",caller,line);
 			logger.info(msg);
 		}
 	}
@@ -442,10 +583,9 @@ public class SqlSplitter {
 		String retval = asSqlString(lines);
 		logger.debug("returning {}\n{}", stmtNumber, retval);
 		return retval;
-		
 	}
 
-	@SuppressWarnings("incomplete-switch")
+	@@SuppressWarnings("incomplete-switch")
 	public SqlStatement getSqlStatement(List<SqlSplitterLine> lines) {
 		String sql = asSqlString(lines);
 		SqlStatement ss = new SqlStatement(sql);
@@ -455,15 +595,15 @@ public class SqlSplitter {
 			case STATEMENT_NAME:
 
 				String upperText = line.getText().toUpperCase();
-				final int index = upperText.indexOf("@NAME ");
+				final int index = upperText.indexOf("@@NAME ");
 				if (name != null) {
-					String message = String.format("Duplicate @NAME found on %d and %d,",
+					String message = String.format("Duplicate @@NAME found on %d and %d,",
 							lines.get(0).getLineNumber(),
 							line.getLineNumber());
 					throw new IllegalArgumentException(message);
 				}
-				//name = upperText.substring(index + "@NAME ".length()).trim();
-				name = line.getText().substring(index + "@NAME ".length()).trim();
+				//name = upperText.substring(index + "@@NAME ".length()).trim();
+				name = line.getText().substring(index + "@@NAME ".length()).trim();
 				ss.setName(name);
 			}
 		}
@@ -493,12 +633,12 @@ public class SqlSplitter {
 	//			final String sqlTextLines[] = sqlText.split("\n");
 	//			String name = null;
 	//			for (final String textLine : sqlTextLines) {
-	//				if (textLine.toUpperCase().contains("@NAME ")) {
+	//				if (textLine.toUpperCase().contains("@@NAME ")) {
 	//					if (name != null) {
-	//						throw new IllegalStateException("@NAME already specified for " + sqlText);
+	//						throw new IllegalStateException("@@NAME already specified for " + sqlText);
 	//					}
-	//					final int index = textLine.toUpperCase().indexOf("@NAME ");
-	//					name = textLine.substring(index + "@NAME ".length()).trim();
+	//					final int index = textLine.toUpperCase().indexOf("@@NAME ");
+	//					name = textLine.substring(index + "@@NAME ".length()).trim();
 	//				}
 	//			}
 	//			final SqlStatement ss = new SqlStatement(sqlText);
@@ -557,3 +697,4 @@ public class SqlSplitter {
 		return this;
 	}
 }
+@

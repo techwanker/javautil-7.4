@@ -10,16 +10,18 @@ import org.javautil.core.sql.SqlSplitterException;
 import org.junit.Test;
 
 public class DbloggerOracleInstallTest {
+	
+	// TODO WTF
 
-	@Test
-	public void testDrop() throws SqlSplitterException, Exception {
-		DataSourceFactory dsf = new DataSourceFactory();
-		DataSource ds = dsf.getDatasource("integration_oracle");
-		Connection loggerConnection = ds.getConnection();
-		DbloggerOracleInstall installer = new DbloggerOracleInstall(loggerConnection, true, true);
-		installer.drop();
-		installer.process();
-		loggerConnection.close();
-		((Closeable) ds).close();
-	}
+//	@Test
+//	public void testDrop() throws SqlSplitterException, Exception {
+//		DataSourceFactory dsf = new DataSourceFactory();
+//		DataSource ds = dsf.getDatasource("integration_oracle");
+//		Connection loggerConnection = ds.getConnection();
+//		DbloggerOracleInstall installer = new DbloggerOracleInstall(loggerConnection, true, true);
+//		installer.drop();
+//		installer.process();
+//		loggerConnection.close();
+//		((Closeable) ds).close();
+//	}
 }
