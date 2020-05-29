@@ -160,48 +160,74 @@ public class SqlSplitter {
 		}
 	}
 
+	/**
+	 * By the time this arrives as loopPhase
+	 * What if start block or end block
+	 * @param linesIndex
+	 * @return
+	 */
 	int processDelimitedBlock(int linesIndex ) {
 		SqlSplitterLine blockBegin = lines.get(linesIndex);
 		SqlSplitterBlockType blockType = blockBegin.getType().getBlockType();
-		SqlSplitterLine line;
+		SqlSplitterLine line = lines.get(linesIndex);
+
+		// block begin
 		int blockLineNbr = 1;
+		blockNumber++;
+
+		logtext("delim top blockBegin" ,linesIndex,blockBegin,"");
 		if (blockBegin.getType().isBlockStart()) {
 			blockBegin.setBlockType(SqlSplitterBlockType.DIRECTIVE);
-			blockNumber++;
-			if (blockBegin.getType().equals(SqlSplitterLineType.PROCEDURE_BLOCK_START)) {
-				statementIndex.put(++statementNumber, linesIndex + 1 );
+			blockBegin.setBlockLineNumber(1);
+			if (linesIndex + 1 < lines.size()) {
+				linesIndex++;
+				line = lines.get(++linesIndex);
+				if (blockBegin.getType().equals(SqlSplitterLineType.PROCEDURE_BLOCK_START)) {
+					blockBegin.setBlockType(SqlSplitterBlockType.STATEMENT_BLOCK);
+					statementIndex.put(++statementNumber, linesIndex  );
+				}
 			}
-		} else {
+		}
+		else {
 			blockBegin.setBlockType(SqlSplitterBlockType.STATEMENT);
 			statementIndex.put(++statementNumber, linesIndex );
 		}
 
-		logtext("\n\ndelimitedBlock begin ==<",linesIndex,blockBegin,"");
-
-		logger.debug("initial preloop blockBegin {} ", blockBegin);
+		logtext("\n\ndelimitedBlock preloop ==<",linesIndex,blockBegin,"");
 		loop:
 			while (linesIndex < lines.size() ) {
-				line = lines.get(++linesIndex);
+				if (line.getType().isBlockStart()) {
+					break loop;
+				}
 				logtext(" loop top ",linesIndex,line,"");
-				line.setBlockNumber(blockNumber);
-			//	logger.debug("blockBegin type {} {}",blockBegin.getType(),blockBegin);
+				//	logger.debug("blockBegin type {} {}",blockBegin.getType(),blockBegin);
 				switch (blockBegin.getBlockType()) {
 				case STATEMENT:
+					line.setBlockNumber(blockNumber);
 					line.setBlockType(SqlSplitterBlockType.STATEMENT);
-					line.setStatementLineNumber(blockLineNbr++);
-					if(	blockBegin.getType().isStatementEnd()) {
+					line.setBlockLineNumber(blockLineNbr++);
+					if(	line.getType().isStatementEnd()) {
 						logger.debug("isStatementEnd {}",line.getType());
 						break loop;
 					}
+					break;
 				case STATEMENT_BLOCK:
-					line.setStatementLineNumber(blockLineNbr++);
+					line.setBlockNumber(blockNumber);
+					line.setBlockType(SqlSplitterBlockType.STATEMENT_BLOCK);
+					line.setBlockLineNumber(blockLineNbr++);
+					break;
 				default:
-					line.setBlockType(blockType);
 					if (	blockBegin.getType().isEndType(line.getType())) {
 						line.setBlockType(SqlSplitterBlockType.DIRECTIVE );
+						line.setBlockLineNumber(1);
 						break loop;
+					} else {
+						line.setBlockType(blockType);
+						line.setBlockNumber(blockNumber);
+						line.setBlockLineNumber(blockLineNbr++);
 					}
 				}
+				line = lines.get(++linesIndex);
 				logtext(" loop bottom",linesIndex,line,"");
 			}
 		logtext("delimitedBlock end ==>",linesIndex,lines.get(linesIndex),"\n");
@@ -352,45 +378,6 @@ public class SqlSplitter {
 	}
 
 
-	//	@SuppressWarnings("incomplete-switch")
-	//	String getSqlText(ArrayList<SqlSplitterLine> lines) {
-	//		if (lines.size() == 0) {
-	//			throw new IllegalArgumentException("no lines");
-	//		}
-	//		final SqlSplitterBlockType blockType = lines.get(0).getBlockType();
-	//		// logger.debug("blockType " + blockType + " line " + lines.get(0));
-	//		final StringBuilder sb = new StringBuilder();
-	//		for (int i = 0; i < (lines.size() - 1); i++) {
-	//			sb.append(lines.get(i).getText());
-	//			sb.append("\n");
-	//		}
-	//		final String lastLine = lines.get(lines.size() - 1).getText();
-	//		switch (blockType) {
-	//
-	//		case SQL:
-	//			// logger.debug("is SQL");
-	//			final int semiIndex = lastLine.indexOf(";");
-	//			if (semiIndex > -1) {
-	//				sb.append(lastLine, 0, semiIndex);
-	//			} else {
-	//				sb.append(lastLine);
-	//			}
-	//			break;
-	//		case PROCEDURE:
-	//			// logger.debug("is procedure");
-	//			sb.append(lastLine);
-	//		}
-	//		final String retval = sb.toString();
-	//		return retval;
-	//
-	//	}
-
-	//	void dumpLines(ArrayList<SqlSplitterLine> lines) {
-	//		for (final SqlSplitterLine line : lines) {
-	//			logger.debug(line.toString());
-	//		}
-	//	}
-
 
 	int getStatementCount() {
 		if (statementIndex.size() == 0) {
@@ -410,19 +397,19 @@ public class SqlSplitter {
 		for (int i = 0; i < getStatementCount(); i++) {
 			final String sql = getSqlText(i);
 			sqlTexts.add(sql);
-		//	logger.debug("sqlText # {}\n{}",i,sql);
+			//	logger.debug("sqlText # {}\n{}",i,sql);
 		}
 		return sqlTexts;
 	}
-//
-//	private void log(String caller, int lineIndex, SqlSplitterLine line) {
-//			logtext(caller,lineIndex,line,"\n");
-//	}
-//
-//	private void lognewline(String caller, int lineIndex, SqlSplitterLine line) {
-//			logtext(caller,lineIndex,line,"");
-//	}
-	
+	//
+	//	private void log(String caller, int lineIndex, SqlSplitterLine line) {
+	//			logtext(caller,lineIndex,line,"\n");
+	//	}
+	//
+	//	private void lognewline(String caller, int lineIndex, SqlSplitterLine line) {
+	//			logtext(caller,lineIndex,line,"");
+	//	}
+
 	private void logtext(String caller, int lineIndex, SqlSplitterLine line, String newline) {
 		if (traceFlags > 0) {
 			String msg = String.format("%-20s %s %s",caller,line, newline);
@@ -430,7 +417,8 @@ public class SqlSplitter {
 		}
 	}
 
-	public String formatLines() {
+
+	public String formatLines(ArrayList<SqlSplitterLine> lines) {
 		StringBuilder sb = new StringBuilder();
 		for (SqlSplitterLine line : lines) {
 			sb.append(line.toString());
@@ -438,13 +426,16 @@ public class SqlSplitter {
 		}
 		return sb.toString();
 	}
+	public String formatLines() {
+		return(formatLines(lines));
+	}
 
 	String getSqlText(int stmtNumber) throws SqlSplitterException {
 		final ArrayList<SqlSplitterLine> lines = getStatementLines(stmtNumber);
 		String retval = asSqlString(lines);
 		logger.debug("returning {}\n{}", stmtNumber, retval);
 		return retval;
-		
+
 	}
 
 	@SuppressWarnings("incomplete-switch")
@@ -486,31 +477,7 @@ public class SqlSplitter {
 		return statements;
 
 	}
-	//	public ArrayList<SqlStatement> getSqlStatementList() throws SqlSplitterException {
-	//		kkfinal ArrayList<SqlStatement> statements = new ArrayList<>();
-	//
-	//		ArrayList<String> sqlTexts = getSqlTexts();
-	//		logger.debug("getSqlStatementList {} {}", "getSqlTexts returned ", sqlTexts.size());
-	//		for (final String sqlText : getSqlTexts()) {
-	//			final String sqlTextLines[] = sqlText.split("\n");
-	//			String name = null;
-	//			for (final String textLine : sqlTextLines) {
-	//				if (textLine.toUpperCase().contains("@NAME ")) {
-	//					if (name != null) {
-	//						throw new IllegalStateException("@NAME already specified for " + sqlText);
-	//					}
-	//					final int index = textLine.toUpperCase().indexOf("@NAME ");
-	//					name = textLine.substring(index + "@NAME ".length()).trim();
-	//				}
-	//			}
-	//			final SqlStatement ss = new SqlStatement(sqlText);
-	//			ss.setName(name);
-	//			statements.add(ss);
-	//		}
-	//		logger.debug("getSqlStatementList: size() {}", statements.size());
-	//		return statements;
-	//	}
-	//
+
 	public SqlStatements getSqlStatements() throws SqlSplitterException {
 		final SqlStatements sqlStatements = new SqlStatements(getSqlStatementList());
 		return sqlStatements;
