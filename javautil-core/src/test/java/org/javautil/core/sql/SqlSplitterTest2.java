@@ -165,39 +165,34 @@ public class SqlSplitterTest2 {
 		assertEquals(3, sqls.size());
 	}
 
-	 //@Ignore
-	 @Test
-	public void test2() throws IOException, SqlSplitterException {
-
-		SqlSplitter splitter = new SqlSplitter(this, "testsr/install_sales_reporting_tables.sr.sql");
-		splitter.processLines();
-		splitter.analyze();
-		// logger.debug(splitter.formatLines());
-		ArrayList<SqlSplitterLine> splitterLines = splitter.getStatementLines(1);
-		assertEquals(1, splitterLines.size());
-		logger.debug("splitterLines");
-
-	}
+	 
 
 	 //@Ignore
 	@Test
 	public void test3() throws IOException, SqlSplitterException {
 
 		SqlStatements sqls = new SqlSplitter(this, "testsr/dblogger_install_tables.sr.sql").getSqlStatements();
-		assertEquals(sqls.get(0).getSql().trim(), "create sequence job_log_id_seq cache 1000");
-		// logger.debug("sql 1\n{}", sqls.get(1).getSql().trim());
-		assertTrue(sqls.get(1).getSql().trim().startsWith("CREATE TABLE job_log"));
-		assertTrue(sqls.get(1).getSql().trim().endsWith(")"));
-		// logger.debug("sql 2\n{}", sqls.get(2).getSql().trim());
-		String sql = sqls.get(2).getSql();
-		String sqlFirst = StringUtils.getFirstLine(sql);
-		String sqlLast = StringUtils.getLastLine(sql);
-		// logger.debug("sql 2 first : " + sqlFirst);
-		// logger.debug("sql 2 last :" + sqlLast);
-		assertEquals("CREATE TABLE job_msg", sqlFirst.trim());
-		assertEquals("references job_log(job_log_id)", sqlLast.trim());
+		logger.debug("sqls.size() {}", sqls.size());
+		String sqls_0 = sqls.get(0).getSql();
+		logger.debug("sqls.get(0) {}", sqls_0);
+		String sqls_0_0 = sqls_0.split("\n")[0].trim();
+		assertEquals("/* Explain Plan */",sqls_0_0);
+		
+//		assertEquals(sqls.get(0).getSql().trim(), "create sequence job_log_id_seq cache 1000");
+//		// logger.debug("sql 1\n{}", sqls.get(1).getSql().trim());
+//		assertTrue(sqls.get(1).getSql().trim().startsWith("CREATE TABLE job_log"));
+//		assertTrue(sqls.get(1).getSql().trim().endsWith(")"));
+//		// logger.debug("sql 2\n{}", sqls.get(2).getSql().trim());
+//		String sql = sqls.get(2).getSql();
+//		logger.debug("sql {}",sql);
+//		String sqlFirst = StringUtils.getFirstLine(sql);
+//		String sqlLast = StringUtils.getLastLine(sql);
+//		// logger.debug("sql 2 first : " + sqlFirst);
+//		// logger.debug("sql 2 last :" + sqlLast);
+//		assertEquals("CREATE TABLE job_msg", sqlFirst.trim());
+//		assertEquals("references job_log(job_log_id)", sqlLast.trim());
 
-		assertEquals(5, sqls.size());
+		assertEquals(25, sqls.size());
 	}
 
 }
