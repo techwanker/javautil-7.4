@@ -452,6 +452,7 @@ public class SqlSplitter {
 	public SqlStatement getSqlStatement(List<SqlSplitterLine> lines) {
 		String sql = asSqlString(lines);
 		SqlStatement ss = new SqlStatement(sql);
+		logger.debug("sql:\n{}",sql);
 		String name = null;
 		for (SqlSplitterLine line : lines) {
 			switch (line.getType()) {

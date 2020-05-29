@@ -99,6 +99,7 @@ public enum LineType {
 
 	boolean isStatementEnd() {
 		switch (this) {
+		case STATEMENT_END:
 		case SQL_WITH_SEMICOLON:
 		case SEMICOLON:
 			return true;
