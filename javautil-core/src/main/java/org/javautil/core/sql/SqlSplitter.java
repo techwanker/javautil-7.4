@@ -66,7 +66,7 @@ public class SqlSplitter {
 	private boolean                    proceduresOnly;
 	private ArrayList<String>          statements = new ArrayList<String>();
 	private TreeMap<Integer,Integer>   blockIndex = new TreeMap<>();
-	private TreeMap<Integer,SqlSplitterBlockType>   blockTypeMap = new TreeMap<>();
+	private TreeMap<Integer,BlockType>   blockTypeMap = new TreeMap<>();
 	private int statementNumber = -1;
 	/**
 	 * k - statement number (relative 0), v lines index (relative 0) 
@@ -168,7 +168,7 @@ public class SqlSplitter {
 	 */
 	int processDelimitedBlock(int linesIndex ) {
 		SqlSplitterLine blockBegin = lines.get(linesIndex);
-		SqlSplitterBlockType blockType = blockBegin.getType().getBlockType();
+		BlockType blockType = blockBegin.getType().getBlockType();
 		SqlSplitterLine line = lines.get(linesIndex);
 
 		// block begin
@@ -177,19 +177,19 @@ public class SqlSplitter {
 
 		logtext("delim top blockBegin" ,linesIndex,blockBegin,"");
 		if (blockBegin.getType().isBlockStart()) {
-			blockBegin.setBlockType(SqlSplitterBlockType.DIRECTIVE);
+			blockBegin.setBlockType(BlockType.DIRECTIVE);
 			blockBegin.setBlockLineNumber(1);
 			if (linesIndex + 1 < lines.size()) {
 				linesIndex++;
-				line = lines.get(++linesIndex);
-				if (blockBegin.getType().equals(SqlSplitterLineType.PROCEDURE_BLOCK_START)) {
-					blockBegin.setBlockType(SqlSplitterBlockType.STATEMENT_BLOCK);
+				line = lines.get(linesIndex);
+				if (blockBegin.getType().equals(LineType.PROCEDURE_BLOCK_START)) {
+					blockBegin.setBlockType(BlockType.STATEMENT_BLOCK);
 					statementIndex.put(++statementNumber, linesIndex  );
 				}
 			}
 		}
 		else {
-			blockBegin.setBlockType(SqlSplitterBlockType.STATEMENT);
+			blockBegin.setBlockType(BlockType.STATEMENT);
 			statementIndex.put(++statementNumber, linesIndex );
 		}
 
@@ -199,12 +199,18 @@ public class SqlSplitter {
 				if (line.getType().isBlockStart()) {
 					break loop;
 				}
+				if (line.getType().isBlockEnd()) {
+					line.setBlockLineNumber(1);
+					line.setBlockNumber(++blockNumber);
+					line.setBlockType(BlockType.DIRECTIVE);
+					break loop;
+				}
 				logtext(" loop top ",linesIndex,line,"");
 				//	logger.debug("blockBegin type {} {}",blockBegin.getType(),blockBegin);
 				switch (blockBegin.getBlockType()) {
 				case STATEMENT:
 					line.setBlockNumber(blockNumber);
-					line.setBlockType(SqlSplitterBlockType.STATEMENT);
+					line.setBlockType(BlockType.STATEMENT);
 					line.setBlockLineNumber(blockLineNbr++);
 					if(	line.getType().isStatementEnd()) {
 						logger.debug("isStatementEnd {}",line.getType());
@@ -213,12 +219,12 @@ public class SqlSplitter {
 					break;
 				case STATEMENT_BLOCK:
 					line.setBlockNumber(blockNumber);
-					line.setBlockType(SqlSplitterBlockType.STATEMENT_BLOCK);
+					line.setBlockType(BlockType.STATEMENT_BLOCK);
 					line.setBlockLineNumber(blockLineNbr++);
 					break;
 				default:
 					if (	blockBegin.getType().isEndType(line.getType())) {
-						line.setBlockType(SqlSplitterBlockType.DIRECTIVE );
+						line.setBlockType(BlockType.DIRECTIVE );
 						line.setBlockLineNumber(1);
 						break loop;
 					} else {
@@ -227,7 +233,11 @@ public class SqlSplitter {
 						line.setBlockLineNumber(blockLineNbr++);
 					}
 				}
+				if (linesIndex + 1 < lines.size()) {
 				line = lines.get(++linesIndex);
+				} else {
+					break loop;
+				}
 				logtext(" loop bottom",linesIndex,line,"");
 			}
 		logtext("delimitedBlock end ==>",linesIndex,lines.get(linesIndex),"\n");
@@ -273,10 +283,10 @@ public class SqlSplitter {
 				linesIndex = processDelimitedBlock(linesIndex);
 				break;
 			case BLANK:
-				srl.setBlockType(SqlSplitterBlockType.IGNORED);
+				srl.setBlockType(BlockType.IGNORED);
 				break;	
 			case COMMENT:               // (trimmed.startsWith("--#"))
-				srl.setBlockType(SqlSplitterBlockType.COMMENT);
+				srl.setBlockType(BlockType.COMMENT);
 				break;
 			case SEMICOLON:
 				throw new IllegalStateException();
@@ -514,7 +524,7 @@ public class SqlSplitter {
 		return blockIndex;
 	}
 
-	public TreeMap<Integer, SqlSplitterBlockType> getBlockTypeMap() {
+	public TreeMap<Integer, BlockType> getBlockTypeMap() {
 		return blockTypeMap;
 	}
 	public int getVerbosity() {

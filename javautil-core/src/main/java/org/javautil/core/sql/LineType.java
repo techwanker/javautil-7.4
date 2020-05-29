@@ -2,7 +2,7 @@ package org.javautil.core.sql;
 
 import java.util.regex.Pattern;
 
-public enum SqlSplitterLineType {
+public enum LineType {
 	BLANK,
 	INDETERMINATE, 
 	STATEMENT_NAME, STATEMENT_END, 
@@ -10,10 +10,10 @@ public enum SqlSplitterLineType {
 	SEMICOLON,
 	COMMENT, COMMENT_BLOCK_BEGIN, COMMENT_BLOCK_END,
 	MARKDOWN_BLOCK_BEGIN, MARKDOWN_BLOCK_END, SQL_WITH_SEMICOLON,
-	PROCEDURE_BLOCK_END, PROCEDURE_BLOCK_START; 
+	PROCEDURE_BLOCK_END, PROCEDURE_BLOCK_START, SLASH; 
 	private static Pattern semiPattern = Pattern.compile(".*;\\s*--.*");
 
-	public static SqlSplitterLineType getSqlSplitterLineType(String text) {
+	public static LineType getSqlSplitterLineType(String text) {
 		final String trimmed = text.trim();
 
 		if (trimmed.startsWith("--#<")) {
@@ -38,7 +38,7 @@ public enum SqlSplitterLineType {
 			return PROCEDURE_BLOCK_END;
 		}
 		if (trimmed.equals("/")) {
-			return PROCEDURE_BLOCK_END;
+			return SLASH;
 		}
 		if (trimmed.startsWith(";--")) {
 			return STATEMENT_END;
@@ -77,21 +77,21 @@ public enum SqlSplitterLineType {
 		default:
 			return false;
 		}
-		
+
 	}
-	SqlSplitterBlockType getBlockType() {
+	BlockType getBlockType() {
 
 		switch (this) {
 		case MARKDOWN_BLOCK_BEGIN:
-			return SqlSplitterBlockType.MARKDOWN;
+			return BlockType.MARKDOWN;
 		case COMMENT_BLOCK_BEGIN:
-			return SqlSplitterBlockType.COMMENT;
+			return BlockType.COMMENT;
 		case PROCEDURE_BLOCK_START:
-			 return SqlSplitterBlockType.STATEMENT_BLOCK;
+			return BlockType.STATEMENT_BLOCK;
 		case STATEMENT_NAME:
 		case INDETERMINATE:
 		case SQL_WITH_SEMICOLON:
-			return SqlSplitterBlockType.STATEMENT;
+			return BlockType.STATEMENT;
 		default:
 			throw new IllegalArgumentException("Unsupported block type "  + this);
 		}
@@ -99,17 +99,30 @@ public enum SqlSplitterLineType {
 
 	boolean isStatementEnd() {
 		switch (this) {
-			case SQL_WITH_SEMICOLON:
-			case SEMICOLON:
-				return true;
-			default:
-				return false;
+		case SQL_WITH_SEMICOLON:
+		case SEMICOLON:
+			return true;
+		default:
+			return false;
 		}
-			
+
 	}
-	boolean isBlockEnd(SqlSplitterLineType sentinel) {
+
+	boolean isBlockEnd() {
 		switch (this) {
-			
+		case COMMENT_BLOCK_END:
+		case MARKDOWN_BLOCK_BEGIN:
+		case MARKDOWN_BLOCK_END:
+		case PROCEDURE_BLOCK_END:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	boolean isBlockEnd(LineType sentinel) {
+		switch (this) {
+
 		case INDETERMINATE:
 			switch (sentinel) {
 			case SQL_WITH_SEMICOLON:
@@ -151,7 +164,7 @@ public enum SqlSplitterLineType {
 
 	} 
 
-	boolean isStatementEndType(SqlSplitterLineType sentinel) {
+	boolean isStatementEndType(LineType sentinel) {
 		switch (this) {
 		case STATEMENT_NAME:
 		case INDETERMINATE:
@@ -178,16 +191,16 @@ public enum SqlSplitterLineType {
 		default:
 			throw new IllegalArgumentException(this.name());
 		}
-		
+
 	}
-	boolean isEndType(SqlSplitterLineType sentinel) {
+	boolean isEndType(LineType sentinel) {
 		switch (this) {
 		case MARKDOWN_BLOCK_BEGIN:
-			return sentinel.equals(SqlSplitterLineType.MARKDOWN_BLOCK_END);
+			return sentinel.equals(LineType.MARKDOWN_BLOCK_END);
 		case PROCEDURE_BLOCK_START:
-			return sentinel.equals(SqlSplitterLineType.PROCEDURE_BLOCK_END);
+			return sentinel.equals(LineType.PROCEDURE_BLOCK_END);
 		case COMMENT_BLOCK_BEGIN:
-			return sentinel.equals(SqlSplitterLineType.COMMENT_BLOCK_END);
+			return sentinel.equals(LineType.COMMENT_BLOCK_END);
 		case STATEMENT_NAME:
 		case INDETERMINATE:
 			switch (sentinel) {
@@ -212,22 +225,22 @@ public enum SqlSplitterLineType {
 		default:
 			throw new IllegalArgumentException(this.name());
 		}
-		
+
 	}
-//	SqlSplitterLineType getEndType() {
-//		switch (this) {
-//		case MARKDOWN_BLOCK_BEGIN:
-//			return MARKDOWN_BLOCK_END;
-//		case PROCEDURE_BLOCK_START:
-//			return PROCEDURE_BLOCK_END;
-//		case COMMENT_BLOCK_BEGIN:
-//			return COMMENT_BLOCK_END;
-//		case STATEMENT_NAME:
-//			return STATEMENT_END;
-//		default:
-//			throw new IllegalArgumentException(this.name());
-//		}
-//	}
+	//	SqlSplitterLineType getEndType() {
+	//		switch (this) {
+	//		case MARKDOWN_BLOCK_BEGIN:
+	//			return MARKDOWN_BLOCK_END;
+	//		case PROCEDURE_BLOCK_START:
+	//			return PROCEDURE_BLOCK_END;
+	//		case COMMENT_BLOCK_BEGIN:
+	//			return COMMENT_BLOCK_END;
+	//		case STATEMENT_NAME:
+	//			return STATEMENT_END;
+	//		default:
+	//			throw new IllegalArgumentException(this.name());
+	//		}
+	//	}
 
 	boolean isBegin() {
 		boolean retval = false;
@@ -258,7 +271,7 @@ public enum SqlSplitterLineType {
 
 	}
 
-	public boolean isMultistatementBlockEnd(SqlSplitterLineType type) {
+	public boolean isMultistatementBlockEnd(LineType type) {
 		boolean retval = false;
 		switch (this) {
 		case COMMENT_BLOCK_END:

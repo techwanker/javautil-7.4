@@ -1,6 +1,6 @@
 package org.javautil.core.sql;
 
-public enum SqlSplitterBlockType {
+public enum BlockType {
 	SQL, 
 	MARKDOWN,   MARKDOWN_DIRECTIVE, 
 	COMMENT, 	COMMENT_DIRECTIVE, 

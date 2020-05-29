@@ -22,7 +22,7 @@ public class SqlSplitterTest2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 
-	@Ignore
+	//@Ignore
 	
 	@Test
 	public void test_01() {
@@ -40,18 +40,28 @@ public class SqlSplitterTest2 {
 		logger.info("actual   '{}'",actual);
 		assertEquals(expected,actual);
 	}
-
-	@Ignore
+	
 	@Test
-	public void testBig() throws IOException, SqlSplitterException {
-		SqlSplitter sr = new SqlSplitter(this, "testsr/dblogger_install.pks.sr.sql").setProceduresOnly(true);
+	public void testStatementBlock() throws IOException, SqlSplitterException {
+		SqlSplitter sr = new SqlSplitter(this, "testsr/statement_block.sr.sql").setProceduresOnly(true);
 		sr.process();
 		List<String> texts = sr.getSqlTexts();
 		assertNotNull(texts);
+		logger.debug("texts.get(0) {}", texts.get(0));
 		assertEquals(1,texts.size());
 	}
 
-	@Ignore
+//	//@Ignore
+//	@Test
+//	public void testBig() throws IOException, SqlSplitterException {
+//		SqlSplitter sr = new SqlSplitter(this, "testsr/dblogger_install.pks.sr.sql").setProceduresOnly(true);
+//		sr.process();
+//		List<String> texts = sr.getSqlTexts();
+//		assertNotNull(texts);
+//		assertEquals(1,texts.size());
+//	}
+
+	//@Ignore
 	@Test
 	public void testShort() throws IOException, SqlSplitterException {
 		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger_short.sql")).setProceduresOnly(true);
@@ -68,15 +78,15 @@ public class SqlSplitterTest2 {
 		assertEquals("--%```",stmtLines.get(0).getText());
 		assertEquals("END logger;",stmtLines.get(9).getText());
 		List<String> texts  = sr.getSqlTexts();
-		assertEquals(1,texts.size());
 		String stmt0 = texts.get(0);
 		logger.debug("stmt0\n{}",stmt0);
+		assertEquals(1,texts.size());
 		ArrayList<String> text = sr.getBlockText(1);
 		logger.info("text ==-\n{}'",text);
 		assertNotNull(text);
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
 	public void testLogger() throws IOException, SqlSplitterException {
 		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger.pks.sr.sql")).setProceduresOnly(true);
@@ -119,7 +129,7 @@ public class SqlSplitterTest2 {
 		assertEquals("select 'z' from dual", sqls.get(2).getSql().trim());
 	}
 	
-	@Ignore
+	////@Ignore
     @Test
 	public void testSqlWithSemicolon() throws IOException, SqlSplitterException {
 
@@ -132,7 +142,7 @@ public class SqlSplitterTest2 {
 		logger.debug("stmt2lines {}",stmt2lines);
 		
 		SqlStatements sqls = runner.getSqlStatements();
-		assertEquals(21,sqls.size());
+		assertEquals(25,sqls.size());
 		int ssndx = 0;
 		for (SqlStatement ss : sqls) {
 			logger.info("ssndx {} {}",ssndx++,ss);
@@ -143,7 +153,7 @@ public class SqlSplitterTest2 {
 	
 	
 	
-	@Ignore
+	//@Ignore
 	 @Test
 	public void testSkipBlock() throws IOException, SqlSplitterException {
 
@@ -155,7 +165,7 @@ public class SqlSplitterTest2 {
 		assertEquals(3, sqls.size());
 	}
 
-	 @Ignore
+	 //@Ignore
 	 @Test
 	public void test2() throws IOException, SqlSplitterException {
 
@@ -169,7 +179,7 @@ public class SqlSplitterTest2 {
 
 	}
 
-	 @Ignore
+	 //@Ignore
 	@Test
 	public void test3() throws IOException, SqlSplitterException {
 

@@ -9,9 +9,9 @@ public class SqlSplitterLine {
 
 	private int                       blockLineNumber;
 
-	private final SqlSplitterLineType type;
+	private final LineType type;
 
-	private SqlSplitterBlockType      blockType = SqlSplitterBlockType.UNKNOWN;
+	private BlockType      blockType = BlockType.UNKNOWN;
 
 	private final String              text;
 
@@ -19,7 +19,7 @@ public class SqlSplitterLine {
 		super();
 		this.lineNumber = lineNumber;
 		this.text = text;
-		this.type = SqlSplitterLineType.getSqlSplitterLineType(text);
+		this.type = LineType.getSqlSplitterLineType(text);
 
 	}
 
@@ -48,7 +48,7 @@ public class SqlSplitterLine {
 		return text;
 	}
 
-	public SqlSplitterLineType getType() {
+	public LineType getType() {
 		return type;
 	}
 
@@ -64,11 +64,11 @@ public class SqlSplitterLine {
 		    blockType, text);
 	}
 
-	public SqlSplitterBlockType getBlockType() {
+	public BlockType getBlockType() {
 		return blockType;
 	}
 
-	public void setBlockType(SqlSplitterBlockType blockType) {
+	public void setBlockType(BlockType blockType) {
 		this.blockType = blockType;
 		// logger.info("setBlockType: " + this.toString());
 	}
