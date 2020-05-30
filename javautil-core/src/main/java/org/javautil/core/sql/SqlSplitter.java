@@ -107,6 +107,9 @@ public class SqlSplitter {
 	}
 
 	public SqlSplitter(InputStream splitterInputStream) {
+		if (splitterInputStream ==  null) {
+			throw new IllegalArgumentException("input stream is null");
+		}
 		reader = new LineNumberReader(new InputStreamReader(splitterInputStream));
 	}
 
@@ -123,7 +126,7 @@ public class SqlSplitter {
 		// TODO need to close the files
 	}
 
-	public static String trimSql(String text) {
+	public static String trimSql(String text, boolean isBlock) {
 		//logger.info("trimming '{}'",text);
 		Character[] whiteCruft = {'\t','\n','\r',' '};
 
@@ -131,7 +134,8 @@ public class SqlSplitter {
 		//logger.info("leading: '{}'", leading);
 
 		Character[] semi = {';'};
-		String noSemi = StringUtils.stripTrailing(leading, semi);
+		String noSemi = isBlock ? leading : StringUtils.stripTrailing(leading, semi);
+		//String noSemi = StringUtils.stripTrailing(leading, semi);
 		//logger.info("noSemi '{}'",noSemi);
 
 		String trimmed = StringUtils.stripLeading(noSemi,whiteCruft);
@@ -196,14 +200,20 @@ public class SqlSplitter {
 		logtext("\n\ndelimitedBlock preloop ==<",linesIndex,blockBegin,"");
 		loop:
 			while (linesIndex < lines.size() ) {
-				if (line.getType().isBlockStart()) {
-					break loop;
-				}
-				if (line.getType().isBlockEnd()) {
-					line.setBlockLineNumber(1);
-					line.setBlockNumber(++blockNumber);
-					line.setBlockType(BlockType.DIRECTIVE);
-					break loop;
+				if (blockBegin.getType().equals(LineType.PROCEDURE_BLOCK_START)) {
+					if (line.getType().equals(LineType.PROCEDURE_BLOCK_END)) {
+						break loop;
+					}
+				} else {
+					if (line.getType().isBlockStart()) {
+						break loop;
+					}
+					if (line.getType().isBlockEnd()) {
+						line.setBlockLineNumber(1);
+						line.setBlockNumber(++blockNumber);
+						line.setBlockType(BlockType.DIRECTIVE);
+						break loop;
+					}
 				}
 				logtext(" loop top ",linesIndex,line,"");
 				//	logger.debug("blockBegin type {} {}",blockBegin.getType(),blockBegin);
@@ -233,12 +243,12 @@ public class SqlSplitter {
 						line.setBlockLineNumber(blockLineNbr++);
 					}
 				}
+				logtext(" loop bottom",linesIndex,line,"");
 				if (linesIndex + 1 < lines.size()) {
-				line = lines.get(++linesIndex);
+					line = lines.get(++linesIndex);
 				} else {
 					break loop;
 				}
-				logtext(" loop bottom",linesIndex,line,"");
 			}
 		logtext("delimitedBlock end ==>",linesIndex,lines.get(linesIndex),"\n");
 		logger.debug("\n");
@@ -324,34 +334,34 @@ public class SqlSplitter {
 
 	}
 
-	private String lineState() {
-		final StringBuilder sb = new StringBuilder();
-		for (final SqlSplitterLine srl : lines) {
-			sb.append(srl.toString());
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
-
-	public String snapshot() throws SqlSplitterException {
-
-		if (lines == null) {
-			throw new IllegalStateException("analyze has not been called");
-		}
-		final StringBuilder sb = new StringBuilder();
-		sb.append(lineState());
-		int i = 1;
-		logger.debug("SqlSplitter snapshot: sqltexts");
-		for (String sqlText : getSqlTexts()) {
-			logger.debug(String.format("#%d\n%s", i++, sqlText));
-		}
-		i = 1;
-		logger.debug("Sqlsplitter sqlStatements");
-		for (SqlStatement ss : getSqlStatements()) {
-			logger.debug(String.format("#%d\n%s", i++, ss.toString()));
-		}
-		return sb.toString();
-	}
+//	private String lineState() {
+//		final StringBuilder sb = new StringBuilder();
+//		for (final SqlSplitterLine srl : lines) {
+//			sb.append(srl.toString());
+//			sb.append("\n");
+//		}
+//		return sb.toString();
+//	}
+//
+//	public String snapshot() throws SqlSplitterException {
+//
+//		if (lines == null) {
+//			throw new IllegalStateException("analyze has not been called");
+//		}
+//		final StringBuilder sb = new StringBuilder();
+//		sb.append(lineState());
+//		int i = 1;
+//		logger.debug("SqlSplitter snapshot: sqltexts");
+//		for (String sqlText : getSqlTexts()) {
+//			logger.debug(String.format("#%d\n%s", i++, sqlText));
+//		}
+//		i = 1;
+//		logger.debug("Sqlsplitter sqlStatements");
+//		for (SqlStatement ss : getSqlStatements()) {
+//			logger.debug(String.format("#%d\n%s", i++, ss.toString()));
+//		}
+//		return sb.toString();
+//	}
 
 	public ArrayList<SqlSplitterLine> getStatementLines(int statementNumber) throws SqlSplitterException {
 		analyze();
@@ -375,6 +385,8 @@ public class SqlSplitter {
 
 	String asSqlString(List<SqlSplitterLine> lines) {
 		final StringBuilder sb = new StringBuilder();
+		SqlSplitterLine firstLine = lines.get(0);
+		boolean stmtBlock =  (firstLine.getBlockType().equals(BlockType.STATEMENT_BLOCK));
 		int lastIndex = lines.size() - 1;
 		for (int i = 0; i <= lastIndex; i++) {
 			sb.append(lines.get(i).getText());
@@ -382,7 +394,7 @@ public class SqlSplitter {
 				sb.append("\n");
 			}
 		}
-		String retval = trimSql(sb.toString());
+		String retval = trimSql(sb.toString(),stmtBlock);
 		//logger.debug("lines:\n{}\nreturn:{}",lines,retval);
 		return retval;
 	}

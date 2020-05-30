@@ -96,16 +96,16 @@ public class DbloggerOracleInstall {
 
 		createTables();
 
-		logger.info("======= creating logger_message_formatter");
-		new SqlRunner(this, "ddl/oracle/logger_message_formatter.plsql.sr.sql").setConnection(connection)
-				.setShowSql(showSql).setProceduresOnly(true).setContinueOnError(true).process();
+//		logger.info("======= creating logger_message_formatter");
+//		new SqlRunner(this, "ddl/oracle/logger_message_formatter.plsql.sr.sql").setConnection(connection)
+//				.setShowSql(showSql).setContinueOnError(true).process();
 
 		logger.info("======= about to compile specs " + loggerSpec);
-		new SqlRunner(this, loggerSpec).setConnection(connection).setShowSql(showSql).setProceduresOnly(true)
+		new SqlRunner(this, loggerSpec).setConnection(connection).setShowSql(showSql)
 				.setContinueOnError(true).process();
 
 		logger.info("======== creating logger package body " + loggerBody);
-		new SqlRunner(this, loggerBody).setConnection(connection).setShowSql(showSql).setProceduresOnly(true)
+		new SqlRunner(this, loggerBody).setConnection(connection).setShowSql(showSql)
 				.setContinueOnError(true).process();
 
 	}

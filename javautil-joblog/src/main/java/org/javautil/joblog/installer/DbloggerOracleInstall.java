@@ -1,5 +1,7 @@
 package org.javautil.joblog.installer;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,6 +16,7 @@ import org.javautil.core.sql.SqlRunner;
 import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.util.ListOfLists;
+import org.javautil.util.NameValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,7 @@ public class DbloggerOracleInstall {
 
 	private boolean drop = true;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private boolean showSql = false;
+	private boolean showSql = true;
 
 	private boolean dryRun;
 
@@ -101,13 +104,23 @@ public class DbloggerOracleInstall {
 //				.setShowSql(showSql).setProceduresOnly(true).setContinueOnError(true).process();
 
 		logger.info("======= about to compile specs " + loggerSpec);
-		new SqlRunner(this, loggerSpec).setConnection(connection).setShowSql(showSql).setProceduresOnly(true)
-				.setContinueOnError(true).process();
+		SqlRunner runner = new SqlRunner(this, loggerSpec).setConnection(connection).
+				setShowSql(showSql)
+				.setContinueOnError(true);
+		runner.setSqlSplitterTrace(3);
+		runner.process();
 
 		logger.info("======== creating logger package body " + loggerBody);
-		new SqlRunner(this, loggerBody).setConnection(connection).setShowSql(showSql).setProceduresOnly(true)
-				.setContinueOnError(true).process();
+		new SqlRunner(this, loggerBody).setConnection(connection).setShowSql(showSql).
+				setContinueOnError(true).process();
+		
+		String sql = "select object_type, status from user_objects\n" + 
+				"where object_name = 'LOGGER'";
 
+		SqlStatement ss = new SqlStatement(connection,sql);
+		NameValue nv = ss.getNameValue();
+		assertEquals("VALID",nv.get("status"));
+		ss.close();
 	}
 
 	public DbloggerOracleInstall setDrop(boolean drop) {

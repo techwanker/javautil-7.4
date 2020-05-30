@@ -1,4 +1,28 @@
-set echo on
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2020.05.30.01.18.24;	author jjs;	state Exp;
+branches;
+next	;
+
+
+desc
+@/.
+.\
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@set echo on
 
 ::
 
@@ -183,3 +207,4 @@ misc
         procedure set_debug(debug boolean default true) ;
 
 END logger; / show errors
+@

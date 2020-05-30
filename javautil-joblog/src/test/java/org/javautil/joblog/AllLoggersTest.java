@@ -56,6 +56,8 @@ public class AllLoggersTest
 
 	
 	public long sampleUsage(Joblog dblogger, Connection appConnection) throws SqlSplitterException, Exception {
+
+		new DbloggerOracleInstall(applicationDataSource.getConnection(), true, false).process();
 		dblogger.prepareConnection();
 		final String processName = "Process Name";
 		// Start the job

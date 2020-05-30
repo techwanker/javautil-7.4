@@ -28,14 +28,14 @@ public class SqlSplitterTest2 {
 	public void test_01() {
 		String input = "select 'x' from dual; ";
 		String expected = "select 'x' from dual";
-		assertEquals(expected,SqlSplitter.trimSql(input));
+		assertEquals(expected,SqlSplitter.trimSql(input,false));
 	}
 	//@Ignore
 	@Test
 	public void test_02() {
 		String input =    "select 'y' from dual  \n;  \n";
 		String expected = "select 'y' from dual  \n";
-		String actual = SqlSplitter.trimSql(input);
+		String actual = SqlSplitter.trimSql(input,false);
 		logger.info("expected '{}'",expected);
 		logger.info("actual   '{}'",actual);
 		assertEquals(expected,actual);
@@ -86,19 +86,19 @@ public class SqlSplitterTest2 {
 		assertNotNull(text);
 	}
 
-	//@Ignore
-	@Test
-	public void testLogger() throws IOException, SqlSplitterException {
-		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger.pks.sr.sql")).setProceduresOnly(true);
-		sr.setTraceState(1);
-		List<String> texts  = sr.getSqlTexts();
-		int stmtNbr = 0;
-		ArrayList<SqlSplitterLine> lines = sr.getStatementLines(0);
-		logger.debug("lines {}",lines);
-		assertEquals(167,lines.size());
-		logger.debug("lines.get(0): {}",lines.get(0));
-		logger.debug("lines.get(0): {}",lines.get(166));
-	}
+//	//@Ignore
+//	@Test
+//	public void testLogger() throws IOException, SqlSplitterException {
+//		SqlSplitter sr = new SqlSplitter(new File("src/test/resources/testsr/logger.pks.sr.sql")).setProceduresOnly(true);
+//		sr.setTraceState(1);
+//		List<String> texts  = sr.getSqlTexts();
+//		int stmtNbr = 0;
+//		ArrayList<SqlSplitterLine> lines = sr.getStatementLines(0);
+//		logger.debug("lines {}",lines);
+//		assertEquals(167,lines.size());
+//		logger.debug("lines.get(0): {}",lines.get(0));
+//		logger.debug("lines.get(0): {}",lines.get(166));
+//	}
 	
 	// @Test
 	public void testUtCondition() throws IOException, SqlSplitterException {
@@ -194,5 +194,36 @@ public class SqlSplitterTest2 {
 
 		assertEquals(25, sqls.size());
 	}
+//	 //@Ignore
+//	@Test
+//	public void testLoggerPks() throws IOException, SqlSplitterException {
+//
+//		SqlStatements sqls = new SqlSplitter(this, "testsr/logger.pks.sr.sql").getSqlStatements();
+//		logger.debug("sqls.size() {}", sqls.size());
+//		String sqls_0 = sqls.get(0).getSql();
+//		logger.debug("sqls.get(0) {}", sqls_0);
+//		String sqls_0_0 = sqls_0.split("\n")[0].trim();
+//		assertEquals("/* Explain Plan */",sqls_0_0);
+//
+//		assertEquals(25, sqls.size());
+//	}
 
+	@Test
+	public void testPackageSpec() throws IOException, SqlSplitterException {
+
+		SqlStatements sqls = new SqlSplitter(this, "testsr/package_spec.sr.sql").getSqlStatements();
+		logger.debug("sqls.size() {}", sqls.size());
+		String sqls_0 = sqls.get(0).getSql();
+		logger.debug("sqls.get(0) {}", sqls_0);
+		String[] sqllines = sqls_0.split("\n");
+		
+		String sqls_0_0 = sqllines[0].trim();
+		assertEquals("--%```",sqls_0_0);
+		String sqls_0_last = sqllines[sqllines.length - 1];
+		
+		assertEquals("END logger;",sqls_0_last);
+
+		assertEquals(1, sqls.size());
+	}
+	
 }

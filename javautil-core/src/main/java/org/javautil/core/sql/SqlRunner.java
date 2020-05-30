@@ -25,7 +25,7 @@ public class SqlRunner {
 	private int           verbosity      = 0;
 	private String        inputName;
 	private String        inputType;
-	private boolean       proceduresOnly = false;                                   // blocks only end in
+	//private boolean       proceduresOnly = false;                                   // blocks only end in
 	// "/"
 	private SqlSplitter   splitter;
 	private SqlStatements statements;
@@ -38,6 +38,8 @@ public class SqlRunner {
 
 	private boolean       commitOrRollbackEveryStatement;
 	private int           sqlSplitterTrace;
+	
+	private boolean       showSqlSplitterOnError = true;
 
 	public boolean isShowSql() {
 		return showSql;
@@ -109,9 +111,9 @@ public class SqlRunner {
 
 			try {
 				int rc;
-				if (proceduresOnly) {
-					rc = ss.executeUpdate(connection, null); // nasty hack for quoted : 'yy:mm:dd'
-				} else {
+//				if (proceduresOnly) {
+//					rc = ss.executeUpdate(connection, null); // nasty hack for quoted : 'yy:mm:dd'
+//				} else {
 					logger.debug("commitEvery:{} about to execute: \n{}", commitOrRollbackEveryStatement, ss.getSql());
 					try {
 						rc = ss.executeUpdate(binds);
@@ -121,6 +123,9 @@ public class SqlRunner {
 						}
 
 					} catch (SQLException sqe) {
+						if (showSqlSplitterOnError) {
+							logger.error("\n{}",splitter.formatLines());
+						}
 						if (commitOrRollbackEveryStatement) {
 							connection.rollback();
 							logger.debug("commitOrRollbackEveryStatement true rolled back");
@@ -133,7 +138,7 @@ public class SqlRunner {
 					if (commitOrRollbackEveryStatement) {
 						connection.commit();
 					}
-				}
+	//			}
 				ss.close();
 			} catch (final SQLException s) {
 //				logger.warn("found an error: processStatements: showError {}", showError);
@@ -201,15 +206,16 @@ public class SqlRunner {
 		return this;
 	}
 
-	public boolean isProceduresOnly() {
-		return proceduresOnly;
-	}
+//	
+//	public boolean isProceduresOnly() {
+//		return proceduresOnly;
+//	}
 
-	public SqlRunner setProceduresOnly(boolean proceduresOnly) {
-		this.proceduresOnly = proceduresOnly;
-		splitter.setProceduresOnly(proceduresOnly);
-		return this;
-	}
+//	public SqlRunner setProceduresOnly(boolean proceduresOnly) {
+//		this.proceduresOnly = proceduresOnly;
+//		splitter.setProceduresOnly(proceduresOnly);
+//		return this;
+//	}
 
 	public boolean isShowError() {
 		return showError;

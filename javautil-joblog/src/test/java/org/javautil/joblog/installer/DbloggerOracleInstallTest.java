@@ -1,7 +1,10 @@
 package org.javautil.joblog.installer;
 
+import java.beans.PropertyVetoException;
 import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 import org.javautil.joblog.installer.DbloggerOracleInstall;
@@ -13,15 +16,17 @@ public class DbloggerOracleInstallTest {
 	
 	// TODO WTF
 
-//	@Test
-//	public void testDrop() throws SqlSplitterException, Exception {
-//		DataSourceFactory dsf = new DataSourceFactory();
-//		DataSource ds = dsf.getDatasource("integration_oracle");
-//		Connection loggerConnection = ds.getConnection();
-//		DbloggerOracleInstall installer = new DbloggerOracleInstall(loggerConnection, true, true);
-//		installer.drop();
-//		installer.process();
-//		loggerConnection.close();
-//		((Closeable) ds).close();
-//	}
+	@Test
+	public void testDrop() throws Exception  {
+		DataSourceFactory dsf = new DataSourceFactory();
+		DataSource ds = dsf.getDatasource("integration_oracle");
+		Connection loggerConnection = ds.getConnection();
+		DbloggerOracleInstall installer = new DbloggerOracleInstall(loggerConnection, true, true);
+		installer.drop();
+		installer.process();
+		loggerConnection.close();
+		((Closeable) ds).close();
+	}
+	
+	
 }
