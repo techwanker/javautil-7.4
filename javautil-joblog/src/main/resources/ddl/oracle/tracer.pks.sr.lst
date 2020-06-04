@@ -1,0 +1,80 @@
+SQL> --#>
+SQL> --/<
+SQL> CREATE OR REPLACE PACKAGE tracer
+  2  is
+  3  
+  4    --%#Tracing
+  5    --%<
+  6    procedure set_trace (trace_level in pls_integer);
+  7    --%>
+  8  
+  9  
+ 10    --%<
+ 11    function get_my_tracefile_name
+ 12    return varchar ;
+ 13    --%>
+ 14  
+ 15    --%<
+ 16    function set_tracefile_identifier(job_nbr in number)
+ 17    return varchar;
+ 18    --%>
+ 19  
+ 20    --%<
+ 21    procedure set_debug(debug boolean default true);
+ 22    --%>
+ 23  
+ 24  
+ 25    --%<
+ 26    procedure set_action ( action in varchar) ;
+ 27    --%>
+ 28  
+ 29    --%<
+ 30    procedure set_module ( module_name in varchar, action_name in varchar );
+ 31    --%>
+ 32  
+ 33  
+ 34    --%<
+ 35    function get_tracefile(file_name in varchar)
+ 36    return clob;
+ 37    --%>
+ 38  
+ 39  
+ 40    --%<
+ 41    procedure trace_step(step_name in varchar, job_step_id in number) ;
+ 42    --%>
+ 43  
+ 44  end tracer;
+ 45  --/>
+ 46  
+ 47  --#<
+ 48  /
+
+Package created.
+
+SQL> show errors
+No errors.
+SQL> --#>
+SQL> exec tracer.set_trace(8);
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> select get_my_tracefile_name from dual;
+select get_my_tracefile_name from dual
+       *
+ERROR at line 1:
+ORA-00904: "GET_MY_TRACEFILE_NAME": invalid identifier 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1* select tracer.get_my_tracefile_name from dual
+SQL> r
+  1* select tracer.get_my_tracefile_name from dual
+
+GET_MY_TRACEFILE_NAME                                                           
+--------------------------------------------------------------------------------
+/common/oracle/diag/rdbms/dev18b/dev18b/trace/dev18b_ora_17504.trc              
+
+SQL> exit

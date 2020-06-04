@@ -31,6 +31,9 @@
    <logger name="org.javautil.dblogging.tracepersistence">
         <level value="warn"/>
    </logger>
+     <logger name="org.javautil.joblog.installer">
+        <level value="debug"/>
+   </logger>
    <logger name="org.javautil.oracle.tracehandlers">
         <level value="warn"/>
    </logger>

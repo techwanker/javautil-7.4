@@ -1,0 +1,115 @@
+SQL> --#>
+SQL> --/<
+SQL> CREATE OR REPLACE PACKAGE BODY tracer
+  2  is
+  3    g_debug		       boolean := false;
+  4    g_job_msg_dir	       varchar (32) := 'JOB_MSG_DIR';
+  5    g_logfile_name	       varchar(255);
+  6  
+  7  
+  8    type logger_dtl_type is table of logger_dtl%rowtype index by varchar(64);
+  9  
+ 10    logger_dtls logger_dtl_type;
+ 11  
+ 12    g_job_log job_log%rowtype;
+ 13  
+ 14  
+ 15    --%#Tracing
+ 16    --%<
+ 17    procedure set_trace (trace_level in pls_integer)
+ 18    --%>
+ 19    is
+ 20    begin
+ 21  	 DBMS_TRACE.set_plsql_trace (trace_level);
+ 22    end set_trace;
+ 23  
+ 24    --%<
+ 25    function get_my_tracefile_name
+ 26    return varchar
+ 27    --%>
+ 28    is
+ 29  	 tracefile_name varchar(4096);
+ 30  	 begin
+ 31  	     select value into tracefile_name
+ 32  	     from v$diag_info
+ 33  	     where name = 'Default Trace File';
+ 34  
+ 35  	     return tracefile_name;
+ 36  	 end get_my_tracefile_name;
+ 37  
+ 38    --%<
+ 39    function set_tracefile_identifier(job_nbr in number)
+ 40    return varchar
+ 41    --%>
+ 42    is
+ 43  	 identifier varchar(32) := 'job_' || to_char(job_nbr);
+ 44    begin
+ 45  	 execute immediate 'alter session set tracefile_identifier = ''' || identifier || '''';
+ 46  	 return get_my_tracefile_name;
+ 47    end set_tracefile_identifier;
+ 48  
+ 49  	--%# Job DML
+ 50  
+ 51    procedure set_debug(debug boolean default true)
+ 52    is
+ 53    begin
+ 54  	     g_debug := debug;
+ 55    end;
+ 56  
+ 57  
+ 58    procedure set_action ( action in varchar ) is
+ 59    begin
+ 60  		 dbms_application_info.set_action(substr(action, 1, 64)) ;
+ 61    end set_action ;
+ 62  
+ 63    procedure set_module ( module_name in varchar, action_name in varchar )
+ 64    is
+ 65    begin
+ 66  		 dbms_application_info.set_module(module_name, action_name) ;
+ 67    end set_module ;
+ 68  
+ 69  
+ 70    function get_tracefile(file_name in varchar)
+ 71    return clob is
+ 72    begin
+ 73  	 return get_file('UDUMP_DIR',file_name);
+ 74    end get_tracefile;
+ 75  
+ 76  
+ 77    procedure trace_step(step_name in varchar, job_step_id in number) is
+ 78  	 my_job_step_id varchar(9) := to_char(job_step_id);
+ 79  	 sql_text varchar(255) := 'select ''step_name: ''''' || step_name ||
+ 80  		    ''''' job_log_id: ' || g_job_log.job_log_id ||
+ 81  		   ' job_step_id: ' || my_job_step_id || ''' from dual';
+ 82    begin
+ 83  	 execute immediate sql_text;
+ 84    end trace_step;
+ 85  
+ 86  
+ 87    --
+ 88    --  Logger hdr and dtl
+ 89    --
+ 90  
+ 91  end tracer;
+ 92  --/>
+ 93  
+ 94  --#<
+ 95  /
+
+Package body created.
+
+SQL> show errors
+No errors.
+SQL> --#>
+SQL> turn off the trace
+SP2-0734: unknown command beginning "turn off t..." - rest of line ignored.
+SQL> SQL> ora
+SP2-0042: unknown command "SQL> ora" - rest of line ignored.
+SQL> exec tracer.set_trace(8);
+
+PL/SQL procedure successfully completed.
+
+SQL> @ logger.pkb.sr.sql
+SQL> --#<
+SQL> set echo on
+SQL> spool logger.pkb.sr.lst

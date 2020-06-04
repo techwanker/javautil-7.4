@@ -11,7 +11,7 @@ import org.javautil.lang.ThreadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OraclePackagePersistence implements JoblogPersistence {
+public class JoblogPersistencePackage implements JoblogPersistence {
 
 	private Connection connection;
 	private CallableStatement persistJobStatement;
@@ -19,63 +19,72 @@ public class OraclePackagePersistence implements JoblogPersistence {
 	private CallableStatement endJobStatement;
 	private CallableStatement insertStepStatement;
 	private SequenceHelper sequenceHelper;
-	private long jobLogId;
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private boolean throwExceptions;
 	private CallableStatement finishStepStatement;
 	private boolean persistTraceOnJobCompletion;
 	private boolean persistPlansOnJobCompletion;
 
-	public OraclePackagePersistence(Connection connection) throws SQLException {
+	public JoblogPersistencePackage(Connection connection) throws SQLException {
 		this.connection = connection;
 		this.sequenceHelper = new SequenceHelper(connection);
+	}	@Override
+	
+	
+	public String joblogInsert(String processName, String className, String moduleName) throws SQLException {
+		return joblogInsert(processName, className, moduleName,"");
 	}
-
 	// TODO externalize
 	@Override
-	public long persistJob(String processName, String className, String moduleName, String statusMsg,
-			String tracefileName, String schema, long jobLogId) throws SQLException {
-		String callSql = "begin " + "persist_job_log ( \n" + "					 p_job_log_id   => :p_job_log_id,\n"
-				+ "					 p_schema_name  => :p_schema_name,\n"
-				+ "					 p_process_name => :p_process_name,\n" + "					 \n"
-				+ "					 p_thread_name  => :p_thread_name,\n"
-				+ "					 p_status_msg   => :p_status_msg,\n"
-				+ "					 p_status_ts    => :p_status_ts,\n" + "					 \n"
-				+ "					 p_sid          => :p_sid,\n"
-				+ "                   p_module_name   => :p_module_name,\n"
-				+ "                   p_classname     => :p_classname, \n" + "                   \n"
-				+ "                   p_tracefile_name => :p_tracefile_name);" + "end;";
+	public String joblogInsert(String processName, String className, 
+			String moduleName, String statusMsg ) throws SQLException {
+		String callSql = "begin " + 
+			    ":token = joblog.job_log_insert ( \n" 
+				+ "		p_process_name => :p_process_name,\n"  
+				+ "     p_classname     => :p_classname, \n" 
+				+ "     p_module_name   => :p_module_name,\n"
+				+ "		p_thread_name  => :p_thread_name,\n"
+				+ "		p_status_msg   => :p_status_msg,\n"
+				+ ");" 
+				+ "end;";
 
 		if (persistJobStatement == null) {
 			persistJobStatement = connection.prepareCall(callSql);
 		}
-		persistJobStatement.setLong("p_job_log_id", jobLogId);
-		persistJobStatement.setString("p_schema_name", null);
+		//persistJobStatement.setLong("p_job_log_id", jobLogId);
+		//persistJobStatement.setString("p_schema_name", null);
 		persistJobStatement.setString("p_process_name", processName);
 		persistJobStatement.setString("p_thread_name", Thread.currentThread().getName());
 		persistJobStatement.setString("p_status_msg", statusMsg);
 		persistJobStatement.setTimestamp("p_status_ts", new Timestamp(System.currentTimeMillis()));
-		persistJobStatement.setLong("p_sid", 0l);// TODO
+		//persistJobStatement.setLong("p_sid", 0l);// TODO
 		persistJobStatement.setString("p_classname", className);
 		persistJobStatement.setString("p_module_name", moduleName);
-		persistJobStatement.setString("p_tracefile_name", tracefileName);
+		//persistJobStatement.setString("p_tracefile_name", tracefileName);
 		persistJobStatement.execute();
-		return jobLogId;
+		String token = persistJobStatement.getString("token");
+		return token;
 	}
 
 	@Override
 	public void endJob() throws SQLException {
-		String callSql = "logger.end_job";
+		String callSql = "job_log.end_job";
 		if (endJobStatement == null) {
 			endJobStatement = connection.prepareCall(callSql);
 		}
 		endJobStatement.execute();
 	}
+	
+	@Override
+	public long insertStep(String jobToken, String stepName, String stepInfo, String className) {
+		return insertStep(jobToken, stepName, stepInfo, className, ""); 
+	}
 
 	@Override
-	public long insertStep(String stepName, String stepInfo, String className, String stack) {
+	public long insertStep(String jobToken, String stepName, String stepInfo, String className, String stack) {
 		long jobStepId = -1L;
-		String callSql = ":p_job_step_id := logger_persistence.save_job_step (\n"
+		String callSql = ":p_job_step_id := joblog.job_step_insert (\n"
+				+ "                p_job_token   => :p_job_token,"
 				+ "                p_job_step_id => :p_job_step,   \n"
 				+ "                p_job_log_id  => :p_job_log_id, \n"
 				+ "                p_step_name   => :p_step_name, \n"
@@ -87,7 +96,7 @@ public class OraclePackagePersistence implements JoblogPersistence {
 				insertStepStatement = connection.prepareCall(callSql);
 			}
 			insertStepStatement.registerOutParameter("p_job_step_id", java.sql.Types.INTEGER);
-			insertStepStatement.setLong("p_job_log_id", jobLogId);
+			insertStepStatement.setString("p_job_token", jobToken);
 			insertStepStatement.setString("p_step_name", stepName);
 			insertStepStatement.setString("p_step_info", stepInfo);
 			insertStepStatement.setString("p_classname", className);
@@ -107,8 +116,8 @@ public class OraclePackagePersistence implements JoblogPersistence {
 	}
 
 	@Override
-	public void finishStep() throws SQLException {
-		String callSql = "logger.finish_step";
+	public void finishStep(long stepId) throws SQLException {
+		String callSql = "joblog.finish_step";
 		if (finishStepStatement == null) {
 			finishStepStatement = connection.prepareCall(callSql);
 		}
@@ -125,7 +134,7 @@ public class OraclePackagePersistence implements JoblogPersistence {
 		}
 
 		if (abortJobStatement == null) {
-			abortJobStatement = connection.prepareCall("begin logger_persistence.abort_job(:p_stacktrace); end;");
+			abortJobStatement = connection.prepareCall("begin job_log.abort_job(:p_stacktrace); end;");
 		}
 		String abortMessage = sb.toString();
 		abortJobStatement.setString("p_stacktrace", abortMessage);
@@ -154,10 +163,7 @@ public class OraclePackagePersistence implements JoblogPersistence {
 		this.persistPlansOnJobCompletion = persistPlans;
 	}
 
-	@Override
-	public long getJobLogId() {
-		return jobLogId;
-	}
+	
 
 	@Override
 	public long getNextJobLogId() {
@@ -174,4 +180,39 @@ public class OraclePackagePersistence implements JoblogPersistence {
 		return retval;
 	}
 
+	@Override
+	public void prepareConnection() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setModule(String string, String string2) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setAction(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setPersistPlansOnSQLExceptionJobCompletion(boolean persistPlans) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ensureDatabaseObjects() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	
 }

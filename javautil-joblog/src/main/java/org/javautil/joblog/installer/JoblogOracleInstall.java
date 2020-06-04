@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -16,16 +15,17 @@ import org.javautil.core.sql.SqlRunner;
 import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.util.ListOfLists;
+import org.javautil.util.ListOfNameValue;
 import org.javautil.util.NameValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DbloggerOracleInstall {
+public class JoblogOracleInstall {
 
 	private final Connection connection;
 
 	private boolean drop = true;
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final  transient static Logger logger = LoggerFactory.getLogger(JoblogOracleInstall.class);
 	private boolean showSql = true;
 
 	private boolean dryRun;
@@ -34,13 +34,13 @@ public class DbloggerOracleInstall {
 
 	private boolean showErrorOnDrop = false;
 
-	public DbloggerOracleInstall(Connection connection, boolean drop, boolean showSql) {
+	public JoblogOracleInstall(Connection connection, boolean drop, boolean showSql) {
 		this.connection = connection;
 		this.drop = drop;
 		this.showSql = showSql;
 	}
 
-	public DbloggerOracleInstall(String outputFileName) {
+	public JoblogOracleInstall(String outputFileName) {
 		this.connection = null;
 		this.showSql = true;
 		this.dryRun = true;
@@ -73,20 +73,20 @@ public class DbloggerOracleInstall {
 	public void drop() throws SqlSplitterException, SQLException, IOException {
 		logger.info("dropping tables");
 		new SqlRunner(this, "ddl/oracle/dblogger_uninstall.sr.sql").setConnection(connection).setShowSql(showSql)
-				.setContinueOnError(true).setShowError(showErrorOnDrop).process();
+		.setContinueOnError(true).setShowError(showErrorOnDrop).process();
 	}
 
 	public void createTables() throws SqlSplitterException, SQLException, IOException {
-	//	final String cursorTables = "ddl/oracle/cursor_tables.sr.sql";
+		//	final String cursorTables = "ddl/oracle/cursor_tables.sr.sql";
 		final String jobTables = "ddl/oracle/job_tables.sr.sql";
 
 		logger.info("loggerObjectInstall showSql: {}", showSql);
 
-//		new SqlRunner(this, cursorTables.setConnection(connection).setContinueOnError(true).setShowSql(showSql)
-//				.process();
+		//		new SqlRunner(this, cursorTables.setConnection(connection).setContinueOnError(true).setShowSql(showSql)
+		//				.process();
 
 		new SqlRunner(this, jobTables).setConnection(connection).setContinueOnError(true).setShowSql(showSql)
-				.process();
+		.process();
 
 	}
 
@@ -99,9 +99,9 @@ public class DbloggerOracleInstall {
 
 		createTables();
 
-//		logger.info("======= creating logger_message_formatter");
-//		new SqlRunner(this, "ddl/oracle/logger_message_formatter.plsql.sr.sql").setConnection(connection)
-//				.setShowSql(showSql).setProceduresOnly(true).setContinueOnError(true).process();
+		//		logger.info("======= creating logger_message_formatter");
+		//		new SqlRunner(this, "ddl/oracle/logger_message_formatter.plsql.sr.sql").setConnection(connection)
+		//				.setShowSql(showSql).setProceduresOnly(true).setContinueOnError(true).process();
 
 		logger.info("======= about to compile specs " + loggerSpec);
 		SqlRunner runner = new SqlRunner(this, loggerSpec).setConnection(connection).
@@ -112,27 +112,44 @@ public class DbloggerOracleInstall {
 
 		logger.info("======== creating logger package body " + loggerBody);
 		new SqlRunner(this, loggerBody).setConnection(connection).setShowSql(showSql).
-				setContinueOnError(true).process();
-		
-		String sql = "select object_type, status from user_objects\n" + 
+		setContinueOnError(true).process();
+
+		ensureLoggerPackage(connection);
+		//		String sql = "select object_type, status from user_objects\n" + 
+		//				"where object_name = 'LOGGER'";
+		//
+		//		SqlStatement ss = new SqlStatement(connection,sql);
+		//		ListOfNameValue lonv = ss.getListOfNameValue();
+		//		for (NameValue nv : lonv) {
+		//		assertEquals("VALID",nv.get("status"));
+		//		}
+		//	ss.close();
+	}
+
+	public JoblogOracleInstall setDrop(boolean drop) {
+		this.drop = drop;
+		return this;
+	}
+
+
+	public static void ensureLoggerPackage(Connection connection) throws SQLException {
+		String sql = "select object_name, object_type, status from user_objects\n" + 
 				"where object_name = 'LOGGER'";
 
 		SqlStatement ss = new SqlStatement(connection,sql);
-		NameValue nv = ss.getNameValue();
-		assertEquals("VALID",nv.get("status"));
-		ss.close();
-	}
-
-	public DbloggerOracleInstall setDrop(boolean drop) {
-		this.drop = drop;
-		return this;
+		ListOfNameValue lonv = ss.getListOfNameValue();
+		logger.debug("lnnv {}",lonv);
+		for (NameValue nv : lonv) {
+			assertEquals("VALID",nv.get("status"));
+		}
+		ss.close();	
 	}
 
 	public static void main(String[] args) throws Exception, SqlSplitterException {
 		DataSourceFactory dsf = new DataSourceFactory();
 		DataSource apds = dsf.getDatasource("integration");
 		final Connection conn = apds.getConnection();
-		new DbloggerOracleInstall(conn, true, true).process();
+		new JoblogOracleInstall(conn, true, true).process();
 
 	}
 

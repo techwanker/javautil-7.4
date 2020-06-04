@@ -4,17 +4,21 @@ import java.sql.Clob;
 import java.sql.SQLException;
 
 public interface JoblogPersistence {
+	String joblogInsert(String processName, String className, String moduleName) throws SQLException;
+	String joblogInsert(String processName, String className, String moduleName, String statusMsg) throws SQLException;
 
-	long persistJob(String processName, String className, String moduleName, String statusMsg, String tracefileName,
-			String schema, long jobLogId) throws SQLException;
+	
+//	long persistJob(String processName, String className, String moduleName, String statusMsg, String tracefileName,
+//			String schema, long jobLogId) throws SQLException;
 
 	void abortJob(Exception e) throws SQLException;
 
 	void endJob() throws SQLException;
 
-	long insertStep(String stepName, String stepInfo, String className, String stack);
-
-	void finishStep() throws SQLException;
+	long insertStep(String jobToken, String stepName, String stepInfo, String className) throws SQLException;
+	long insertStep(String jobToken, String stepName, String stepInfo, String className, 
+			String stack);
+	void finishStep(long jobStepId) throws SQLException;
 
 	Clob createClob() throws SQLException;
 
@@ -30,10 +34,24 @@ public interface JoblogPersistence {
 	 */
 	public void setPersistTraceOnJobCompletion(boolean persistTrace);
 
-	public void setPersistPlansOnJobCompletion(boolean persistPlans);
-
-	long getJobLogId();
+	public void setPersistPlansOnSQLExceptionJobCompletion(boolean persistPlans);
 
 	long getNextJobLogId();
+
+	void prepareConnection() throws SQLException;
+
+	void setModule(String string, String string2) throws SQLException;
+
+
+	void setAction(String string);
+
+	void ensureDatabaseObjects() throws SQLException;
+
+	void setPersistPlansOnJobCompletion(boolean persistPlans);
+
+
+
+
+
 
 }

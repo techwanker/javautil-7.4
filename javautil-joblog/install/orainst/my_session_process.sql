@@ -138,4 +138,4 @@ create public synonym my_session_process for sys.my_session_process;
 
 drop public synonym my_session;
 
-create public synoym my_sessio for sys.my_session_process;
+create public synonym my_session for sys.my_session_process;

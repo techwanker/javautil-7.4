@@ -1,19 +1,15 @@
 package org.javautil.joblog.installer;
 
-import java.beans.PropertyVetoException;
 import java.io.Closeable;
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import javax.sql.DataSource;
-import org.javautil.joblog.installer.DbloggerOracleInstall;
+
 import org.javautil.core.sql.DataSourceFactory;
-import org.javautil.core.sql.SqlSplitterException;
 import org.junit.Test;
 
-public class DbloggerOracleInstallTest {
-	
+public class JoblogOracleInstallTest {
+
 	// TODO WTF
 
 	@Test
@@ -21,12 +17,20 @@ public class DbloggerOracleInstallTest {
 		DataSourceFactory dsf = new DataSourceFactory();
 		DataSource ds = dsf.getDatasource("integration_oracle");
 		Connection loggerConnection = ds.getConnection();
-		DbloggerOracleInstall installer = new DbloggerOracleInstall(loggerConnection, true, true);
+		JoblogOracleInstall installer = new JoblogOracleInstall(loggerConnection, true, true);
 		installer.drop();
 		installer.process();
 		loggerConnection.close();
 		((Closeable) ds).close();
 	}
-	
-	
+
+//	public static void ensureLoggerPackage(Connection connection) throws SQLException {
+//		String sql = "select object_type, status from user_objects\n" + 
+//				"where object_name = 'LOGGER'";
+//
+//		SqlStatement ss = new SqlStatement(connection,sql);
+//		NameValue nv = ss.getNameValue();
+//		assertEquals("VALID",nv.get("status"));
+//		ss.close();	
+//	}
 }

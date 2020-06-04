@@ -1,0 +1,33 @@
+SQL> --#>
+SQL> --/<
+SQL> CREATE OR REPLACE PACKAGE file_helper
+  2  is
+  3  
+  4    function open_log_file (
+  5  	     directory_name in varchar,
+  6  	     file_name in varchar,
+  7  	     headers in boolean default true)
+  8    return utl_file.file_type;
+  9  
+ 10    function get_directory_path return varchar;
+ 11  
+ 12    function basename (full_path in varchar,
+ 13  			  suffix    in varchar default null,
+ 14  			  separator in char default '/')
+ 15    return varchar;
+ 16  
+ 17    function get_file(directory in varchar, file_name in varchar)
+ 18    return clob;
+ 19  
+ 20  end file_helper;
+ 21  --/>
+ 22  
+ 23  --#<
+ 24  /
+
+Package created.
+
+SQL> show errors
+No errors.
+SQL> --#>
+SQL> exit

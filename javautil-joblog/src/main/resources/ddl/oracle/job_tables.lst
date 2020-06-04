@@ -1,0 +1,299 @@
+SQL> --#>
+SQL> 
+SQL> create sequence job_log_id_seq;
+
+Sequence created.
+
+SQL> 
+SQL> create table job_log (
+  2  	 job_log_id number(9),
+  3  	 job_token	      varchar(64),
+  4  	 process_name	      varchar(128),
+  5  	 thread_name	      varchar(128),
+  6  	 status_msg	      varchar(256),
+  7  	 status_ts	      timestamp(9),
+  8  	 start_ts	      timestamp(9),
+  9  	 end_ts 	      timestamp(9),
+ 10  	 log_level	      number(1),
+ 11  	 elapsed_millis       number(9),
+ 12  	 ignore_flg	      varchar(1) default 'N' not null,
+ 13  	 module_name	      varchar(64),
+ 14  	 classname	      varchar(255),
+ 15  	 msg_lvl	      number(1),
+ 16  	 trace_level	      number(2),
+ 17  	 directory_name       varchar(128),
+ 18  	 logfile_name	      varchar(64),
+ 19  	 abort_stacktrace     clob,
+ 20  	 check ( ignore_flg in ('Y', 'N')) ,
+ 21  	 constraint job_log_pk primary key (job_log_id)
+ 22  	);
+
+Table created.
+
+SQL> 
+SQL> create sequence job_step_id_seq;
+
+Sequence created.
+
+SQL> 
+SQL> alter table job_log add constraint job_log_token_uq unique (job_token);
+
+Table altered.
+
+SQL> 
+SQL> create table job_step (
+  2  	 job_step_id		 number(9),
+  3  	 job_log_id		 number(9),
+  4  	 step_name		 varchar(64),
+  5  	 classname		 varchar(256),
+  6  	 step_info		 varchar(2000),
+  7  	 start_ts		 timestamp(9),
+  8  	 end_ts 		 timestamp(9),
+  9  	 tracefile_name       varchar(255),
+ 10  	 --cursor_info_run_id	   number(9) references cursor_info_run,
+ 11  	 stacktrace		 varchar(4000),
+ 12  	 sid			 number(8),
+ 13  	 serial#		 number(8),
+ 14  	 instance_name		  varchar(16),
+ 15  	 constraint job_step_pk primary key (job_step_id),
+ 16  	 constraint step_status_fk
+ 17  	     foreign key (job_log_id) references job_log
+ 18  );
+
+Table created.
+
+SQL> 
+SQL> create table job_step_tracefile (
+  2  	 job_step_id		 number(9) primary key,
+  3  	 tracefile_data 	 clob
+  4  	 );
+
+Table created.
+
+SQL> 
+SQL> alter table job_step_tracefile
+  2  add constraint jst_js_fk
+  3  foreign key (job_step_id) references job_step;
+
+Table altered.
+
+SQL> 
+SQL> create table job_step_tracefile_json (
+  2  	 job_step_id		 number(9) primary key,
+  3  	 tracefile_jsoh 	 clob
+  4  	 );
+
+Table created.
+
+SQL> 
+SQL> alter table job_step_tracefile_json
+  2  add constraint jstj_js_fk
+  3  foreign key (job_step_id) references job_step;
+
+Table altered.
+
+SQL> 
+SQL> create sequence job_msg_id_seq;
+
+Sequence created.
+
+SQL> 
+SQL> create table job_msg (
+  2  	 job_msg_id	   number(9) not null,
+  3  	 job_log_id	   number(9) not null,
+  4  	 job_step_id	   number(9),
+  5  	 log_msg_id	       varchar2(8) not null,
+  6  	 log_msg	       varchar2(256),
+  7  	 log_msg_clob	   clob,
+  8  	 log_msg_ts	       timestamp (9),
+  9  	 elapsed_time_milliseconds number(9),
+ 10  	 log_seq_nbr	       number(18,0) not null,
+ 11  	 caller_name	   varchar2(100),
+ 12  	 line_nbr	       number(5,0),
+ 13  	 call_stack	       clob,
+ 14  	 log_level	       number(2,0),
+ 15  	 constraint job_msg_pk primary key (job_log_id, log_seq_nbr)
+ 16  );
+
+Table created.
+
+SQL> 
+SQL> 
+SQL> alter table job_msg
+  2  add constraint job_msg_job_log_fk
+  3  foreign key (job_log_id)
+  4  references job_log(job_log_id);
+
+Table altered.
+
+SQL> 
+SQL> alter table job_msg
+  2  add constraint job_fk
+  3  foreign key (job_step_id)
+  4  references job_step(job_step_id);
+
+Table altered.
+
+SQL> 
+SQL> create or replace view job_step_vw as
+  2  select
+  3  	 job_step_id,
+  4  	 job_log_id,
+  5  	     step_name,
+  6  	     classname ,
+  7  	     step_info,
+  8  	 start_ts,
+  9  	 end_ts ,
+ 10  	 end_ts - start_ts elapsed_millis
+ 11  from job_step;
+
+View created.
+
+SQL> 
+SQL> create or replace view job_log_vw as
+  2  select
+  3  	job_log_id,
+  4  	process_name,
+  5  	thread_name,
+  6  	status_msg,
+  7  	status_ts,
+  8  	end_ts,
+  9  	ignore_flg,
+ 10  	module_name,
+ 11  	classname,
+ 12  	end_ts - status_ts elapsed_millis
+ 13  from job_log;
+
+View created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> describe my_session;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ SADDR                                              RAW(8)
+ SID                                                NUMBER
+ SERIAL#                                            NUMBER
+ AUDSID                                             NUMBER
+ PADDR                                              RAW(8)
+ USER#                                              NUMBER
+ USERNAME                                           VARCHAR2(128)
+ COMMAND                                            NUMBER
+ OWNERID                                            NUMBER
+ TADDR                                              VARCHAR2(16)
+ LOCKWAIT                                           VARCHAR2(16)
+ STATUS                                             VARCHAR2(8)
+ SERVER                                             VARCHAR2(9)
+ SCHEMA#                                            NUMBER
+ SCHEMANAME                                         VARCHAR2(128)
+ OSUSER                                             VARCHAR2(128)
+ PROCESS                                            VARCHAR2(24)
+ MACHINE                                            VARCHAR2(64)
+ PORT                                               NUMBER
+ TERMINAL                                           VARCHAR2(30)
+ PROGRAM                                            VARCHAR2(48)
+ TYPE                                               VARCHAR2(10)
+ SQL_ADDRESS                                        RAW(8)
+ SQL_HASH_VALUE                                     NUMBER
+ SQL_ID                                             VARCHAR2(13)
+ SQL_CHILD_NUMBER                                   NUMBER
+ SQL_EXEC_START                                     DATE
+ SQL_EXEC_ID                                        NUMBER
+ PREV_SQL_ADDR                                      RAW(8)
+ PREV_HASH_VALUE                                    NUMBER
+ PREV_SQL_ID                                        VARCHAR2(13)
+ PREV_CHILD_NUMBER                                  NUMBER
+ PREV_EXEC_START                                    DATE
+ PREV_EXEC_ID                                       NUMBER
+ PLSQL_ENTRY_OBJECT_ID                              NUMBER
+ PLSQL_ENTRY_SUBPROGRAM_ID                          NUMBER
+ PLSQL_OBJECT_ID                                    NUMBER
+ PLSQL_SUBPROGRAM_ID                                NUMBER
+ MODULE                                             VARCHAR2(64)
+ MODULE_HASH                                        NUMBER
+ ACTION                                             VARCHAR2(64)
+ ACTION_HASH                                        NUMBER
+ CLIENT_INFO                                        VARCHAR2(64)
+ FIXED_TABLE_SEQUENCE                               NUMBER
+ ROW_WAIT_OBJ#                                      NUMBER
+ ROW_WAIT_FILE#                                     NUMBER
+ ROW_WAIT_BLOCK#                                    NUMBER
+ ROW_WAIT_ROW#                                      NUMBER
+ TOP_LEVEL_CALL#                                    NUMBER
+ LOGON_TIME                                         DATE
+ LAST_CALL_ET                                       NUMBER
+ PDML_ENABLED                                       VARCHAR2(3)
+ FAILOVER_TYPE                                      VARCHAR2(13)
+ FAILOVER_METHOD                                    VARCHAR2(10)
+ FAILED_OVER                                        VARCHAR2(3)
+ RESOURCE_CONSUMER_GROUP                            VARCHAR2(32)
+ PDML_STATUS                                        VARCHAR2(8)
+ PDDL_STATUS                                        VARCHAR2(8)
+ PQ_STATUS                                          VARCHAR2(8)
+ CURRENT_QUEUE_DURATION                             NUMBER
+ CLIENT_IDENTIFIER                                  VARCHAR2(64)
+ BLOCKING_SESSION_STATUS                            VARCHAR2(11)
+ BLOCKING_INSTANCE                                  NUMBER
+ BLOCKING_SESSION                                   NUMBER
+ FINAL_BLOCKING_SESSION_STATUS                      VARCHAR2(11)
+ FINAL_BLOCKING_INSTANCE                            NUMBER
+ FINAL_BLOCKING_SESSION                             NUMBER
+ SEQ#                                               NUMBER
+ EVENT#                                             NUMBER
+ EVENT                                              VARCHAR2(64)
+ P1TEXT                                             VARCHAR2(64)
+ P1                                                 NUMBER
+ P1RAW                                              RAW(8)
+ P2TEXT                                             VARCHAR2(64)
+ P2                                                 NUMBER
+ P2RAW                                              RAW(8)
+ P3TEXT                                             VARCHAR2(64)
+ P3                                                 NUMBER
+ P3RAW                                              RAW(8)
+ WAIT_CLASS_ID                                      NUMBER
+ WAIT_CLASS#                                        NUMBER
+ WAIT_CLASS                                         VARCHAR2(64)
+ WAIT_TIME                                          NUMBER
+ SECONDS_IN_WAIT                                    NUMBER
+ STATE                                              VARCHAR2(19)
+ WAIT_TIME_MICRO                                    NUMBER
+ TIME_REMAINING_MICRO                               NUMBER
+ TIME_SINCE_LAST_WAIT_MICRO                         NUMBER
+ SERVICE_NAME                                       VARCHAR2(64)
+ SQL_TRACE                                          VARCHAR2(8)
+ SQL_TRACE_WAITS                                    VARCHAR2(5)
+ SQL_TRACE_BINDS                                    VARCHAR2(5)
+ SQL_TRACE_PLAN_STATS                               VARCHAR2(10)
+ SESSION_EDITION_ID                                 NUMBER
+ CREATOR_ADDR                                       RAW(8)
+ CREATOR_SERIAL#                                    NUMBER
+ ECID                                               VARCHAR2(64)
+ SQL_TRANSLATION_PROFILE_ID                         NUMBER
+ PGA_TUNABLE_MEM                                    NUMBER
+ SHARD_DDL_STATUS                                   VARCHAR2(8)
+ CON_ID                                             NUMBER
+ EXTERNAL_NAME                                      VARCHAR2(1024)
+ PLSQL_DEBUGGER_CONNECTED                           VARCHAR2(5)
+ PID                                                NUMBER
+ SOSID                                              VARCHAR2(24)
+ SPID                                               VARCHAR2(24)
+ STID                                               VARCHAR2(24)
+ EXECUTION_TYPE                                     VARCHAR2(20)
+ PNAME                                              VARCHAR2(5)
+ TRACEID                                            VARCHAR2(255)
+ TRACEFILE                                          VARCHAR2(513)
+ BACKGROUND                                         VARCHAR2(1)
+ LATCHWAIT                                          VARCHAR2(16)
+ LATCHSPIN                                          VARCHAR2(16)
+ PGA_USED_MEM                                       NUMBER
+ PGA_ALLOC_MEM                                      NUMBER
+ PGA_FREEABLE_MEM                                   NUMBER
+ PGA_MAX_MEM                                        NUMBER
+ NUMA_DEFAULT                                       NUMBER
+ NUMA_CURR                                          NUMBER
+
+SQL> 
+SQL> 
+SQL> exit

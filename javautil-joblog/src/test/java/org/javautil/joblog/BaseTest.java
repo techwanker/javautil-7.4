@@ -8,10 +8,10 @@ import javax.sql.DataSource;
 
 import org.javautil.core.sql.DataSourceFactory;
 import org.javautil.core.sql.SqlSplitterException;
-import org.javautil.joblog.installer.DbloggerOracleInstall;
-import org.javautil.joblog.logger.Joblog;
-import org.javautil.joblog.logger.SplitLoggerForOracle;
-import org.javautil.joblog.persistence.OraclePackagePersistence;
+import org.javautil.joblog.installer.JoblogOracleInstall;
+import org.javautil.joblog.persistence.JoblogPersistence;
+import org.javautil.joblog.persistence.JoblogPersistencePackage;
+import org.javautil.joblog.persistence.JoblogPersistenceSql;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -29,9 +29,9 @@ public class BaseTest {
 
 	static DataSource loggerDataSource;
 	static Connection loggerConnection;
-	static Joblog dblogger;
+	static JoblogPersistence dblogger;
 	private static Logger logger = LoggerFactory.getLogger(BaseTest.class);
-	static OraclePackagePersistence oraclePackagePersistence;
+	static JoblogPersistencePackage oraclePackagePersistence;
 	boolean showSql = false;
 
 	@BeforeClass
@@ -42,11 +42,11 @@ public class BaseTest {
 		applicationConnection = applicationDataSource.getConnection();
 		loggerDataSource = dsf.getDatasource("integration_oracle");
 		loggerConnection = loggerDataSource.getConnection();
-		dblogger = new SplitLoggerForOracle(applicationConnection, loggerConnection);
+		dblogger = new JoblogPersistenceSql(loggerConnection, applicationConnection);
 
-		new DbloggerOracleInstall(applicationConnection, true, false).process();
-		new DbloggerOracleInstall(loggerConnection, true, false).process();
-		oraclePackagePersistence = new OraclePackagePersistence(applicationConnection);
+		new JoblogOracleInstall(applicationConnection, true, false).process();
+		new JoblogOracleInstall(loggerConnection, true, false).process();
+		oraclePackagePersistence = new JoblogPersistencePackage(applicationConnection);
 
 	}
 
@@ -73,7 +73,7 @@ public class BaseTest {
 		return loggerConnection;
 	}
 
-	public static Joblog getDblogger() {
+	public static JoblogPersistence getDblogger() {
 		return dblogger;
 	}
 
@@ -85,7 +85,7 @@ public class BaseTest {
 		this.showSql = showSql;
 	}
 
-	public static OraclePackagePersistence getOraclePackagePersistence() {
+	public static JoblogPersistencePackage getOraclePackagePersistence() {
 		return oraclePackagePersistence;
 	}
 }

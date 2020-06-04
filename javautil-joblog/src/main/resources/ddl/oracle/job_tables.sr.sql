@@ -1,9 +1,13 @@
+--#<
+set echo on
+spool job_tables
+--#>
+
 create sequence job_log_id_seq;
 
 create table job_log (    
     job_log_id number(9),
     job_token            varchar(64),
-    schema_name          varchar(30),
     process_name         varchar(128),
     thread_name          varchar(128),
     status_msg           varchar(256),
@@ -12,18 +16,13 @@ create table job_log (
     end_ts               timestamp(9),
     log_level            number(1),
     elapsed_millis       number(9),
-    sid                  number,
-    serial_nbr           number,
     ignore_flg           varchar(1) default 'N' not null,
     module_name          varchar(64),
     classname            varchar(255),
-    tracefile_name       varchar(4000),
     msg_lvl              number(1),
     trace_level          number(2),
     directory_name       varchar(128),
     logfile_name         varchar(64),
-    tracefile_data       clob,
-    tracefile_json       clob,
     abort_stacktrace     clob,
     check ( ignore_flg in ('Y', 'N')) ,
     constraint job_log_pk primary key (job_log_id)
@@ -33,7 +32,7 @@ create sequence job_step_id_seq;
 
 alter table job_log add constraint job_log_token_uq unique (job_token);
 
-create table job_step (    
+create table job_step (   
     job_step_id             number(9),
     job_log_id 	            number(9),
     step_name               varchar(64),
@@ -41,14 +40,34 @@ create table job_step (
     step_info               varchar(2000),
     start_ts    	    timestamp(9),
     end_ts  		    timestamp(9),
-    dbstats                 clob,
-    step_info_json          clob,
+    tracefile_name       varchar(255),
     --cursor_info_run_id      number(9) references cursor_info_run,
     stacktrace              varchar(4000),
+    sid                     number(8),
+    serial#                 number(8),
+    instance_name            varchar(16),
     constraint job_step_pk primary key (job_step_id),
     constraint step_status_fk
 	foreign key (job_log_id) references job_log
 );
+
+create table job_step_tracefile (   
+    job_step_id             number(9) primary key,
+    tracefile_data          clob
+    );
+    
+alter table job_step_tracefile
+add constraint jst_js_fk 
+foreign key (job_step_id) references job_step;
+
+create table job_step_tracefile_json (   
+    job_step_id             number(9) primary key,
+    tracefile_jsoh          clob
+    );
+    
+alter table job_step_tracefile_json
+add constraint jstj_js_fk 
+foreign key (job_step_id) references job_step;
 
 create sequence job_msg_id_seq;
 
@@ -95,18 +114,14 @@ from job_step;
 create or replace view job_log_vw as 
 select  
    job_log_id, 
-   schema_name,         
    process_name,        
    thread_name,          
    status_msg,                               
    status_ts,                        
    end_ts,                               
-   sid,                                      
-   serial_nbr,                       
    ignore_flg,    
    module_name,    
    classname,             
-   tracefile_name,                 
    end_ts - status_ts elapsed_millis 
 from job_log;
 

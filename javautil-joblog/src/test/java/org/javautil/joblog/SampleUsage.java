@@ -8,36 +8,38 @@ import java.sql.SQLException;
 import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.ConnectionHelper;
 import org.javautil.core.sql.SqlStatement;
-import org.javautil.joblog.logger.Joblog;
+import org.javautil.joblog.persistence.JoblogPersistence;
 import org.javautil.util.NameValue;
 
 public class SampleUsage {
 
-	private Joblog dblogger;
+	private JoblogPersistence dblogger;
 	private Connection connection;
 	private String processName;
-
-	public SampleUsage(Connection connection, Joblog dblogger, String processName) {
+	private String jobToken = null;
+	
+	public SampleUsage(Connection connection, JoblogPersistence dblogger, String processName) {
 		this.connection = connection;
 		this.dblogger = dblogger;
 		this.processName = processName;
 	}
 
-	public long process() throws SQLException {
+	public String process() throws SQLException {
 		dblogger.prepareConnection();
 
-		long id = dblogger.startJobLogging(processName, getClass().getName(), "SampleUsage", "", 8);
+		jobToken = dblogger.joblogInsert(processName, getClass().getName(), "SampleUsage");
 
 		actionNoStep();
 		stepNoAction();
 		dblogger.endJob();
-		return id;
+		return jobToken;
 
 	}
 
-	public long processException() throws SQLException, FileNotFoundException, IOException {
+	public String processException() throws SQLException, FileNotFoundException, IOException {
 		// id = dblogger.startJobLogging(processName, "ExampleLogging", null, 12);
-		long logJobId = dblogger.startJobLogging(processName, getClass().getName(), "SamplueUsage", null, 8);
+		String logJobId = dblogger.joblogInsert(processName, getClass().getName(), 
+				"SamplueUsage");
 
 		try {
 			int x = 1 / 0;
@@ -56,7 +58,7 @@ public class SampleUsage {
 
 	private void stepNoAction() throws SQLException {
 
-		dblogger.insertStep("Useless join", "full join", getClass().getName());
+		dblogger.insertStep(jobToken,"Useless join", "full join", getClass().getName());
 		ConnectionHelper.exhaustQuery(connection, "select * from user_tab_columns, user_tables");
 	}
 

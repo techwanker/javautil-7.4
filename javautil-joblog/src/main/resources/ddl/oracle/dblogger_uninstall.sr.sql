@@ -13,6 +13,8 @@ drop view cursor_info_vw;
 drop table job_log cascade constraint;
 drop table job_msg cascade constraint;                                  
 drop table job_step cascade constraint;
+drop table job_step_tracefile cascade constraint;
+drop table job_step_tracefile_json cascade constraint;
 drop view job_log_vw;          
 drop view job_step_vw;   
 drop package logger;

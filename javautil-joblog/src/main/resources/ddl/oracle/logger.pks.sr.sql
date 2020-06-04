@@ -112,7 +112,9 @@ create or replace PACKAGE logger AS
 
 --%## Abort job
 --%```
-    procedure abort_job(exception_msg in varchar default null,
+  procedure abort_job(
+                p_job_token     in varchar,
+		exception_msg in varchar default null,
 		stacktrace in varchar default null);
 --%```
 

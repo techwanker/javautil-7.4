@@ -211,4 +211,12 @@ public class OracleConnectionHelper extends ConnectionHelper {
 		binds.put("show_wait", myEmitWaits);
 		ss.execute(binds);
 	}
+	
+	public static String getCurrentTraceFileName(Connection conn) throws SQLException {
+		String sql = "SELECT VALUE FROM V$DIAG_INFO WHERE NAME = 'Default Trace File'";
+		SqlStatement ss = new SqlStatement(conn,sql);
+		NameValue nv = ss.getNameValue();
+		ss.close();
+		return (String) nv.get("value");
+	}
 }

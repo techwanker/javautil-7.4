@@ -1,27 +1,16 @@
 package org.javautil.joblog.formatter;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.H2FileDatabase;
 import org.javautil.core.sql.SqlRunner;
 import org.javautil.core.sql.SqlSplitterException;
-import org.javautil.core.sql.SqlStatement;
 import org.javautil.core.text.SimpleDateFormatFactory;
-//import org.javautil.oracle.trace.CursorsStats;
-//import org.javautil.oracle.trace.formatter.SqlMarshaller;
-//import org.javautil.oracle.tracehandlers.OracleTraceProcessor;
-import org.javautil.util.ListOfNameValue;
-import org.javautil.util.NameValue;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

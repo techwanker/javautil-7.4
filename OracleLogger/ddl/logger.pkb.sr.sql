@@ -4,6 +4,9 @@ spool logger.pkb.sr.lst
 --#>
 --/<
 CREATE OR REPLACE PACKAGE BODY logger
+-- ##########################################################################
+--   logger
+-- ##########################################################################
 is
   g_debug                 boolean := false;
   g_job_msg_dir           varchar (32) := 'JOB_MSG_DIR';
@@ -19,7 +22,8 @@ is
   function format_timestamp(timestamp in timestamp)
   return varchar 
   is
-    my_timestamp varchar(256) :=  to_char (current_timestamp, 'YYYY-MM-DD HH24:MI:SSXFF');
+    -- hack so as not to find MI as a bind variable
+    my_timestamp varchar(256) :=  to_char (current_timestamp, 'YYYY-MM-DD HH24' || ':' || 'MISSXFF');
   begin
     my_timestamp := replace(my_timestamp,' ','T');
     return my_timestamp;
@@ -148,13 +152,13 @@ is
   begin
     insert into job_log (    
       job_log_id,     process_name,    thread_name,
-      status_msg,     status_ts,       tracefile_name,
-      classname,      schema_name,     module_name, 
+      status_msg,     status_ts,       -- tracefile_name
+      classname,           module_name, 
       job_token,      logfile_name
      ) values (
        rec.job_log_id,  rec.process_name,   rec.thread_name,
-       rec.status_msg,  current_timestamp,  rec.tracefile_name,
-       rec.classname,   rec.schema_name,  rec.module_name, 
+       rec.status_msg,  current_timestamp, --  rec.tracefile_name,
+       rec.classname,   rec.module_name, 
        rec.job_token,   rec.logfile_name
      );
 
@@ -288,7 +292,6 @@ is
        set_action('end_job');
        update job_log
        set
-              SID = NULL,
               status_msg = 'DONE',
               status_ts = SYSDATE
         where job_log_id = g_job_log.job_log_id;
@@ -297,7 +300,9 @@ is
       set_action('end_job complete');
   end end_job;
    
-  procedure abort_job(exception_msg in varchar default null,
+  procedure abort_job(
+                p_job_token     in varchar,
+		exception_msg in varchar default null,
 		stacktrace in varchar default null)
   --::* procedure abort_job
   --::* update job_log
@@ -321,11 +326,11 @@ is
         end if;
 
         update job_log
-        set  SID = NULL,
+        set  
              status_msg = 'ABORT',
              status_ts = SYSDATE,
              abort_stacktrace = stack
-        where job_log_id = g_job_log.job_log_id;
+        where job_token = p_job_token;
 
         COMMIT;
         set_action('abort_job complete');

@@ -21,6 +21,8 @@ altering execution plans, creating or eliminating indexes or rewriting SQL.
 
 SGA parameters may have to be changed.
 
+
+https://asktom.oracle.com/Misc/instrumentation.html
 # TODO
 
 

@@ -234,6 +234,5 @@ select
    ignore_flg,    
    module_name,    
    classname,             
-   tracefile_name,                 
    end_ts - status_ts elapsed_millis 
 from job_log;
