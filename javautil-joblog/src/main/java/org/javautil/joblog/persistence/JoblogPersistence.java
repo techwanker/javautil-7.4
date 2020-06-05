@@ -6,21 +6,16 @@ import java.sql.SQLException;
 public interface JoblogPersistence {
 	String joblogInsert(String processName, String className, String moduleName) throws SQLException;
 	String joblogInsert(String processName, String className, String moduleName, String statusMsg) throws SQLException;
-
 	
-//	long persistJob(String processName, String className, String moduleName, String statusMsg, String tracefileName,
-//			String schema, long jobLogId) throws SQLException;
+	void abortJob(String jobToken, Exception e) throws SQLException;
 
-	void abortJob(Exception e) throws SQLException;
-
-	void endJob() throws SQLException;
+	void endJob(String jobToken) throws SQLException;
 
 	long insertStep(String jobToken, String stepName, String stepInfo, String className) throws SQLException;
 	long insertStep(String jobToken, String stepName, String stepInfo, String className, 
 			String stack);
 	void finishStep(long jobStepId) throws SQLException;
 
-	Clob createClob() throws SQLException;
 
 	public void persistenceUpdateTrace(long jobId, Clob traceData) throws SQLException;
 

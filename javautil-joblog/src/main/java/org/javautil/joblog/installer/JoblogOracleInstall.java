@@ -94,6 +94,8 @@ public class JoblogOracleInstall {
 
 		final String loggerSpec = "ddl/oracle/logger.pks.sr.sql";
 		final String loggerBody = "ddl/oracle/logger.pkb.sr.sql";
+		final String joblogSpec = "ddl/oracle/joblog.pks.sr.sql";
+		final String joblogBody = "ddl/oracle/joblog.pkb.sr.sql";
 
 		logger.info("loggerObjectInstall showSql: {}", showSql);
 
@@ -114,6 +116,15 @@ public class JoblogOracleInstall {
 		new SqlRunner(this, loggerBody).setConnection(connection).setShowSql(showSql).
 		setContinueOnError(true).process();
 
+		runner = new SqlRunner(this, joblogSpec).setConnection(connection).
+				setShowSql(showSql)
+				.setContinueOnError(true);
+		runner.setSqlSplitterTrace(3);
+		runner.process();
+
+		new SqlRunner(this, joblogBody).setConnection(connection).setShowSql(showSql).
+		setContinueOnError(true).process();
+		
 		ensureLoggerPackage(connection);
 		//		String sql = "select object_type, status from user_objects\n" + 
 		//				"where object_name = 'LOGGER'";
@@ -134,7 +145,7 @@ public class JoblogOracleInstall {
 
 	public static void ensureLoggerPackage(Connection connection) throws SQLException {
 		String sql = "select object_name, object_type, status from user_objects\n" + 
-				"where object_name = 'LOGGER'";
+				"where object_name in ('LOGGER', 'JOBLOG')";
 
 		SqlStatement ss = new SqlStatement(connection,sql);
 		ListOfNameValue lonv = ss.getListOfNameValue();

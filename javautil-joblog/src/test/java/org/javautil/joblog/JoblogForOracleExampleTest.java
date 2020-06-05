@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.SqlStatement;
+import org.javautil.joblog.persistence.JoblogPersistence;
 import org.javautil.util.ListOfNameValue;
 import org.javautil.util.NameValue;
 import org.junit.AfterClass;
@@ -18,7 +19,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DbloggerForOracleExampleTest extends BaseTest {
+public class JoblogForOracleExampleTest extends BaseTest {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -30,19 +31,27 @@ public class DbloggerForOracleExampleTest extends BaseTest {
 
 	@Test
 	public void testDirectly() throws SQLException {
-		String token = dblogger.joblogInsert("DbLoggerForOracle", getClass().getName(), "ExampleLogging");
+		String token = joblogPersistence.joblogInsert("DbLoggerForOracle", getClass().getName(), "ExampleLogging");
 		SqlStatement ss = new SqlStatement("select * from job_log where job_token = :token");
 		ss.setConnection(loggerConnection);
 		Binds binds = new Binds();
 		binds.put("token", token);
 		NameValue jobNv = ss.getNameValue(binds, true);
-		String jobId2 = dblogger.joblogInsert("DbLoggerForOracle", getClass().getName(), "ExampleLogging");
+		String jobId2 = joblogPersistence.joblogInsert("DbLoggerForOracle", getClass().getName(), "ExampleLogging");
 	}
 
 	@Test
-	public void test1() throws SQLException, IOException {
+	public void testSql() throws SQLException, IOException {
+		test1(joblogPersistence);
+}   
+	@Test
+	public void testPackage() throws SQLException, IOException {
+		test1(oraclePackagePersistence);
+}   
+
+	public void test1(JoblogPersistence joblogPersistence) throws SQLException, IOException {
 		// TODO look for waits
-		JoblogForOracleExample example = new JoblogForOracleExample(applicationConnection, dblogger, "example",
+		JoblogForOracleExample example = new JoblogForOracleExample(applicationConnection, joblogPersistence, "example",
 				false, 12);
 		String token = example.process();
 		logger.info("test1 token {}", token);

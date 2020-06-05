@@ -31,7 +31,7 @@ public class SampleUsage {
 
 		actionNoStep();
 		stepNoAction();
-		dblogger.endJob();
+		dblogger.endJob(jobToken);
 		return jobToken;
 
 	}
@@ -44,7 +44,7 @@ public class SampleUsage {
 		try {
 			int x = 1 / 0;
 		} catch (Exception e) {
-			dblogger.abortJob(e);
+			dblogger.abortJob(jobToken, e);
 		}
 
 		return logJobId;

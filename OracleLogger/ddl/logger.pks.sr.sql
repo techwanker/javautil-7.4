@@ -118,6 +118,7 @@ create or replace PACKAGE logger AS
 		stacktrace in varchar default null);
 --%```
 
+   function get_job_token return varchar;
 
 
 --%# TODO

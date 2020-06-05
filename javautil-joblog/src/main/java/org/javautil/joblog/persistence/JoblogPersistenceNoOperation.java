@@ -21,11 +21,11 @@ public class JoblogPersistenceNoOperation implements JoblogPersistence
 	};
 
 	@Override
-	public void abortJob(Exception e) {
+	public void abortJob(String jobToken, Exception e) {
 	}
 
 	@Override
-	public void endJob() {
+	public void endJob(String token) {
 	}
 
 	@Override
@@ -62,12 +62,12 @@ public class JoblogPersistenceNoOperation implements JoblogPersistence
 	public void ensureDatabaseObjects() {
 	}
 
-
-	@Override
-	public Clob createClob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//
+//	@Override
+//	public Clob createClob() throws SQLException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public void persistenceUpdateTrace(long jobId, Clob traceData) throws SQLException {

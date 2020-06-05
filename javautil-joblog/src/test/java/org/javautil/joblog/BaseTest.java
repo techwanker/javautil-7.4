@@ -29,7 +29,7 @@ public class BaseTest {
 
 	static DataSource loggerDataSource;
 	static Connection loggerConnection;
-	static JoblogPersistence dblogger;
+	static JoblogPersistence joblogPersistence;
 	private static Logger logger = LoggerFactory.getLogger(BaseTest.class);
 	static JoblogPersistencePackage oraclePackagePersistence;
 	boolean showSql = false;
@@ -42,7 +42,7 @@ public class BaseTest {
 		applicationConnection = applicationDataSource.getConnection();
 		loggerDataSource = dsf.getDatasource("integration_oracle");
 		loggerConnection = loggerDataSource.getConnection();
-		dblogger = new JoblogPersistenceSql(loggerConnection, applicationConnection);
+		joblogPersistence = new JoblogPersistenceSql(loggerConnection, applicationConnection);
 
 		new JoblogOracleInstall(applicationConnection, true, false).process();
 		new JoblogOracleInstall(loggerConnection, true, false).process();
@@ -74,7 +74,7 @@ public class BaseTest {
 	}
 
 	public static JoblogPersistence getDblogger() {
-		return dblogger;
+		return joblogPersistence;
 	}
 
 	public boolean isShowSql() {

@@ -3,134 +3,123 @@ SQL>
 SQL> --/<
 SQL> CREATE OR REPLACE PACKAGE BODY joblog
   2  is
-  3  	  --g_job_log_id	    pls_integer;
-  4  	  --g_job_step_id	    pls_integer;
-  5  
-  6  
-  7  
-  8  	 procedure job_log_insert (
-  9  	     p_process_name in varchar,
- 10  	     p_classname    in varchar,
- 11  	     p_module_name  in varchar,
- 12  	     p_status_msg   in varchar,
- 13  	     p_thread_name  in varchar,
- 14  	     p_trace_level  in pls_integer default logger.G_INFO
- 15  	 ) is
- 16  	     pragma autonomous_transaction ;
- 17  	     my_job_log_id number :=  job_log_id_seq.nextval;
- 18  	---  my_schem  varchar(64) :=  sys_context('userenv','current_schema')
- 19  	 begin
- 20  	     insert into job_log (
- 21  	       job_log_id,   process_name,   thread_name,
- 22  	       status_msg,   status_ts,      module_name,
- 23  	       classname
- 24  	     ) values (
- 25  	       my_job_log_id,  p_process_name,	p_thread_name,
- 26  	       p_status_msg,  systimestamp,    p_module_name,
- 27  	       p_classname
- 28  	     );
- 29  	     commit;
+  3  
+  4  	 function job_log_insert (
+  5  	     p_process_name in varchar,
+  6  	     p_classname    in varchar,
+  7  	     p_module_name  in varchar,
+  8  	     p_status_msg   in varchar,
+  9  	     p_thread_name  in varchar,
+ 10  	     p_trace_level  in pls_integer default logger.G_INFO
+ 11  	 )  return varchar is
+ 12  	     pragma autonomous_transaction ;
+ 13  	     my_job_log_id number :=  job_log_id_seq.nextval;
+ 14  	     my_job_token varchar(32) := logger.get_job_token;
+ 15  	---  my_schem  varchar(64) :=  sys_context('userenv','current_schema')
+ 16  	 begin
+ 17  	     insert into job_log (
+ 18  	       job_log_id,    job_token,
+ 19  	       process_name,   thread_name,
+ 20  	       status_msg,   status_ts,      module_name,
+ 21  	       classname
+ 22  	     ) values (
+ 23  	       my_job_log_id,  my_job_token,
+ 24  	       p_process_name,	p_thread_name,
+ 25  	       p_status_msg,  systimestamp,    p_module_name,
+ 26  	       p_classname
+ 27  	     );
+ 28  	     commit;
+ 29  	     return my_job_token;
  30  	end job_log_insert;
  31  
- 32  	     -- TODO should use token
- 33  	function job_step_insert (
- 34  	     p_job_log_id  in pls_integer,
- 35  	     p_step_name   in varchar,
- 36  	     p_step_info   in varchar,
- 37  	     p_classname   in varchar,
- 38  	     p_start_ts    in timestamp,
- 39  	     p_stacktrace  in varchar
- 40  	) return number
- 41  	is
- 42  		 pragma autonomous_transaction ;
- 43  		     my_job_step_id number;
- 44  	begin
- 45  	   insert into job_step (
- 46  	     job_step_id,   job_log_id, step_name, step_info,
- 47  	     classname,     start_ts,	stacktrace
- 48  	   ) values (
- 49  	     job_step_id_seq.nextval, p_job_log_id, p_step_name, p_step_info,
- 50  	     p_classname,   p_start_ts,   p_stacktrace
- 51  	   ) returning job_step_id into my_job_step_id;
- 52  	   return my_job_step_id;
- 53  
- 54  	end job_step_insert;
- 55  
- 56  	 procedure finish_step(stepid in number) is
- 57  	     pragma autonomous_transaction ;
- 58  	 begin
- 59  	    update job_step
- 60  	    set end_ts = systimestamp
- 61  	    where job_step_id = stepid;
- 62  	 end finish_step;
- 63  
- 64  
- 65  	procedure end_job(p_job_token in varchar, p_elapsed_milliseconds in pls_integer)
- 66  	--::* update job_log.status_id to 'C' and status_msg to 'DONE'
- 67  	--::>
- 68  	is
- 69  	    PRAGMA AUTONOMOUS_TRANSACTION;
- 70  	begin
- 71  	    update job_log
- 72  	    set
- 73  		   status_msg = 'DONE',
- 74  		   status_ts = SYSDATE,
- 75  		   elapsed_millis = p_elapsed_milliseconds
- 76  	    where job_token = p_job_token;
- 77  
- 78  	   commit;
- 79  	--   logger.set_action('end_job complete');
- 80  	end end_job;
- 81  
- 82  	--::<
- 83  	procedure abort_job(p_job_token in varchar, p_elapsed_milliseconds in pls_integer,
- 84  	     p_stacktrace in varchar)
- 85  	--::* status_id = 'I'
- 86  	--::* status_msg = 'ABORT'
- 87  	--::>
- 88  	is
- 89  	   PRAGMA AUTONOMOUS_TRANSACTION;
- 90  
- 91  
- 92  	begin
- 93  	   update job_log
- 94  	   set
- 95  	       status_msg = 'ABORT',
- 96  	       status_ts = current_timestamp,
- 97  	       abort_stacktrace = p_stacktrace,
- 98  	       elapsed_millis = p_elapsed_milliseconds
- 99  	    where job_token = p_job_token;
-100  
-101  	   COMMIT;
-102  	   logger.set_action('abort_job complete');
-103  	end abort_job;
-104  
+ 32  	function job_step_insert (
+ 33  	     p_job_token   in varchar,
+ 34  	     p_step_name   in varchar,
+ 35  	     p_step_info   in varchar,
+ 36  	     p_classname   in varchar,
+ 37  	     p_start_ts    in timestamp,
+ 38  	     p_stacktrace  in varchar
+ 39  	) return number
+ 40  	is
+ 41  	     pragma autonomous_transaction ;
+ 42  		     my_job_step_id number;
+ 43  		     job_log_rec job_log%rowtype;
+ 44  
+ 45  	begin
+ 46  	    select *
+ 47  	    into   job_log_rec
+ 48  	    from   job_log
+ 49  	    where  job_token = p_job_token;
+ 50  
+ 51  	   insert into job_step (
+ 52  	     job_step_id,   job_log_id, step_name, step_info,
+ 53  	     classname,     start_ts,	stacktrace
+ 54  	   ) values (
+ 55  	     job_step_id_seq.nextval, job_log_rec.job_log_id, p_step_name, p_step_info,
+ 56  	     p_classname,   p_start_ts,   p_stacktrace
+ 57  	   ) returning job_step_id into my_job_step_id;
+ 58  	   return my_job_step_id;
+ 59  	   commit;
+ 60  	end job_step_insert;
+ 61  
+ 62  	 procedure finish_step(stepid in number) is
+ 63  	     pragma autonomous_transaction ;
+ 64  	 begin
+ 65  	    update job_step
+ 66  	    set end_ts = systimestamp
+ 67  	    where job_step_id = stepid;
+ 68  	      commit;
+ 69  	 end finish_step;
+ 70  
+ 71  
+ 72  	procedure end_job(p_job_token in varchar)
+ 73  	--::* update job_log.status_id to 'C' and status_msg to 'DONE'
+ 74  	--::>
+ 75  	is
+ 76  	    PRAGMA AUTONOMOUS_TRANSACTION;
+ 77  	begin
+ 78  	    update job_log
+ 79  	    set
+ 80  		   status_msg = 'DONE',
+ 81  		   status_ts = SYSDATE
+ 82  	    where job_token = p_job_token;
+ 83  
+ 84  	   commit;
+ 85  	--   logger.set_action('end_job complete');
+ 86  	end end_job;
+ 87  
+ 88  	--::<
+ 89  	procedure abort_job(p_job_token in varchar,
+ 90  	     p_stacktrace in varchar)
+ 91  	--::* status_id = 'I'
+ 92  	--::* status_msg = 'ABORT'
+ 93  	--::>
+ 94  	is
+ 95  	   PRAGMA AUTONOMOUS_TRANSACTION;
+ 96  
+ 97  
+ 98  	begin
+ 99  	   update job_log
+100  	   set
+101  	       status_msg = 'ABORT',
+102  	       status_ts = current_timestamp,
+103  	       abort_stacktrace = p_stacktrace
+104  	    where job_token = p_job_token;
 105  
-106  
-107  end joblog;
-108  --/>
+106  	   COMMIT;
+107  	   logger.set_action('abort_job complete');
+108  	end abort_job;
 109  
-110  --#<
-111  /
+110  -- cancer
+111  end joblog;
+112  --/>
+113  
+114  --#<
+115  /
 
 Package body created.
 
 SQL> show errors
 No errors.
-SQL> --#>
-SQL> 
-SQL> 
-SQL> describe job_step
-ERROR:
-ORA-04043: object job_step does not exist 
-
-
-SQL> exit
-                            
--------- -----------------------------------------------------------------      
-45/7     PL/SQL: SQL Statement ignored                                          
-45/19    PL/SQL: ORA-00942: table or view does not exist                        
-59/8     PL/SQL: SQL Statement ignored                                          
-59/15    PL/SQL: ORA-00942: table or view does not exist                        
 SQL> --#>
 SQL> exit

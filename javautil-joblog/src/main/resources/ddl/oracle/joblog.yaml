@@ -1,0 +1,28 @@
+joblogInsert:
+sql> begin
+    	:token := joblog.job_log_insert ( 
+		  p_process_name => :p_process_name,
+		  p_classname     => :p_classname,
+		  p_module_name   => :p_module_name,
+		  p_thread_name  => :p_thread_name,
+		  p_status_msg   => :p_status_msg
+		);" 
+	 end;
+jobstepInsert:
+sql> begin 
+		p_job_step_id := joblog.job_step_insert (
+	 	  p_job_token   => :p_job_token,
+		  p_job_step_id => :p_job_step,   
+		  p_job_log_id  => :p_job_log_id, 
+		  p_step_name   => :p_step_name, 
+		  p_step_info   => :p_step_info, 
+		  p_classname   => :p_classname,     
+		  p_start_ts    => :p_start_ps,
+		  p_stacktrace  => :p_stacktrace
+		);
+	end;
+finishStep:
+sql>  begin 
+        joblog.finish_step(stepid => :step_id); 
+      end;
+    

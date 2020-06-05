@@ -4,8 +4,10 @@ import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.Timestamp;
 
+import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.SequenceHelper;
 import org.javautil.lang.ThreadUtil;
 import org.slf4j.Logger;
@@ -39,27 +41,28 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 	public String joblogInsert(String processName, String className, 
 			String moduleName, String statusMsg ) throws SQLException {
 		String callSql = "begin " + 
-			    ":token = joblog.job_log_insert ( \n" 
+			    ":token := joblog.job_log_insert ( \n" 
 				+ "		p_process_name => :p_process_name,\n"  
 				+ "     p_classname     => :p_classname, \n" 
 				+ "     p_module_name   => :p_module_name,\n"
 				+ "		p_thread_name  => :p_thread_name,\n"
-				+ "		p_status_msg   => :p_status_msg,\n"
+				+ "		p_status_msg   => :p_status_msg\n"
 				+ ");" 
 				+ "end;";
 
 		if (persistJobStatement == null) {
 			persistJobStatement = connection.prepareCall(callSql);
 		}
+		persistJobStatement.registerOutParameter("token", java.sql.Types.VARCHAR);
 		//persistJobStatement.setLong("p_job_log_id", jobLogId);
 		//persistJobStatement.setString("p_schema_name", null);
 		persistJobStatement.setString("p_process_name", processName);
-		persistJobStatement.setString("p_thread_name", Thread.currentThread().getName());
-		persistJobStatement.setString("p_status_msg", statusMsg);
-		persistJobStatement.setTimestamp("p_status_ts", new Timestamp(System.currentTimeMillis()));
-		//persistJobStatement.setLong("p_sid", 0l);// TODO
 		persistJobStatement.setString("p_classname", className);
 		persistJobStatement.setString("p_module_name", moduleName);
+		persistJobStatement.setString("p_thread_name", Thread.currentThread().getName());
+		persistJobStatement.setString("p_status_msg", statusMsg);
+		//persistJobStatement.setTimestamp("p_status_ts", new Timestamp(System.currentTimeMillis()));
+		//persistJobStatement.setLong("p_sid", 0l);// TODO
 		//persistJobStatement.setString("p_tracefile_name", tracefileName);
 		persistJobStatement.execute();
 		String token = persistJobStatement.getString("token");
@@ -67,11 +70,12 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 	}
 
 	@Override
-	public void endJob() throws SQLException {
-		String callSql = "job_log.end_job";
+	public void endJob(String token) throws SQLException {
+		String callSql = "begin joblog.end_job(p_job_token => :p_token); end;";
 		if (endJobStatement == null) {
 			endJobStatement = connection.prepareCall(callSql);
 		}
+		endJobStatement.setString("p_token",token);
 		endJobStatement.execute();
 	}
 	
@@ -83,14 +87,16 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 	@Override
 	public long insertStep(String jobToken, String stepName, String stepInfo, String className, String stack) {
 		long jobStepId = -1L;
-		String callSql = ":p_job_step_id := joblog.job_step_insert (\n"
+		String callSql = "begin \n"
+				+ ":p_job_step_id := joblog.job_step_insert (\n"
 				+ "                p_job_token   => :p_job_token,"
-				+ "                p_job_step_id => :p_job_step,   \n"
-				+ "                p_job_log_id  => :p_job_log_id, \n"
 				+ "                p_step_name   => :p_step_name, \n"
 				+ "                p_step_info   => :p_step_info, \n"
 				+ "                p_classname   => :p_classname,     \n"
-				+ "                p_start_ts    => :p_start_ps,\n" + "                p_stacktrace  => :p_stacktrace";
+				+ "                p_start_ts    => :p_start_ps,\n"
+				+ "                p_stacktrace  => :p_stacktrace\n"
+				+ ");"
+				+ "end;";
 		try {
 			if (insertStepStatement == null) {
 				insertStepStatement = connection.prepareCall(callSql);
@@ -117,14 +123,22 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 
 	@Override
 	public void finishStep(long stepId) throws SQLException {
-		String callSql = "joblog.finish_step";
+		String callSql = "begin joblog.finish_step(stepid => :step_id); end;";
 		if (finishStepStatement == null) {
 			finishStepStatement = connection.prepareCall(callSql);
 		}
+		finishStepStatement.setLong("step_id", stepId);
+		finishStepStatement.execute();
 	}
 
 	@Override
-	public void abortJob(Exception e) throws SQLException {
+	public void abortJob(String jobToken, Exception e) throws SQLException {
+		String abortJobSql  = "begin\n"
+				+ "joblog.abort_job("
+				+ "  p_job_token => :job_token,\n"
+				+ "  p_stacktrace => :p_stack_trace);\n"
+				+ "end;";
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append(e.getMessage());
 		sb.append("\n");
@@ -132,21 +146,22 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 			sb.append(el.toString());
 			sb.append("\n");
 		}
+		String abortMessage = sb.toString();
 
 		if (abortJobStatement == null) {
-			abortJobStatement = connection.prepareCall("begin job_log.abort_job(:p_stacktrace); end;");
+			abortJobStatement = connection.prepareCall(abortJobSql);
 		}
-		String abortMessage = sb.toString();
-		abortJobStatement.setString("p_stacktrace", abortMessage);
+		abortJobStatement.setString("job_token", jobToken);
+		abortJobStatement.setString("p_stack_trace", abortMessage);
 		abortJobStatement.execute();
 		logger.warn("job terminated with: '{}'", abortMessage);
 	}
 
-	@Override
-	public Clob createClob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public Clob createClob() throws SQLException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public void persistenceUpdateTrace(long jobId, Clob traceData) throws SQLException {

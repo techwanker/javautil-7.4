@@ -353,12 +353,12 @@ s.paddr = p.addr;
 	}
 
 	@Override
-	public void abortJob(Exception e) throws SQLException {
+	public void abortJob(String token,Exception e) throws SQLException {
 		finishJob(statements.getSqlStatement("abort_job"));
 	}
 
 	@Override
-	public void endJob() throws SQLException {
+	public void endJob(String token) throws SQLException {
 
 		finishJob(statements.getSqlStatement("end_job"));
 	}
@@ -489,11 +489,11 @@ s.paddr = p.addr;
 		}
 
 	}
-
-	@Override
-	public Clob createClob() throws SQLException {
-		return joblogConnection.createClob();
-	}
+//
+//	@Override
+//	public Clob createClob() throws SQLException {
+//		return joblogConnection.createClob();
+//	}
 
 	@Override
 	public void setPersistTraceOnJobCompletion(boolean persistTrace) {
