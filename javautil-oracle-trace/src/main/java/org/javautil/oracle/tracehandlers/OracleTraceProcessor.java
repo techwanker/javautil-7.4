@@ -53,17 +53,17 @@ public class OracleTraceProcessor {
 	private static HashMap<RecordType, Integer> unhandledCount = new HashMap<RecordType, Integer>();
 
 	public OracleTraceProcessor(Connection conn, String traceFileName) throws SQLException, IOException {
-		reader = new TraceFileUtlFileReader(conn, traceFileName);
+		reader = new TraceFileReaderImpl(conn, traceFileName);
 	}
 
 	public OracleTraceProcessor(final String fileName) throws IOException {
-		reader = new TraceFileSystemReader(fileName);
+		reader = new TraceFileReaderImpl(fileName);
 		logger.info("processing file " + fileName);
 	}
 
 	public OracleTraceProcessor(final File file) throws IOException {
 		this.inputFile = file;
-		reader = new TraceFileSystemReader(file.getAbsolutePath());
+		reader = new TraceFileReaderImpl(file.getAbsolutePath());
 		logger.info("processing file " + file.getAbsolutePath());
 	}
 

@@ -4,6 +4,7 @@
 package org.javautil.oracle.tracehandlers;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,11 +12,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.javautil.oracle.OracleConnectionHelper;
 import org.javautil.oracle.trace.record.Action;
 import org.javautil.oracle.trace.record.Close;
 import org.javautil.oracle.trace.record.Error;
@@ -37,11 +42,11 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class TraceFileSystemReader implements TraceFileReader, Closeable {
+public class TraceFileReaderImpl implements TraceFileReader, Closeable {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	private static EventHelper events = new EventHelper();
 	private static final Integer LOG_PARSED_RECORD = Integer.valueOf(1);
-	private final String fileName;
+	private  String fileName;
 	//
 	private final ArrayList<String> filePreamble = new ArrayList<String>();
 	//
@@ -80,16 +85,27 @@ public class TraceFileSystemReader implements TraceFileReader, Closeable {
 	private boolean showParseError;
 	private HashMap<RecordType, Integer> unhandledCountByType = new HashMap<>();
 
-	public TraceFileSystemReader(final String fileName) throws IOException {
+	public TraceFileReaderImpl(final String fileName) throws IOException {
 		logger.info("reading file {}", fileName);
 		this.fileName = fileName;
 		br = new LineNumberReader(new BufferedReader(new FileReader(fileName)));
 		initResources();
 	}
 
-	public TraceFileSystemReader(final InputStream inputStream) throws IOException {
+	public TraceFileReaderImpl(final InputStream inputStream) throws IOException {
 		this.fileName = null;
 		br = new LineNumberReader(new BufferedReader(new InputStreamReader(inputStream)));
+		initResources();
+	}
+	
+	public TraceFileReaderImpl(Connection conn, String filename) throws SQLException, IOException {
+		this.fileName = filename;
+		String fileText = OracleConnectionHelper.getTextFromRdbmsTraceFile(conn,fileName);
+		logger.info("attempting to read trace file {} ", fileName);
+		ByteArrayInputStream bais = new ByteArrayInputStream(fileText.getBytes());
+		Reader r = new InputStreamReader(bais);
+		BufferedReader buffy = new BufferedReader(r);
+		br = new LineNumberReader(buffy);
 		initResources();
 	}
 

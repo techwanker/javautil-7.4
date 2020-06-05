@@ -3,6 +3,7 @@ package org.javautil.oracle.trace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -59,9 +60,11 @@ public class TraceProcessorTest {
 	public void test3() throws IOException {
 		String base = "dev18b_ora_813";
 		String inputFileName = "src/test/resources/oratrace/" + base + ".trc";
-
-		FileOutputStream fos = new FileOutputStream("target/test-classes/oratrace/" + base + ".juf");
-		Tracer tracer = new Tracer("target/test-classes/oratrace/" + base + ".trace");
+	    File outputDir = new File("target/oratrace");
+	    outputDir.mkdirs();
+	    		
+		FileOutputStream fos = new FileOutputStream("target/oratrace/" + base + ".juf");
+		Tracer tracer = new Tracer("target/oratrace/" + base + ".trace");
 		OracleTraceProcessor tfr = new OracleTraceProcessor(inputFileName);
 		tfr.setTracer(tracer);
 		tfr.process();
