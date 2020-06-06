@@ -2,16 +2,15 @@
 <classpath>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
 		<attributes>
-			<attribute name="test" value="true"/>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="java"/>
 	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
 		<attributes>
-			<attribute name="test" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" output="target/classes" path="src/main/java">
@@ -35,7 +34,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/javautil/javautil-core/VER-7.3.0/javautil-core-VER-7.3.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/javautil/javautil-core/VER-7.4.0/javautil-core-VER-7.4.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.5/commons-codec-1.5.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.5/commons-codec-1.5-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/common/home/jjs/.m2/repository/commons-codec/commons-codec/1.5/commons-codec-1.5-javadoc.jar!/"/>
@@ -51,7 +50,7 @@
 			<attribute name="javadoc_location" value="jar:file:/common/home/jjs/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/javautil/javautil-commandline/VER-7.3.0/javautil-commandline-VER-7.3.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/javautil/javautil-commandline/VER-7.4.0/javautil-commandline-VER-7.4.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/common/home/jjs/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25-javadoc.jar!/"/>
@@ -103,9 +102,9 @@
 			<attribute name="javadoc_location" value="jar:file:/common/home/jjs/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.10.1/jackson-dataformat-yaml-2.10.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.23/snakeyaml-1.23.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.23/snakeyaml-1.23-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/org/yaml/snakeyaml/1.25/snakeyaml-1.25.jar" sourcepath="M2_REPO/org/yaml/snakeyaml/1.25/snakeyaml-1.25-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/common/home/jjs/.m2/repository/org/yaml/snakeyaml/1.23/snakeyaml-1.23-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:file:/common/home/jjs/.m2/repository/org/yaml/snakeyaml/1.25/snakeyaml-1.25-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.8.5/gson-2.8.5-sources.jar">
@@ -167,6 +166,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/javautil-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

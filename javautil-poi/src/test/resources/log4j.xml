@@ -20,12 +20,9 @@
 		<logger name="org.javautil.core.sql.SqlSplitter">
 		<level value="debug" />
 	</logger>
-		</logger>
-		<logger name="oorg.javautil.dblogging.installer">
-		<level value="debug" />
-	</logger>
-	<logger name="org.javautil.dataset.ColumnMetadata">
 	
+	<logger name="org.javautil.dataset.ColumnMetadata">
+
 		<level value="debug" />
 	</logger>
 	

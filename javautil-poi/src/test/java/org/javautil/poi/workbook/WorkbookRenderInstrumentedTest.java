@@ -20,7 +20,7 @@ import org.javautil.core.text.YamlUtils;
 import org.javautil.core.workbook.WorkbookDefinition;
 import org.javautil.dataset.ColumnMetadata;
 import org.javautil.dataset.DataType;
-import org.javautil.dblogging.installer.H2Install;
+import org.javautil.joblog.installer.H2Install;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

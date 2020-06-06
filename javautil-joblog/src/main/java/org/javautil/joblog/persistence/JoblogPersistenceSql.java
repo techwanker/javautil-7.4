@@ -17,6 +17,7 @@ import org.javautil.core.sql.NamedSqlStatements;
 import org.javautil.core.sql.SequenceHelper;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.lang.ThreadUtil;
+import org.javautil.oracle.OracleConnectionHelper;
 import org.javautil.util.ListOfNameValue;
 import org.javautil.util.NameValue;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 	SequenceHelper sequenceHelper;
 	protected List<CallableStatement> callableStatements = new ArrayList<>();
 	protected final Connection joblogConnection;
+	private boolean isJoblogConnectionOracle = false;
 	protected final Connection applicationConnection;
 	protected NamedSqlStatements statements;
 	private long jobLogId = -1;
@@ -41,7 +43,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 	private SqlStatement jobLogSelectSqlStatement;
 	private SqlStatement updateJobLogSqlStatement;
 	private SqlStatement jobLogSelectSqlStatement2;
-
+	
 	private static transient final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss.SSS");
 
 	private boolean persistPlans;
@@ -53,6 +55,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		this.applicationConnection = applogConnection;
 		statements = NamedSqlStatements.getNameSqlStatementsFromSqlSplitterResource(this, "ddl/h2/dblogger_dml.ss.sql");
 		sequenceHelper = new SequenceHelper(joblogConnection);
+		isJoblogConnectionOracle = OracleConnectionHelper.isOracleConnection(joblogConnection) ;
 
 	}
 
@@ -94,8 +97,6 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		binds.put("module_name", moduleName);
 		binds.put("status_msg", statusMsg);
 		binds.put("thread_name", Thread.currentThread().getName());
-		// binds.put("schema_name", schema);
-		// binds.put("tracefile_name", tracefileName);
 		binds.put("status_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		if (logger.isDebugEnabled()) {
 			logger.debug("job_log_insert\n{}", ss.getSql());
@@ -114,138 +115,41 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 			logger.debug("persistJob select: {}", nvs.toString());
 		}
 
-
 		joblogConnection.commit();
 		return token;
 	}
 	/*
 	create or replace view my_session_process as 
     select 
-    s.SADDR, 
-    s.SID, 
-    s.SERIAL#, 
-    s.AUDSID , 
-    s.PADDR,
-    s.USER#, 
-    s.USERNAME, 
-    s.COMMAND, 
-    s.OWNERID,
-    s.TADDR, 
-    s.LOCKWAIT, 
-    s.STATUS , 
-    s.SERVER ,
-    s.SCHEMA#, 
-    s.SCHEMANAME, 
-    s.OSUSER , 
-    s.PROCESS,
-    s.MACHINE, 
-    s.PORT, 
-    s.TERMINAL, 
-    s.PROGRAM,
-    s.TYPE, 
-    	s.SQL_ADDRESS, 
-    	s.SQL_HASH_VALUE, 
-    	s.SQL_ID ,
-    	s.SQL_CHILD_NUMBER, 
-    	s.SQL_EXEC_START , 
-    	s.SQL_EXEC_ID, 
-    	s.PREV_SQL_ADDR,
-    s.PREV_HASH_VALUE, 
-    	s.PREV_SQL_ID, 
-    	s.PREV_CHILD_NUMBER, 
-    	s.PREV_EXEC_START,
-    	s.PREV_EXEC_ID, 
-    	s.PLSQL_ENTRY_OBJECT_ID, 
-    	s.PLSQL_ENTRY_SUBPROGRAM_ID, 
-    	s.PLSQL_OBJECT_ID,
-    	s.PLSQL_SUBPROGRAM_ID, 
-    	s.MODULE , 
-    	s.MODULE_HASH, 
-    	s.ACTION ,
-    	s.ACTION_HASH, 
-    	s.CLIENT_INFO,
-    s.FIXED_TABLE_SEQUENCE,
-    s.ROW_WAIT_OBJ#,
-    s.ROW_WAIT_FILE# ,
-    s.ROW_WAIT_BLOCK#,
-    s.ROW_WAIT_ROW#,
-    s.TOP_LEVEL_CALL#,
-    s.LOGON_TIME,
-    s.LAST_CALL_ET,
-    s.PDML_ENABLED,
-    s.FAILOVER_TYPE,
-    s.FAILOVER_METHOD,
-    s.FAILED_OVER,
-    s.RESOURCE_CONSUMER_GROUP,
-    s.PDML_STATUS,
-    s.PDDL_STATUS,
-    s.PQ_STATUS,
-    s.CURRENT_QUEUE_DURATION ,
-    s.CLIENT_IDENTIFIER,
-    s.BLOCKING_SESSION_STATUS,
-    s.BLOCKING_INSTANCE,
-    s.BLOCKING_SESSION,
-    s.FINAL_BLOCKING_SESSION_STATUS,
-    s.FINAL_BLOCKING_INSTANCE,
-    s.FINAL_BLOCKING_SESSION ,
-    s.SEQ#,
-    s.EVENT# ,
-    s.EVENT,
-    s.P1TEXT ,
-    s.P1,
-    s.P1RAW,
-    s.P2TEXT ,
-    s.P2,
-    s.P2RAW,
-    s.P3TEXT ,
-    s.P3,
-    s.P3RAW,
-    s.WAIT_CLASS_ID,
-    s.WAIT_CLASS#,
-    s.WAIT_CLASS,
-    s.WAIT_TIME,
-    s.SECONDS_IN_WAIT,
-    s.STATE,
-    s.WAIT_TIME_MICRO,
-    s.TIME_REMAINING_MICRO,
-    s.TIME_SINCE_LAST_WAIT_MICRO,
-    s.SERVICE_NAME,
-    s.SQL_TRACE,
-    s.SQL_TRACE_WAITS,
-    s.SQL_TRACE_BINDS,
-    s.SQL_TRACE_PLAN_STATS,
-    s.SESSION_EDITION_ID,
-    s.CREATOR_ADDR,
-    s.CREATOR_SERIAL#,
-    s.ECID,
-    s.SQL_TRANSLATION_PROFILE_ID,
-    s.PGA_TUNABLE_MEM,
-    s.SHARD_DDL_STATUS,
-    s.CON_ID ,
-    s.EXTERNAL_NAME,
-    s.PLSQL_DEBUGGER_CONNECTED,
-    p.PID,
-    p.SOSID,
-    p.SPID,
-    p.STID,
-    p.EXECUTION_TYPE ,
-    p.PNAME,
-    p.TRACEID,
-    p.TRACEFILE,
-    p.BACKGROUND,
-    p.LATCHWAIT,
-    p.LATCHSPIN,
-    p.PGA_USED_MEM,
-    p.PGA_ALLOC_MEM,
-    p.PGA_FREEABLE_MEM,
-    p.PGA_MAX_MEM,
-    p.NUMA_DEFAULT,
-    p.NUMA_CURR
-from    sys.v$session s,
-        sys.v$process p
-where s.audsid = userenv('sessionid') and
-s.paddr = p.addr;
-*/
+    s.SADDR, s.SID, s.SERIAL#, s.AUDSID , s.PADDR,
+    s.USER#, s.USERNAME, s.COMMAND, s.OWNERID, s.TADDR, 
+    s.LOCKWAIT, s.STATUS , s.SERVER , s.SCHEMA#, s.SCHEMANAME, 
+    s.OSUSER , s.PROCESS, s.MACHINE, s.PORT, s.TERMINAL, 
+    s.PROGRAM, s.TYPE, s.SQL_ADDRESS, s.SQL_HASH_VALUE, s.SQL_ID ,
+    s.SQL_CHILD_NUMBER, s.SQL_EXEC_START , s.SQL_EXEC_ID, 
+    s.PREV_SQL_ADDR, s.PREV_HASH_VALUE, s.PREV_SQL_ID, s.PREV_CHILD_NUMBER, s.PREV_EXEC_START, s.PREV_EXEC_ID, 
+    s.PLSQL_ENTRY_OBJECT_ID, s.PLSQL_ENTRY_SUBPROGRAM_ID, s.PLSQL_OBJECT_ID, s.PLSQL_SUBPROGRAM_ID, s.MODULE , 
+    s.MODULE_HASH, s.ACTION , s.ACTION_HASH, s.CLIENT_INFO, s.FIXED_TABLE_SEQUENCE,
+    s.ROW_WAIT_OBJ#, s.ROW_WAIT_FILE# , s.ROW_WAIT_BLOCK#, s.ROW_WAIT_ROW#, s.TOP_LEVEL_CALL#,
+    s.LOGON_TIME, s.LAST_CALL_ET, s.PDML_ENABLED, s.FAILOVER_TYPE, s.FAILOVER_METHOD,
+    s.FAILED_OVER, s.RESOURCE_CONSUMER_GROUP,
+    s.PDML_STATUS, s.PDDL_STATUS, s.PQ_STATUS, s.CURRENT_QUEUE_DURATION , s.CLIENT_IDENTIFIER, s.BLOCKING_SESSION_STATUS,
+    s.BLOCKING_INSTANCE, s.BLOCKING_SESSION, s.FINAL_BLOCKING_SESSION_STATUS, s.FINAL_BLOCKING_INSTANCE, s.FINAL_BLOCKING_SESSION ,
+    s.SEQ#, s.EVENT# , s.EVENT, s.P1TEXT , s.P1,
+    s.P1RAW, s.P2TEXT , s.P2, s.P2RAW, s.P3TEXT ,
+    s.P3, s.P3RAW, s.WAIT_CLASS_ID, s.WAIT_CLASS#, s.WAIT_CLASS,
+    s.WAIT_TIME, s.SECONDS_IN_WAIT, s.STATE, s.WAIT_TIME_MICRO, s.TIME_REMAINING_MICRO,
+    s.TIME_SINCE_LAST_WAIT_MICRO, s.SERVICE_NAME, s.SQL_TRACE, s.SQL_TRACE_WAITS, s.SQL_TRACE_BINDS,
+    s.SQL_TRACE_PLAN_STATS, s.SESSION_EDITION_ID, s.CREATOR_ADDR, s.CREATOR_SERIAL#, s.ECID,
+    s.SQL_TRANSLATION_PROFILE_ID, s.PGA_TUNABLE_MEM, s.SHARD_DDL_STATUS, s.CON_ID , s.EXTERNAL_NAME,
+    s.PLSQL_DEBUGGER_CONNECTED, p.PID, p.SOSID, p.SPID, p.STID,
+    p.EXECUTION_TYPE , p.PNAME, p.TRACEID, p.TRACEFILE, p.BACKGROUND,
+    p.LATCHWAIT, p.LATCHSPIN, p.PGA_USED_MEM, p.PGA_ALLOC_MEM, p.PGA_FREEABLE_MEM,
+    p.PGA_MAX_MEM, p.NUMA_DEFAULT, p.NUMA_CURR 
+    from    sys.v$session s, sys.v$process p
+    where s.audsid = userenv('sessionid') and
+    s.paddr = p.addr;
+  */
 
 	public Binds getSessionInfo(Connection conn) throws SQLException {
 		Binds binds;

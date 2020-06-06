@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>javautil-dblogging</artifactId>
+	<artifactId>javautil-oracle-trace</artifactId>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -134,7 +134,7 @@
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 						<manifest>
-							<mainClass>org.javautil.dblogging.OracleInstall</mainClass>
+							<mainClass>org.javautil.joblog.OracleInstall</mainClass>
 						</manifest>
 					</archive>
 

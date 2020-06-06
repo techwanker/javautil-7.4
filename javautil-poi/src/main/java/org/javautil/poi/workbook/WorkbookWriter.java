@@ -21,7 +21,7 @@ import org.javautil.core.sql.SqlStatement;
 import org.javautil.core.workbook.WorkbookDefinition;
 import org.javautil.core.workbook.Worksheet;
 import org.javautil.dataset.ListOfNameValueDataset;
-import org.javautil.dblogging.logger.JobLogger;
+import org.javautil.joblog.persistence.JoblogPersistenceSql;
 import org.javautil.document.style.StyleFactory;
 import org.javautil.poi.sheet.ListWorksheetRenderer;
 import org.javautil.poi.style.HSSFCellStyleFactory;
@@ -41,7 +41,7 @@ public class WorkbookWriter  {
 	private HSSFWorkbook workbook;
 	private HSSFCellStyleFactory cellStyleFactory;
 	private Connection loggerConnection;
-	private	JobLogger dbLogger;
+	private	JoblogPersistenceSql dbLogger;
 
 	public WorkbookWriter(Connection conn, Connection loggerConnection,WorkbookDefinition wd, Binds binds) {
 		this.conn = conn;
@@ -76,28 +76,28 @@ public class WorkbookWriter  {
 
 	public void process() throws SQLException {
 		try {
-			dbLogger = new JobLogger(loggerConnection);
+			dbLogger = new JoblogPersistenceSql(loggerConnection, conn);
 		} catch (SqlSplitterException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		final long logJobId = dbLogger.startJobLogging(getClass().getName(), getClass().getName(), null, null, 4);
+		final String token = dbLogger.joblogInsert("WorkbookWriter", getClass().getName(), null);
 		try {
-			runJob();
-			dbLogger.endJob();
-			logger.info("finished job {}",logJobId);
+			runJob(token);
+			dbLogger.endJob(token);
+			logger.info("finished job {}",token);
 		}
 		catch(SQLException e) {
-			dbLogger.abortJob(e);
+			dbLogger.abortJob(token,e);
 			throw e;
 		}
 	}
 
 
-	private void runJob() throws SQLException {
+	private void runJob(String token) throws SQLException {
 		for (Worksheet worksheet : workbookDefinition.getWorksheets().values()) {
-			dbLogger.insertStep("sheet " + worksheet.getName(), null, getClass().getName(), null);
+			long stepId = dbLogger.insertStep(token, "sheet " + worksheet.getName(), null, getClass().getName(), null);
 			Timer sqlTime = new Timer();
 			// create the sheet
 			logger.info("processing {}", worksheet);
@@ -109,7 +109,7 @@ public class WorkbookWriter  {
 			ListOfNameValueDataset dataset = ss.getListOfNameValueDataSet(binds,workbookDefinition.getColumns());
 			logger.info("worksheet {} sql ms {}",worksheet.getName(),sqlTime.getElapsedMillis());
 			sheetRenderer.emitRegion(dataset);
-			dbLogger.finishStep();
+			dbLogger.finishStep(stepId);
 
 		}
 	}

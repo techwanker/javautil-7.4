@@ -25,7 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.javautil</groupId>
-			<artifactId>javautil-dblogging</artifactId>
+			<artifactId>javautil-joblog</artifactId>
 			<version>${org.javautil.version}</version>
 		</dependency>
 		<dependency>
