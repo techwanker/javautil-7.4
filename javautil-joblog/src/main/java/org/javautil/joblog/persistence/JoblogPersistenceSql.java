@@ -324,11 +324,8 @@ s.paddr = p.addr;
 		ss.setConnection(joblogConnection);
 		int rowCount = ss.executeUpdate(binds);
 		if (rowCount != 1) {
-			// should have option to abort
 			logger.error(String.format("finishStep stepId %d updated %d rows", jobStepId, rowCount));
-			// now what? rollback TODO
 		}
-
 		joblogConnection.commit();
 	}
 
@@ -339,14 +336,11 @@ s.paddr = p.addr;
 		binds.put("job_log_id", jobLogId);
 		binds.put("end_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		int rowcount = ss.executeUpdate(binds);
-		// connection.commit(); // TODO is this a hack?
 		if (rowcount != 1) {
 			logger.warn("job_log not updated for {}", jobLogId);
 		} else {
 			logger.info("finishJob: {}", jobLogId);
 		}
-
-		//updateJob(jobLogId);
 
 		joblogConnection.commit();
 		logger.info("job " + jobLogId + " finished =====");

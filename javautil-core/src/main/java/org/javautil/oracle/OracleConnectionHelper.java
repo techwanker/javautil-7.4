@@ -1,5 +1,6 @@
 package org.javautil.oracle;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
@@ -212,6 +213,34 @@ public class OracleConnectionHelper extends ConnectionHelper {
 		ss.execute(binds);
 	}
 	
+
+	public static String getDBMSDirectoryForTraceFiles(Connection conn) throws SQLException {
+		String filesystemDir = getFileSystemDirectoryForTraceFiles(conn);
+		String sql = "select * from all_directories where directory_path = :path";
+		SqlStatement ss = new SqlStatement(conn,sql);
+		Binds binds = new Binds();
+		binds.put("path",filesystemDir);
+		ListOfNameValue  lon = ss.getListOfNameValue();
+		ss.close();
+		switch (lon.size())  {
+		case 0:
+			throw new IllegalArgumentException("No dbms directory for filesystem dir " + filesystemDir);
+		case 1:
+			return lon.get(0).getString("directory_name");
+		default:
+			String retval =  lon.get(0).getString("directory_name");
+			logger.warn("multiple directories {} returning {}", lon, retval);
+			return retval;
+		}
+	}
+	
+	public static String getFileSystemDirectoryForTraceFiles(Connection conn) throws SQLException {
+		String fileName = getCurrentTraceFileName(conn);
+		File   file = new File(fileName);
+		File   directory = file.getParentFile();
+		String directoryName = directory.getPath();
+		return directoryName;
+	}
 	public static String getCurrentTraceFileName(Connection conn) throws SQLException {
 		String sql = "SELECT VALUE FROM V$DIAG_INFO WHERE NAME = 'Default Trace File'";
 		SqlStatement ss = new SqlStatement(conn,sql);
