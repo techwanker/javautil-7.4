@@ -53,13 +53,13 @@ public class SqlSplitter {
 	private int traceFlags = traceBlock | traceAnalysis;
 
 	private int                        verbosity         = 0;
+	private int                        traceState        = 0;
 	private InputStream                is;
 	private String                     inputName;
 	private String                     inputType;
 	private String                     inLine;
 	private ArrayList<SqlSplitterLine> lines;
 	private boolean                    analyzed          = false;
-	private int                        traceState        = 1;
 	private final static Pattern       annotationPattern = Pattern.compile("^ *--@.*");
 	private boolean                    trace             = false;
 	private int                        blockNumber = -1;
@@ -127,22 +127,12 @@ public class SqlSplitter {
 	}
 
 	public static String trimSql(String text, boolean isBlock) {
-		//logger.info("trimming '{}'",text);
 		Character[] whiteCruft = {'\t','\n','\r',' '};
-
 		String leading = StringUtils.stripTrailing(text,whiteCruft);
-		//logger.info("leading: '{}'", leading);
-
 		Character[] semi = {';'};
 		String noSemi = isBlock ? leading : StringUtils.stripTrailing(leading, semi);
-		//String noSemi = StringUtils.stripTrailing(leading, semi);
-		//logger.info("noSemi '{}'",noSemi);
-
 		String trimmed = StringUtils.stripLeading(noSemi,whiteCruft);
-
-		//logger.info("trimmed '{}'",trimmed);
 		return trimmed;
-
 	}
 
 	public String lineInfo() {
@@ -303,7 +293,7 @@ public class SqlSplitter {
 			default:
 				break;
 			}
-			logger.info("linesIndex {}",linesIndex);
+			logger.debug("linesIndex {}",linesIndex);
 			logtext("analyzed",linesIndex,lines.get(linesIndex),"");
 			linesIndex++;	
 		}

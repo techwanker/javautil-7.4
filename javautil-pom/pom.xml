@@ -14,10 +14,10 @@
 	<modules>
 		<module>../javautil-commandline</module>
 		<module>../javautil-core</module>
-        <!-- <module>../javautil-dblogging</module> -->
 		<module>../javautil-hibernate</module> 
 		<module>../javautil-poi</module>
 		<module>../javautil-test</module>
+		<module>../javautil-oracle-trace</module>
 		<!-- <module>../javautil-cli</module> -->
 		<module>../vending-sales-reporting</module>
 	</modules>
