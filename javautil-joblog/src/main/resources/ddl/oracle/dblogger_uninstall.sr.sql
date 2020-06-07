@@ -10,6 +10,7 @@ drop table cursor_info_run cascade constraint;
 drop table cursor_sql_text cascade constraint;                                             
 drop table cursor_stat cascade constraint;
 drop view cursor_info_vw;
+drop tqble logger_settings;
 drop table job_log cascade constraint;
 drop table job_msg cascade constraint;                                  
 drop table job_step cascade constraint;

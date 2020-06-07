@@ -69,7 +69,7 @@ public class JoblogForOracleExampleTest extends BaseTest {
 		// assertNotNull(jobNv.get("process_run_nbr"));
 		//assertEquals("DONE", jobNv.get("status_msg")); //. TODO
 		// assertEquals("C",jobNv.get("status_id"));
-		assertNotNull(jobNv.get("status_ts"));
+		assertNotNull(jobNv.get("start_ts"));
 		assertEquals("N", jobNv.get("ignore_flg"));
 		assertEquals("ExampleLogging", jobNv.get("module_name"));
 		assertEquals("org.javautil.joblog.JoblogForOracleExample", jobNv.get("classname"));

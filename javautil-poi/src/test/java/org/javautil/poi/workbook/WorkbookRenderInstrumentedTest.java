@@ -38,8 +38,8 @@ public class WorkbookRenderInstrumentedTest {
 	DataSource dataSource = null;
 	@Before
 	public void before() throws Exception {
-		//
-		DataSource jobDatasource = DataSourceFactory.getH2Permanent("./target/joblogging", "sa", "tutorial");
+		//DataSource jobDatasource = DataSourceFactory.getH2Permanent("./target/joblogging", "sa", "tutorial");
+		DataSource jobDatasource = DataSourceFactory.getH2Permanent("/tmp/joblogging", "sa", "tutorial");
 	  loggingConnection = jobDatasource.getConnection();	
 	  
 		

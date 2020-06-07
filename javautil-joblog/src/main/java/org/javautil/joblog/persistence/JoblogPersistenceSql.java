@@ -53,7 +53,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 			Connection applogConnection) throws IOException, SQLException {
 		this.joblogConnection = joblogConnection;
 		this.applicationConnection = applogConnection;
-		statements = NamedSqlStatements.getNameSqlStatementsFromSqlSplitterResource(this, "ddl/h2/dblogger_dml.ss.sql");
+		statements = NamedSqlStatements.getNameSqlStatementsFromSqlSplitterResource(this, "ddl/logjob_dml.ss.sql");
 		sequenceHelper = new SequenceHelper(joblogConnection);
 		isJoblogConnectionOracle = OracleConnectionHelper.isOracleConnection(joblogConnection) ;
 
@@ -97,7 +97,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		binds.put("module_name", moduleName);
 		binds.put("status_msg", statusMsg);
 		binds.put("thread_name", Thread.currentThread().getName());
-		binds.put("status_ts", new java.sql.Timestamp(System.currentTimeMillis()));
+		binds.put("start_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		if (logger.isDebugEnabled()) {
 			logger.debug("job_log_insert\n{}", ss.getSql());
 		}

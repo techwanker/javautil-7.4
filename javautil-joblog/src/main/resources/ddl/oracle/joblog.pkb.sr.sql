@@ -23,7 +23,7 @@ is
         insert into job_log (
           job_log_id,    job_token,
           process_name,   thread_name,        
-          status_msg,   status_ts,      module_name,
+          status_msg,   start_ts,      module_name,
           classname
         ) values (
           my_job_log_id,  my_job_token,
@@ -83,8 +83,7 @@ is
    begin
        update job_log
        set
-              status_msg = 'DONE',
-              status_ts = SYSDATE
+              status_msg = 'DONE'
        where job_token = p_job_token;
 
       commit;
@@ -103,7 +102,6 @@ is
       update job_log
       set 
           status_msg = 'ABORT',
-          status_ts = current_timestamp,
           abort_stacktrace = p_stacktrace
        where job_token = p_job_token;
 

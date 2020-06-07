@@ -1,5 +1,0 @@
-Installation
-============
-
-Obtain the code
----------------

@@ -2,6 +2,24 @@
 set echo on
 spool job_tables
 --#>
+create sequence logger_settings_id_seq;
+
+create table logger_settings (    
+    logger_settings_id number(9),
+    logger_token            varchar(64),
+    process_name         varchar(128),
+    classname            varchar(255),
+    thread_name          varchar(128),
+    module_name          varchar(64),
+    status_msg           varchar(256),
+    trace_level          number(2),
+    directory_name       varchar(128),
+    logfile_name         varchar(64),
+    abort_stacktrace     clob,
+    log_level            number(1),
+    msg_lvl              number(1),
+    constraint logger_settings_pk primary key (logger_settings_id)
+   ); 
 
 create sequence job_log_id_seq;
 
@@ -10,20 +28,16 @@ create table job_log (
     job_token            varchar(64),
     process_name         varchar(128),
     thread_name          varchar(128),
+    module_name          varchar(64),
     status_msg           varchar(256),
-    status_ts 	         timestamp(9),
-    start_ts    	 timestamp(9),
+    start_ts    	     timestamp(9),
     end_ts               timestamp(9),
-    log_level            number(1),
     elapsed_millis       number(9),
     ignore_flg           varchar(1) default 'N' not null,
-    module_name          varchar(64),
     classname            varchar(255),
-    msg_lvl              number(1),
     trace_level          number(2),
-    directory_name       varchar(128),
-    logfile_name         varchar(64),
     abort_stacktrace     clob,
+    msg_lvl              number(1),
     check ( ignore_flg in ('Y', 'N')) ,
     constraint job_log_pk primary key (job_log_id)
    ); 
@@ -117,11 +131,11 @@ select
    process_name,        
    thread_name,          
    status_msg,                               
-   status_ts,                        
+   start_ts,                        
    end_ts,                               
    ignore_flg,    
    module_name,    
    classname,             
-   end_ts - status_ts elapsed_millis 
+   end_ts - start_ts elapsed_millis 
 from job_log;
 

@@ -17,7 +17,8 @@ is
    
   logger_dtls logger_dtl_type;
 
-  g_job_log job_log%rowtype;
+  g_logger_settings logger_settings%rowtype;
+  g_job_log         job_log%rowtype;
     
   function format_timestamp(timestamp in timestamp)
   return varchar 
@@ -71,12 +72,18 @@ is
     return format_timestamp(current_timestamp);
   end;
 
+
+  function get_new_logger_settings_id 
+  return number 
+  is begin
+    return logger_settings_id_seq.nextval;
+  end;
+
   function get_new_job_log_id 
   return number 
   is begin
     return job_log_id_seq.nextval;
   end;
-
   --%#Tracing
   --%<
   procedure set_trace (trace_level in pls_integer)
@@ -128,7 +135,7 @@ is
      pragma autonomous_transaction ;
    begin
     
-     if log_level = g_snap OR log_level <= g_job_log.msg_lvl then
+     if log_level = g_snap OR log_level <= g_logger_settings.msg_lvl then
        insert into job_msg (
          job_msg_id,    job_log_id,        
          -- log_seq_nbr,         
@@ -148,21 +155,40 @@ is
 
     --%# job_log
 
+  procedure log_settings_insert(rec in logger_settings%rowtype) 
+   is
+     pragma autonomous_transaction ;
+  begin
+    insert into logger_settings (    
+   	logger_settings_id,      logger_token,   process_name,
+        thread_name,             module_name,    status_msg,
+        trace_level,             directory_name, logfile_name,
+      abort_stacktrace,          log_level,      msg_lvl
+     ) values (
+   	rec.logger_settings_id, rec.logger_token,   rec.process_name,
+        rec.thread_name,        rec.module_name,    rec.status_msg,
+        rec.trace_level,        rec.directory_name, rec.logfile_name,
+        rec.abort_stacktrace,   rec.log_level,      rec.msg_lvl
+     );
+    commit;
+
+    end log_settings_insert;
+
   procedure job_log_insert(rec in job_log%rowtype) is
   begin
     insert into job_log (    
-      job_log_id,     process_name,    thread_name,
-      status_msg,     status_ts,       -- tracefile_name
-      classname,           module_name, 
-      job_token,      logfile_name
+      job_log_id,        job_token,
+      process_name,      thread_name,
+      status_msg,        start_ts,       
+      classname,         module_name 
      ) values (
-       rec.job_log_id,  rec.process_name,   rec.thread_name,
-       rec.status_msg,  current_timestamp, --  rec.tracefile_name,
-       rec.classname,   rec.module_name, 
-       rec.job_token,   rec.logfile_name
+       rec.job_log_id,   rec.job_token,
+       rec.process_name, rec.thread_name,
+       rec.status_msg,   current_timestamp, 
+       rec.classname,    rec.module_name 
      );
 
-    end;
+    end job_log_insert;
 
   function job_step_insert (
     step_name   in varchar, 
@@ -174,11 +200,15 @@ is
     my_job_step_id number;
   begin
     insert into job_step (
-      job_step_id,   job_log_id, step_name, step_info, 
-      classname,     start_ts,   stacktrace
+      job_step_id,   job_log_id, 
+      step_name,     step_info, 
+      classname,     start_ts,   
+      stacktrace
     ) values (
-      job_step_id_seq.nextval, g_job_log.job_log_id, step_name, step_info, 
-      classname,   current_timestamp,   stacktrace
+      job_step_id_seq.nextval, g_job_log.job_log_id, 
+      step_name,               step_info, 
+      classname,               current_timestamp,   
+      stacktrace
     ) returning job_step_id into my_job_step_id;
     return my_job_step_id;
   end job_step_insert;
@@ -204,30 +234,26 @@ is
     --%>
     is
       my_tracefile_name varchar(256);
-      my_job_token varchar(64) := get_job_token;
+      my_logger_token varchar(64) := get_job_token;
     
     begin
       if g_debug then
         dbms_output.put_line('begin_log() logfile_name "' || logfile_name || '"');
       end if;
-      g_job_log.logfile_name := logfile_name;
-      g_job_log.directory_name := logfile_directory;
-        --g_job_log.job_log_id   := job_log_id_seq.nextval;
-      g_job_log.process_name := process_name;
-      g_job_log.classname    := classname;
-      g_job_log.module_name  := module_name;
-      g_job_log.status_msg   := status_msg;
-      g_job_log.thread_name  := thread_name;
-      g_job_log.job_token    := my_job_token;
-      g_job_log.logfile_name := logfile_name;
-      g_job_log.trace_level  := trace_level;
-      g_job_log.start_ts     := current_timestamp;
-      g_job_log.log_level    := log_level;
+      g_logger_settings.logfile_name := logfile_name;
+      g_logger_settings.directory_name := logfile_directory;
+      g_logger_settings.process_name := process_name;
+      g_logger_settings.classname    := classname;
+      g_logger_settings.module_name  := module_name;
+      g_logger_settings.status_msg   := status_msg;
+      g_logger_settings.thread_name  := thread_name;
+      g_logger_settings.logger_token    := my_logger_token;
+      g_logger_settings.logfile_name := logfile_name;
+      g_logger_settings.trace_level  := trace_level;
+      --g_logger_settings.start_ts     := current_timestamp;
+      g_logger_settings.log_level    := log_level;
 
       set_trace(trace_level);
-
-      my_tracefile_name := set_tracefile_identifier(g_job_log.job_log_id);
-      set_action('begin_job ' || to_char(g_job_log.job_log_id)); 
 
          
    end begin_log;
@@ -255,12 +281,14 @@ is
     
      g_job_log.job_log_id := job_log_id_seq.nextval;
 
+	/*
      if logfile_name is not null then
        my_logfile_name := logfile_name;
      else 
-       my_logfile_name := my_job_token || '-' || g_job_log.job_log_id  ||
+       my_logfile_name := my_job_token || '-' || g_logger_settings.job_log_id  ||
                                '.log';
      end if;
+	*/
  
      begin_log (
 	    logfile_name   => my_logfile_name,
@@ -292,8 +320,7 @@ is
        set_action('end_job');
        update job_log
        set
-              status_msg = 'DONE',
-              status_ts = SYSDATE
+              status_msg = 'DONE'
         where job_log_id = g_job_log.job_log_id;
 
       commit;
@@ -328,7 +355,6 @@ is
         update job_log
         set  
              status_msg = 'ABORT',
-             status_ts = SYSDATE,
              abort_stacktrace = stack
         where job_token = p_job_token;
 
@@ -492,7 +518,7 @@ is
   procedure trace_step(step_name in varchar, job_step_id in number) is
     my_job_step_id varchar(9) := to_char(job_step_id);
     sql_text varchar(255) := 'select ''step_name: ''''' || step_name || 
-               ''''' job_log_id: ' || g_job_log.job_log_id || 
+               ''''' job_token: ' || g_job_log.job_token || 
               ' job_step_id: ' || my_job_step_id || ''' from dual';
   begin
     execute immediate sql_text;
@@ -501,9 +527,9 @@ is
   procedure set_log_level (log_level in pls_integer) is
 
   begin
-    if    log_level < 1 then g_job_log.log_level := 1;
-    elsif log_level > 9 then g_job_log.log_level := 9;
-    else  g_job_log.log_level := log_level;
+    if    log_level < 1 then g_logger_settings.log_level := 1;
+    elsif log_level > 9 then g_logger_settings.log_level := 9;
+    else  g_logger_settings.log_level := log_level;
     end if;
   end set_log_level;
 
@@ -566,10 +592,10 @@ is
              retval := my_log_dtl.log_lvl;
          exception 
             when no_data_found then
-              if g_job_log.log_level is null then
+              if g_logger_settings.log_level is null then
                   retval := g_info;
               else 
-                  retval := g_job_log.log_level;
+                  retval := g_logger_settings.log_level;
               end if;
               was_not := 'was not';
          end;
@@ -669,13 +695,13 @@ is
                ' log_level: '     || to_char(log_level));
     end if;  
 
-      --dbms_output.put_line('logfile_name: ' || g_job_log.logfile_name);     
+      --dbms_output.put_line('logfile_name: ' || g_logger_settings.logfile_name);     
       
     if log_level <= my_logger_level then
-      if g_job_log.logfile_name is not null then
+      if g_logger_settings.logfile_name is not null then
         -- write to file       
          my_message := logger_message_formatter  (
-           job_log_id   => g_job_log.job_log_id,
+           job_log_id   => g_logger_settings.logger_settings_id,
            job_msg_id   => null,
            log_msg      => log_msg,
            log_level    => log_level,
@@ -685,14 +711,14 @@ is
            call_stack   => null
          );
 
-         my_file_handle := utl_file.fopen(g_job_log.directory_name,g_job_log.logfile_name,'a'); 
-         --my_file_handle := open_log_file (g_job_log.directory_name,g_job_log.logfile_name); 
+         my_file_handle := utl_file.fopen(g_logger_settings.directory_name,g_logger_settings.logfile_name,'a'); 
+         --my_file_handle := open_log_file (g_logger_settings.directory_name,g_logger_settings.logfile_name); 
          UTL_FILE.put_line (my_file_handle, my_message); 
          utl_file.fclose(my_file_handle); 
       else
         raise invalid_state_exception;
         my_message := logger_message_formatter  (
-          job_log_id   => g_job_log.job_log_id,
+          job_log_id   => g_logger_settings.logger_settings_id,
           job_msg_id   => null,
           log_msg      => log_msg,
           log_level    => log_level,
