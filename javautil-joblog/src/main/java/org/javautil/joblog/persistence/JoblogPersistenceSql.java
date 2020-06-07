@@ -35,7 +35,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 	private boolean isJoblogConnectionOracle = false;
 	protected final Connection applicationConnection;
 	protected NamedSqlStatements statements;
-	private long jobLogId = -1;
+	//private long jobLogId = -1;
 	private long jobStepId;
 	private boolean persistTrace;
 	private SqlStatement upsStatement = null;
@@ -98,24 +98,20 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		binds.put("status_msg", statusMsg);
 		binds.put("thread_name", Thread.currentThread().getName());
 		binds.put("start_ts", new java.sql.Timestamp(System.currentTimeMillis()));
-		if (logger.isDebugEnabled()) {
-			logger.debug("job_log_insert\n{}", ss.getSql());
-		}
+		logger.debug("job_log_insert\n{}", ss.getSql());
 		ss.executeUpdate(binds);
 		joblogConnection.commit();
 		if (logger.isDebugEnabled()) {
-			logger.debug("started job {} ", jobLogId);
+			logger.debug("started job {} ", joblogId);
 			if (jobLogSelectSqlStatement2 == null) {
-				jobLogSelectSqlStatement2 = new SqlStatement("select * from job_log where job_log_id = :job_log_id");
+				jobLogSelectSqlStatement2 = new SqlStatement("select * from job_log where job_token = :job_token");
 			}
 			jobLogSelectSqlStatement2.setConnection(joblogConnection);
 			Binds selBinds = new Binds();
-			selBinds.put("job_log_id", jobLogId);
+			selBinds.put("job_token", token);
 			NameValue nvs = jobLogSelectSqlStatement2.getNameValue(selBinds, true);
 			logger.debug("persistJob select: {}", nvs.toString());
 		}
-
-		joblogConnection.commit();
 		return token;
 	}
 	/*
@@ -167,7 +163,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		NameValue nv = ss.getNameValue();
 		ss.close();
 		binds.put("tracefile_name", nv.get("value"));
-		
+        binds.put("serial_nbr",binds.get("serial#"));
 		return binds;
 	}
 
@@ -178,7 +174,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 
 	@Override
 	public long insertStep(String jobToken, String stepName, String className, String stepInfo, 
-			String stacktrace) {
+			String stacktrace) throws SQLException {
 		long retval = -1;
 		try {
 			if (sequenceHelper == null) {
@@ -186,19 +182,24 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 			}
 			this.jobStepId = sequenceHelper.getSequence("job_step_id_seq");
 			Binds binds = getSessionInfo(applicationConnection);
-			
-			SqlStatement ssJob = new SqlStatement(applicationConnection,
+			//
+			SqlStatement ssJob = new SqlStatement(joblogConnection,
 					"select * from job_log where job_token = :token");
 			binds.put("token",jobToken);
-			NameValue nvJob = ssJob.getNameValue(binds,true);
-
+			NameValue nvJob = null;
+			try {
+				nvJob = ssJob.getNameValue(binds,true);
+			} catch (org.javautil.core.sql.DataNotFoundException e) {
+				throw new IllegalArgumentException("no job_log found for " + jobToken);
+			}
+			//
 			binds.put("job_step_id", jobStepId);
 			binds.put("job_log_id", nvJob.get("job_log_id"));
 			binds.put("step_name", stepName);
 			binds.put("step_info", stepInfo);
 			binds.put("classname", className);
 			binds.put("start_ts", new java.sql.Timestamp(System.currentTimeMillis()));
-			binds.put("serial_nbr",binds.get("serial#"));
+		//	binds.put("serial_nbr",binds.get("serial_nbr"));
 			binds.put("stacktrace", stacktrace);
 			//binds.put("instance_name", );
 			if (statements == null) {
@@ -215,6 +216,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		} catch (SQLException sqe) {
 			sqe.printStackTrace();
 			logger.error(sqe.getMessage());
+			throw sqe;
 		}
 		return retval;
 	}
@@ -233,137 +235,137 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		joblogConnection.commit();
 	}
 
-	private void finishJob(SqlStatement ss) throws SQLException {
-		logger.debug("finishJob {} {}", jobLogId, ss.getSql());
+	private void finishJob(String token, SqlStatement ss) throws SQLException {
+		logger.debug("finishJob {} {}", token , ss.getSql());
 		ss.setConnection(joblogConnection);
 		Binds binds = new Binds();
-		binds.put("job_log_id", jobLogId);
+		binds.put("job_token",token );
 		binds.put("end_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		int rowcount = ss.executeUpdate(binds);
 		if (rowcount != 1) {
-			logger.warn("job_log not updated for {}", jobLogId);
+			logger.warn("job_log not updated for {}", token);
 		} else {
-			logger.info("finishJob: {}", jobLogId);
+			logger.info("finishJob: {}", token);
 		}
 
 		joblogConnection.commit();
-		logger.info("job " + jobLogId + " finished =====");
+		logger.info("job " + token + " finished =====");
 	}
 
 	@Override
 	public void abortJob(String token,Exception e) throws SQLException {
-		finishJob(statements.getSqlStatement("abort_job"));
+		finishJob(token,statements.getSqlStatement("abort_job"));
 	}
 
 	@Override
 	public void endJob(String token) throws SQLException {
 
-		finishJob(statements.getSqlStatement("end_job"));
+		finishJob(token,statements.getSqlStatement("end_job"));
 	}
 
-	protected ListOfNameValue getUtProcessStatus(long jobNbr) throws SQLException {
-		String sql = "select * from job_log order by job_log_id";
-		if (jobLogSelectSqlStatement == null) {
-			jobLogSelectSqlStatement = new SqlStatement(joblogConnection, sql);
-		}
-		return jobLogSelectSqlStatement.getListOfNameValue(new Binds());
+//	protected ListOfNameValue getUtProcessStatus(long jobNbr) throws SQLException {
+//		String sql = "select * from job_log order by job_log_id";
+//		if (jobLogSelectSqlStatement == null) {
+//			jobLogSelectSqlStatement = new SqlStatement(joblogConnection, sql);
+//		}
+//		return jobLogSelectSqlStatement.getListOfNameValue(new Binds());
+//
+//	}
+//
+//	public void showUtProcessStep() throws SQLException {
+//		String sql = "select * from job_step order by job_step_id";
+//		if (jobStepOrderSqlStatement == null) {
+//			jobStepOrderSqlStatement = new SqlStatement(joblogConnection, sql);
+//		}
+//		for (NameValue nv : jobStepOrderSqlStatement.getListOfNameValue(new Binds())) {
+//			System.out.println(nv);
+//		}
+//
+//	}
 
-	}
-
-	public void showUtProcessStep() throws SQLException {
-		String sql = "select * from job_step order by job_step_id";
-		if (jobStepOrderSqlStatement == null) {
-			jobStepOrderSqlStatement = new SqlStatement(joblogConnection, sql);
-		}
-		for (NameValue nv : jobStepOrderSqlStatement.getListOfNameValue(new Binds())) {
-			System.out.println(nv);
-		}
-
-	}
-
-	public void updateJob(long jobId) throws SQLException {
-		String ups = "select tracefile_name from job_log " + "where job_log_id = :job_log_id";
-
-		String upd = "update job_log " + "set tracefile_data =  ?, " + "    tracefile_json =  ? "
-				+ "where job_log_id = ?";
-
-		logger.info("updating job {}", jobId);
-		if (upsStatement == null) {
-			upsStatement = new SqlStatement(joblogConnection, ups);
-		}
-		Binds binds = new Binds();
-		binds.put("job_log_id", jobId);
-		NameValue upsRow = upsStatement.getNameValue(binds, true);
-		//
-		//		String traceFileName = upsRow.getString("tracefile_name");
-		//		if (traceFileName == null) {
-		//			logger.warn("tracefileName is null");
-		//			//throw new IllegalStateException("traceFileName is null");
-		//		} else {
-		//			//
-		//			//
-		//			// TODO this is reading directly from the file 
-		//			Clob clob = connection.createClob();
-		//			String tracefileData = null;
-		//			try {
-		//				tracefileData = FileUtil.getAsString(traceFileName);
-		//			} catch (IOException e) {
-		//				logger.error(e.getMessage());
-		//			}
-		//			clob.setString(1, tracefileData);
-		//			//
-		//			Clob jsonClob = connection.createClob();
-
-
-		//			OracleTraceProcessor tfr;
-		//			try {
-		//				tfr = new OracleTraceProcessor(connection, traceFileName);
-		//				tfr.process();
-		//				CursorsStats cursorStats = tfr.getCursors();
-		//				String jsonString = cursorStats.toString();
-		//				jsonClob.setString(1, jsonString);
-		//
-		//				PreparedStatement updateTraceFile = connection.prepareStatement(upd);
-		//
-		//				updateTraceFile.setClob(1, clob);
-		//				updateTraceFile.setClob(2, jsonClob);
-		//				updateTraceFile.setLong(3, jobId);
-		//				int count = updateTraceFile.executeUpdate();
-		//
-		//				binds.put("tracefile_data", clob);
-		//				if (count != 1) {
-		//					throw new IllegalArgumentException("unable to update job_log_id " + jobId);
-		//				}
-		//				logger.info("updated {}", jobId);
-		//			} catch (IOException e) {
-		//				e.printStackTrace();
-		//				logger.error(e.getMessage());
-		//			}
-		//		}
-	}
+//	public void updateJob(long jobId) throws SQLException {
+//		String ups = "select tracefile_name from job_log " + "where job_log_id = :job_log_id";
+//
+//		String upd = "update job_log " + "set tracefile_data =  ?, " + "    tracefile_json =  ? "
+//				+ "where job_log_id = ?";
+//
+//		logger.info("updating job {}", jobId);
+//		if (upsStatement == null) {
+//			upsStatement = new SqlStatement(joblogConnection, ups);
+//		}
+//		Binds binds = new Binds();
+//		binds.put("job_log_id", jobId);
+//		NameValue upsRow = upsStatement.getNameValue(binds, true);
+//		//
+//		//		String traceFileName = upsRow.getString("tracefile_name");
+//		//		if (traceFileName == null) {
+//		//			logger.warn("tracefileName is null");
+//		//			//throw new IllegalStateException("traceFileName is null");
+//		//		} else {
+//		//			//
+//		//			//
+//		//			// TODO this is reading directly from the file 
+//		//			Clob clob = connection.createClob();
+//		//			String tracefileData = null;
+//		//			try {
+//		//				tracefileData = FileUtil.getAsString(traceFileName);
+//		//			} catch (IOException e) {
+//		//				logger.error(e.getMessage());
+//		//			}
+//		//			clob.setString(1, tracefileData);
+//		//			//
+//		//			Clob jsonClob = connection.createClob();
+//
+//
+//		//			OracleTraceProcessor tfr;
+//		//			try {
+//		//				tfr = new OracleTraceProcessor(connection, traceFileName);
+//		//				tfr.process();
+//		//				CursorsStats cursorStats = tfr.getCursors();
+//		//				String jsonString = cursorStats.toString();
+//		//				jsonClob.setString(1, jsonString);
+//		//
+//		//				PreparedStatement updateTraceFile = connection.prepareStatement(upd);
+//		//
+//		//				updateTraceFile.setClob(1, clob);
+//		//				updateTraceFile.setClob(2, jsonClob);
+//		//				updateTraceFile.setLong(3, jobId);
+//		//				int count = updateTraceFile.executeUpdate();
+//		//
+//		//				binds.put("tracefile_data", clob);
+//		//				if (count != 1) {
+//		//					throw new IllegalArgumentException("unable to update job_log_id " + jobId);
+//		//				}
+//		//				logger.info("updated {}", jobId);
+//		//			} catch (IOException e) {
+//		//				e.printStackTrace();
+//		//				logger.error(e.getMessage());
+//		//			}
+//		//		}
+	// }
 
 	public Connection getConnection() {
 		return joblogConnection;
 	}
 
-	public void updateTraceFileName(String appTracefileName) throws SQLException {
-		logger.info("*** updating trace to {}", appTracefileName);
-		if (updateJobLogSqlStatement == null) {
-			updateJobLogSqlStatement = new SqlStatement(joblogConnection,
-					"update job_log set tracefile_name = :tracefile_name " + "where job_log_id = :job_log_id");
-		}
-		Binds binds = new Binds();
-		binds.put("tracefile_name", appTracefileName);
-		binds.put("job_log_id", jobLogId);
-		int rowCount = updateJobLogSqlStatement.executeUpdate(binds);
-		joblogConnection.commit();
-		if (rowCount != 1) {
-			logger.error("Unable to update job_log for {}", jobLogId);
-		} else {
-			logger.info("updated job_log {}", appTracefileName);
-		}
-
-	}
+//	public void updateTraceFileName(String appTracefileName) throws SQLException {
+//		logger.info("*** updating trace to {}", appTracefileName);
+//		if (updateJobLogSqlStatement == null) {
+//			updateJobLogSqlStatement = new SqlStatement(joblogConnection,
+//					"update job_log set tracefile_name = :tracefile_name " + "where job_log_id = :job_log_id");
+//		}
+//		Binds binds = new Binds();
+//		binds.put("tracefile_name", appTracefileName);
+//		binds.put("job_log_id", jobLogId);
+//		int rowCount = updateJobLogSqlStatement.executeUpdate(binds);
+//		joblogConnection.commit();
+//		if (rowCount != 1) {
+//			logger.error("Unable to update job_log for {}", jobLogId);
+//		} else {
+//			logger.info("updated job_log {}", appTracefileName);
+//		}
+//
+//	}
 
 	@Override
 	public void persistenceUpdateTrace(long jobId, Clob traceClob) throws SQLException {

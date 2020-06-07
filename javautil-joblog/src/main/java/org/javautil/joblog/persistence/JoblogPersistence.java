@@ -13,7 +13,7 @@ public interface JoblogPersistence {
 
 	long insertStep(String jobToken, String stepName, String stepInfo, String className) throws SQLException;
 	long insertStep(String jobToken, String stepName, String stepInfo, String className, 
-			String stack);
+			String stack) throws SQLException;
 	void finishStep(long jobStepId) throws SQLException;
 
 

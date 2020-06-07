@@ -1,6 +1,6 @@
 package org.javautil.joblog.installer;
 
-import static org.junit.Assert.assertEquals;
+
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -151,7 +151,7 @@ public class JoblogOracleInstall {
 		ListOfNameValue lonv = ss.getListOfNameValue();
 		logger.debug("lnnv {}",lonv);
 		for (NameValue nv : lonv) {
-			assertEquals("VALID",nv.get("status"));
+			assert("VALID".equals(nv.get("status")));
 		}
 		ss.close();	
 	}

@@ -39,7 +39,7 @@ public class H2Install extends AbstractDbloggerDatabaseObjectsInstaller implemen
 			dropObjects();
 		}
 		logger.info("creating logger tables for h2");
-		final String createTablesResource = "ddl/h2/dblogger_install_tables.sr.sql";
+		final String createTablesResource = "ddl/oracle/job_tables.sr.sql";
 		logger.info("about to call SqlRunner showSql {}", showSql);
 
 		new SqlRunner(this, createTablesResource).setConnection(connection).setShowSql(showSql)

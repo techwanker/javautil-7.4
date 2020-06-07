@@ -35,7 +35,7 @@ insert into job_step (
         job_step_id,   job_log_id, step_name, 
         classname,     step_info, 
         start_ts,      stacktrace,
-        tracefile_name, sid, serial#
+        tracefile_name, sid, serial_nbr
 ) values (
         :job_step_id, :job_log_id, :step_name,:step_info, 
         :classname,   :start_ts,   :stacktrace,
@@ -63,10 +63,10 @@ UPDATE job_log
 SET 
     status_msg = 'ABORT',
     end_ts = :end_ts
-where job_log_id = :job_log_id;
+where job_token = :job_token;
 --@name end_job
 UPDATE job_log
 SET   
        status_msg = 'DONE',
        end_ts    = :end_ts
-where job_log_id = :job_log_id;
+where job_token = :job_token;

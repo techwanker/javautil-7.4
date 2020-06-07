@@ -58,7 +58,7 @@ create table job_step (
     --cursor_info_run_id      number(9) references cursor_info_run,
     stacktrace              varchar(4000),
     sid                     number(8),
-    serial#                 number(8),
+    serial_nbr                 number(8),
     instance_name            varchar(16),
     constraint job_step_pk primary key (job_step_id),
     constraint step_status_fk
