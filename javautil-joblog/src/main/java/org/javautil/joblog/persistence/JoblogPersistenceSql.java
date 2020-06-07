@@ -16,16 +16,45 @@ import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.NamedSqlStatements;
 import org.javautil.core.sql.SequenceHelper;
 import org.javautil.core.sql.SqlStatement;
-import org.javautil.lang.ThreadUtil;
 import org.javautil.oracle.OracleConnectionHelper;
-import org.javautil.util.ListOfNameValue;
 import org.javautil.util.NameValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO these should all throw Dblogger exception, don't want
+/*
+create or replace view my_session_process as 
+select 
+s.SADDR, s.SID, s.SERIAL#, s.AUDSID , s.PADDR,
+s.USER#, s.USERNAME, s.COMMAND, s.OWNERID, s.TADDR, 
+s.LOCKWAIT, s.STATUS , s.SERVER , s.SCHEMA#, s.SCHEMANAME, 
+s.OSUSER , s.PROCESS, s.MACHINE, s.PORT, s.TERMINAL, 
+s.PROGRAM, s.TYPE, s.SQL_ADDRESS, s.SQL_HASH_VALUE, s.SQL_ID ,
+s.SQL_CHILD_NUMBER, s.SQL_EXEC_START , s.SQL_EXEC_ID, 
+s.PREV_SQL_ADDR, s.PREV_HASH_VALUE, s.PREV_SQL_ID, s.PREV_CHILD_NUMBER, s.PREV_EXEC_START, s.PREV_EXEC_ID, 
+s.PLSQL_ENTRY_OBJECT_ID, s.PLSQL_ENTRY_SUBPROGRAM_ID, s.PLSQL_OBJECT_ID, s.PLSQL_SUBPROGRAM_ID, s.MODULE , 
+s.MODULE_HASH, s.ACTION , s.ACTION_HASH, s.CLIENT_INFO, s.FIXED_TABLE_SEQUENCE,
+s.ROW_WAIT_OBJ#, s.ROW_WAIT_FILE# , s.ROW_WAIT_BLOCK#, s.ROW_WAIT_ROW#, s.TOP_LEVEL_CALL#,
+s.LOGON_TIME, s.LAST_CALL_ET, s.PDML_ENABLED, s.FAILOVER_TYPE, s.FAILOVER_METHOD,
+s.FAILED_OVER, s.RESOURCE_CONSUMER_GROUP,
+s.PDML_STATUS, s.PDDL_STATUS, s.PQ_STATUS, s.CURRENT_QUEUE_DURATION , s.CLIENT_IDENTIFIER, s.BLOCKING_SESSION_STATUS,
+s.BLOCKING_INSTANCE, s.BLOCKING_SESSION, s.FINAL_BLOCKING_SESSION_STATUS, s.FINAL_BLOCKING_INSTANCE, s.FINAL_BLOCKING_SESSION ,
+s.SEQ#, s.EVENT# , s.EVENT, s.P1TEXT , s.P1,
+s.P1RAW, s.P2TEXT , s.P2, s.P2RAW, s.P3TEXT ,
+s.P3, s.P3RAW, s.WAIT_CLASS_ID, s.WAIT_CLASS#, s.WAIT_CLASS,
+s.WAIT_TIME, s.SECONDS_IN_WAIT, s.STATE, s.WAIT_TIME_MICRO, s.TIME_REMAINING_MICRO,
+s.TIME_SINCE_LAST_WAIT_MICRO, s.SERVICE_NAME, s.SQL_TRACE, s.SQL_TRACE_WAITS, s.SQL_TRACE_BINDS,
+s.SQL_TRACE_PLAN_STATS, s.SESSION_EDITION_ID, s.CREATOR_ADDR, s.CREATOR_SERIAL#, s.ECID,
+s.SQL_TRANSLATION_PROFILE_ID, s.PGA_TUNABLE_MEM, s.SHARD_DDL_STATUS, s.CON_ID , s.EXTERNAL_NAME,
+s.PLSQL_DEBUGGER_CONNECTED, p.PID, p.SOSID, p.SPID, p.STID,
+p.EXECUTION_TYPE , p.PNAME, p.TRACEID, p.TRACEFILE, p.BACKGROUND,
+p.LATCHWAIT, p.LATCHSPIN, p.PGA_USED_MEM, p.PGA_ALLOC_MEM, p.PGA_FREEABLE_MEM,
+p.PGA_MAX_MEM, p.NUMA_DEFAULT, p.NUMA_CURR 
+from    sys.v$session s, sys.v$process p
+where s.audsid = userenv('sessionid') and
+s.paddr = p.addr;
+*/// TODO these should all throw Dblogger exception, don't want
 //  to blow up a job because of an error in the logger
-public class JoblogPersistenceSql implements JoblogPersistence {
+public class JoblogPersistenceSql extends AbstractJoblogPersistence implements JoblogPersistence {
 
 	private Logger logger = LoggerFactory.getLogger(JoblogPersistenceSql.class);
 
@@ -37,16 +66,16 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 	protected NamedSqlStatements statements;
 	//private long jobLogId = -1;
 	private long jobStepId;
-	private boolean persistTrace;
-	private SqlStatement upsStatement = null;
-	private SqlStatement jobStepOrderSqlStatement;
-	private SqlStatement jobLogSelectSqlStatement;
-	private SqlStatement updateJobLogSqlStatement;
+//	private boolean persistTrace;
+//	private SqlStatement upsStatement = null;
+//	private SqlStatement jobStepOrderSqlStatement;
+//	private SqlStatement jobLogSelectSqlStatement;
+//	private SqlStatement updateJobLogSqlStatement;
 	private SqlStatement jobLogSelectSqlStatement2;
 	
 	private static transient final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss.SSS");
 
-	private boolean persistPlans;
+//	private boolean persistPlans;
 
 	private boolean throwExceptions;
 	public JoblogPersistenceSql(Connection joblogConnection,
@@ -73,12 +102,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		return sdf.format(new Date());
 
 	}
-	@Override
-	public String joblogInsert(final String processName, 
-			String className, String moduleName 
-			) throws SQLException {
-		return joblogInsert(processName, className, moduleName,"");
-	}
+
 	@Override
 	public String joblogInsert(final String processName, 
 			String className, String moduleName, String statusMsg 
@@ -114,38 +138,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		}
 		return token;
 	}
-	/*
-	create or replace view my_session_process as 
-    select 
-    s.SADDR, s.SID, s.SERIAL#, s.AUDSID , s.PADDR,
-    s.USER#, s.USERNAME, s.COMMAND, s.OWNERID, s.TADDR, 
-    s.LOCKWAIT, s.STATUS , s.SERVER , s.SCHEMA#, s.SCHEMANAME, 
-    s.OSUSER , s.PROCESS, s.MACHINE, s.PORT, s.TERMINAL, 
-    s.PROGRAM, s.TYPE, s.SQL_ADDRESS, s.SQL_HASH_VALUE, s.SQL_ID ,
-    s.SQL_CHILD_NUMBER, s.SQL_EXEC_START , s.SQL_EXEC_ID, 
-    s.PREV_SQL_ADDR, s.PREV_HASH_VALUE, s.PREV_SQL_ID, s.PREV_CHILD_NUMBER, s.PREV_EXEC_START, s.PREV_EXEC_ID, 
-    s.PLSQL_ENTRY_OBJECT_ID, s.PLSQL_ENTRY_SUBPROGRAM_ID, s.PLSQL_OBJECT_ID, s.PLSQL_SUBPROGRAM_ID, s.MODULE , 
-    s.MODULE_HASH, s.ACTION , s.ACTION_HASH, s.CLIENT_INFO, s.FIXED_TABLE_SEQUENCE,
-    s.ROW_WAIT_OBJ#, s.ROW_WAIT_FILE# , s.ROW_WAIT_BLOCK#, s.ROW_WAIT_ROW#, s.TOP_LEVEL_CALL#,
-    s.LOGON_TIME, s.LAST_CALL_ET, s.PDML_ENABLED, s.FAILOVER_TYPE, s.FAILOVER_METHOD,
-    s.FAILED_OVER, s.RESOURCE_CONSUMER_GROUP,
-    s.PDML_STATUS, s.PDDL_STATUS, s.PQ_STATUS, s.CURRENT_QUEUE_DURATION , s.CLIENT_IDENTIFIER, s.BLOCKING_SESSION_STATUS,
-    s.BLOCKING_INSTANCE, s.BLOCKING_SESSION, s.FINAL_BLOCKING_SESSION_STATUS, s.FINAL_BLOCKING_INSTANCE, s.FINAL_BLOCKING_SESSION ,
-    s.SEQ#, s.EVENT# , s.EVENT, s.P1TEXT , s.P1,
-    s.P1RAW, s.P2TEXT , s.P2, s.P2RAW, s.P3TEXT ,
-    s.P3, s.P3RAW, s.WAIT_CLASS_ID, s.WAIT_CLASS#, s.WAIT_CLASS,
-    s.WAIT_TIME, s.SECONDS_IN_WAIT, s.STATE, s.WAIT_TIME_MICRO, s.TIME_REMAINING_MICRO,
-    s.TIME_SINCE_LAST_WAIT_MICRO, s.SERVICE_NAME, s.SQL_TRACE, s.SQL_TRACE_WAITS, s.SQL_TRACE_BINDS,
-    s.SQL_TRACE_PLAN_STATS, s.SESSION_EDITION_ID, s.CREATOR_ADDR, s.CREATOR_SERIAL#, s.ECID,
-    s.SQL_TRANSLATION_PROFILE_ID, s.PGA_TUNABLE_MEM, s.SHARD_DDL_STATUS, s.CON_ID , s.EXTERNAL_NAME,
-    s.PLSQL_DEBUGGER_CONNECTED, p.PID, p.SOSID, p.SPID, p.STID,
-    p.EXECUTION_TYPE , p.PNAME, p.TRACEID, p.TRACEFILE, p.BACKGROUND,
-    p.LATCHWAIT, p.LATCHSPIN, p.PGA_USED_MEM, p.PGA_ALLOC_MEM, p.PGA_FREEABLE_MEM,
-    p.PGA_MAX_MEM, p.NUMA_DEFAULT, p.NUMA_CURR 
-    from    sys.v$session s, sys.v$process p
-    where s.audsid = userenv('sessionid') and
-    s.paddr = p.addr;
-  */
+	
 
 	public Binds getSessionInfo(Connection conn) throws SQLException {
 		Binds binds;
@@ -167,14 +160,9 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 		return binds;
 	}
 
-	public long insertStep(String jobToken, String stepName, String stepInfo, String className) throws SQLException {
-		String stackTrace = ThreadUtil.getStackTrace(2);
-		return insertStep(jobToken, stepName, stepInfo, className, stackTrace);
-	}
 
 	@Override
-	public long insertStep(String jobToken, String stepName, String className, String stepInfo, 
-			String stacktrace) throws SQLException {
+	public long insertStep(String jobToken, String stepName, String className, String stepInfo ) throws SQLException {
 		long retval = -1;
 		try {
 			if (sequenceHelper == null) {
@@ -200,7 +188,7 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 			binds.put("classname", className);
 			binds.put("start_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		//	binds.put("serial_nbr",binds.get("serial_nbr"));
-			binds.put("stacktrace", stacktrace);
+			binds.put("stacktrace", null);
 			//binds.put("instance_name", );
 			if (statements == null) {
 				throw new IllegalStateException("statements is null");
@@ -394,67 +382,66 @@ public class JoblogPersistenceSql implements JoblogPersistence {
 //	public Clob createClob() throws SQLException {
 //		return joblogConnection.createClob();
 //	}
+//
+//	@Override
+//	public void setPersistTraceOnJobCompletion(boolean persistTrace) {
+//		this.persistTrace = persistTrace;
+//
+//	}
+//
+//	@Override
+//	public void setPersistPlansOnJobCompletion(boolean persistPlans) {
+//		this.persistPlans = persistPlans;
+//
+//	}
+//
+//	@Override
+//	public long getNextJobLogId() {
+//		long retval = -1;
+//		try {
+//			retval = sequenceHelper.getSequence("job_log_id_seq");
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//			logger.error(e.getMessage(), e);
+//			if (throwExceptions) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+//		return retval;
+//	}
 
-	@Override
-	public void setPersistTraceOnJobCompletion(boolean persistTrace) {
-		this.persistTrace = persistTrace;
-
-	}
-
-	@Override
-	public void setPersistPlansOnJobCompletion(boolean persistPlans) {
-		this.persistPlans = persistPlans;
-
-	}
-
-	@Override
-	public long getNextJobLogId() {
-		long retval = -1;
-		try {
-			retval = sequenceHelper.getSequence("job_log_id_seq");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-			if (throwExceptions) {
-				throw new RuntimeException(e);
-			}
-		}
-		return retval;
-	}
-
-
-	@Override
-	public void prepareConnection() throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setModule(String string, String string2) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setAction(String string) {
-		// TODO Auto-generated method stub
-
-	}
-
-
-
-	@Override
-	public void setPersistPlansOnSQLExceptionJobCompletion(boolean persistPlans) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void ensureDatabaseObjects() throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
+//
+//	@Override
+//	public void prepareConnection() throws SQLException {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//	@Override
+//	public void setModule(String string, String string2) throws SQLException {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//	@Override
+//	public void setAction(String string) {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
+//
+//	/*
+//	 * @Override public void setPersistPlansOnSQLExceptionJobCompletion(boolean
+//	 * persistPlans) { // TODO Auto-generated method stub
+//	 * 
+//	 * }
+//	 */
+//	@Override
+//	public void ensureDatabaseObjects() throws SQLException {
+//		// TODO Auto-generated method stub
+//
+//	}
+//
 
 
 }

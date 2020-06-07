@@ -13,19 +13,19 @@ import org.javautil.lang.ThreadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JoblogPersistencePackage implements JoblogPersistence {
+public class JoblogPersistencePackage extends AbstractJoblogPersistence implements JoblogPersistence {
 
 	private Connection connection;
 	private CallableStatement persistJobStatement;
 	private CallableStatement abortJobStatement;
 	private CallableStatement endJobStatement;
 	private CallableStatement insertStepStatement;
-	private SequenceHelper sequenceHelper;
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	private boolean throwExceptions;
+	SequenceHelper sequenceHelper;
+	Logger logger = LoggerFactory.getLogger(getClass());
+	boolean throwExceptions;
 	private CallableStatement finishStepStatement;
-	private boolean persistTraceOnJobCompletion;
-	private boolean persistPlansOnJobCompletion;
+	boolean persistTraceOnJobCompletion;
+	boolean persistPlansOnJobCompletion;
 
 	public JoblogPersistencePackage(Connection connection) throws SQLException {
 		this.connection = connection;
@@ -79,13 +79,9 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 		endJobStatement.execute();
 	}
 	
+	
 	@Override
 	public long insertStep(String jobToken, String stepName, String stepInfo, String className) {
-		return insertStep(jobToken, stepName, stepInfo, className, ""); 
-	}
-
-	@Override
-	public long insertStep(String jobToken, String stepName, String stepInfo, String className, String stack) {
 		long jobStepId = -1L;
 		String callSql = "begin \n"
 				+ ":p_job_step_id := joblog.job_step_insert (\n"
@@ -166,65 +162,6 @@ public class JoblogPersistencePackage implements JoblogPersistence {
 	@Override
 	public void persistenceUpdateTrace(long jobId, Clob traceData) throws SQLException {
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void setPersistTraceOnJobCompletion(boolean persistTrace) {
-		this.persistTraceOnJobCompletion = persistTrace;
-	}
-
-	@Override
-	public void setPersistPlansOnJobCompletion(boolean persistPlans) {
-		this.persistPlansOnJobCompletion = persistPlans;
-	}
-
-	
-
-	@Override
-	public long getNextJobLogId() {
-		long retval = -1L;
-		try {
-			retval = sequenceHelper.getSequence("job_log_id_seq");
-		} catch (SQLException e) {
-			if (throwExceptions) {
-				throw new RuntimeException(e);
-			} else {
-				logger.error(e.getMessage());
-			}
-		}
-		return retval;
-	}
-
-	@Override
-	public void prepareConnection() throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setModule(String string, String string2) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setAction(String string) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setPersistPlansOnSQLExceptionJobCompletion(boolean persistPlans) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void ensureDatabaseObjects() throws SQLException {
-		// TODO Auto-generated method stub
-		
 	}
 
 

@@ -32,7 +32,7 @@ public class JoblogForOracleExample {
 		joblog.prepareConnection();
 
 		try {
-			jobToken = joblog.joblogInsert(processName, getClass().getName(), "ExampleLogging");
+			jobToken = joblog.joblogInsert(processName, getClass().getName(), "JoblogForOracleExample");
 			logger.debug("============================ token: {}", jobToken);
 			limitedFullJoin();
 			fullJoin();

@@ -18,6 +18,7 @@ import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.joblog.installer.H2Install;
 import org.javautil.joblog.installer.JoblogOracleInstall;
+import org.javautil.joblog.persistence.AbstractJoblogPersistence;
 import org.javautil.joblog.persistence.JoblogPersistence;
 import org.javautil.joblog.persistence.JoblogPersistencePackage;
 import org.javautil.joblog.persistence.JoblogPersistenceSql;
@@ -38,7 +39,7 @@ public class JoblogH2ExampleTest  {
 	static DataSource jobDataSource;
 	static Connection joblogConnection;
 	static JoblogPersistence joblogPersistence;
-	static JoblogPersistencePackage oraclePackagePersistence;
+	static JoblogPersistence oraclePackagePersistence;
 	boolean showSql = false;
 	
 	@BeforeClass
@@ -48,7 +49,7 @@ public class JoblogH2ExampleTest  {
 		applicationDataSource = dsf.getDatasource("integration_oracle");
 		applicationConnection = applicationDataSource.getConnection();
 		
-		jobDataSource = DataSourceFactory.getH2Permanent("/tmp/J0bLogTest", "sa", "tutorial");
+		jobDataSource = DataSourceFactory.getH2Permanent("/tmp/JobLogTest1", "sa", "tutorial");
 		joblogConnection = jobDataSource.getConnection();
 		SqlStatement dropJoblog = new SqlStatement(joblogConnection,"drop all objects");
 		dropJoblog.execute(new Binds());
@@ -64,7 +65,7 @@ public class JoblogH2ExampleTest  {
 		((Closeable) jobDataSource).close();
 	}
 
-	@Test
+//	@Test
 	public void testDirectly() throws SQLException {
 		String token = joblogPersistence.joblogInsert("DbLoggerForOracle", getClass().getName(), "ExampleLogging");
 		SqlStatement ss = new SqlStatement("select * from job_log where job_token = :token");
@@ -99,7 +100,7 @@ public class JoblogH2ExampleTest  {
 		assertEquals("main", jobNv.get("thread_name"));
 		assertNotNull(jobNv.get("start_ts"));
 		assertEquals("N", jobNv.get("ignore_flg"));
-		assertEquals("ExampleLogging", jobNv.get("module_name"));
+		assertEquals("JoblogForOracleExample", jobNv.get("module_name"));
 		assertEquals("org.javautil.joblog.JoblogForOracleExample", jobNv.get("classname"));
 		//
 		SqlStatement stepSs = new SqlStatement(

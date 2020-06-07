@@ -3,7 +3,7 @@ package org.javautil.joblog.persistence;
 import java.sql.Clob;
 import java.sql.SQLException;
 
-public class JoblogPersistenceNoOperation implements JoblogPersistence
+public class JoblogPersistenceNoOperation extends AbstractJoblogPersistence implements JoblogPersistence
 {
 
 	@Override
@@ -45,35 +45,7 @@ public class JoblogPersistenceNoOperation implements JoblogPersistence
 		return -1;
 	}
 
-	@Override
-	public long insertStep(String jobToken, String stepName, String stepInfo, String className, String stack) {
-		return -1;
-	}
 
-	@Override
-	public void setPersistTraceOnJobCompletion(boolean persistTrace) {
-	}
-
-	@Override
-	public void setPersistPlansOnJobCompletion(boolean persistPlans) {
-	}
-
-
-	public void ensureDatabaseObjects() {
-	}
-
-//
-//	@Override
-//	public Clob createClob() throws SQLException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
-	@Override
-	public void persistenceUpdateTrace(long jobId, Clob traceData) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 
 	
 
@@ -83,25 +55,10 @@ public class JoblogPersistenceNoOperation implements JoblogPersistence
 		return 0;
 	}
 
-//	@Override
-//	public long jobLogInsert(String processName, String className, String moduleName, long jobId) {
-//		// TODO Auto-generated method stub
-//		return 0;
-//	}
-
 	@Override
-	public void setPersistPlansOnSQLExceptionJobCompletion(boolean persistPlans) {
+	public void persistenceUpdateTrace(long jobId, Clob traceData) throws SQLException {
 		// TODO Auto-generated method stub
 		
 	}
-
-
-
-
-//    @Override
-//    public long beginJob(String processName, String processInfo, int traceLevel) {
-//        // TODO Auto-generated method stub
-//        return 0;
-//    }
 
 }

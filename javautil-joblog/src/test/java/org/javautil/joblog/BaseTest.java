@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.javautil.core.sql.DataSourceFactory;
 import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.joblog.installer.JoblogOracleInstall;
+import org.javautil.joblog.persistence.AbstractJoblogPersistence;
 import org.javautil.joblog.persistence.JoblogPersistence;
 import org.javautil.joblog.persistence.JoblogPersistencePackage;
 import org.javautil.joblog.persistence.JoblogPersistenceSql;
@@ -31,7 +32,7 @@ public class BaseTest {
 	static Connection loggerConnection;
 	static JoblogPersistence joblogPersistence;
 	private static Logger logger = LoggerFactory.getLogger(BaseTest.class);
-	static JoblogPersistencePackage oraclePackagePersistence;
+	static JoblogPersistence oraclePackagePersistence;
 	boolean showSql = false;
 
 	@BeforeClass
@@ -85,7 +86,7 @@ public class BaseTest {
 		this.showSql = showSql;
 	}
 
-	public static JoblogPersistencePackage getOraclePackagePersistence() {
-		return oraclePackagePersistence;
-	}
+//	public static JoblogPersistence getOraclePackagePersistence() {
+//		return oraclePackagePersistence;
+//	}
 }

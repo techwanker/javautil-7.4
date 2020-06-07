@@ -67,7 +67,7 @@ public class JoblogForOracleExampleTest extends BaseTest {
 		assertEquals("main", jobNv.get("thread_name"));
 		assertNotNull(jobNv.get("start_ts"));
 		assertEquals("N", jobNv.get("ignore_flg"));
-		assertEquals("ExampleLogging", jobNv.get("module_name"));
+		assertEquals("JoblogForOracleExample", jobNv.get("module_name"));
 		assertEquals("org.javautil.joblog.JoblogForOracleExample", jobNv.get("classname"));
 		//
 		SqlStatement stepSs = new SqlStatement(

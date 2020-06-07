@@ -11,9 +11,7 @@ public interface JoblogPersistence {
 
 	void endJob(String jobToken) throws SQLException;
 
-	long insertStep(String jobToken, String stepName, String stepInfo, String className) throws SQLException;
-	long insertStep(String jobToken, String stepName, String stepInfo, String className, 
-			String stack) throws SQLException;
+	long insertStep(String jobToken, String stepName, String className, String stepInfo) throws SQLException;
 	void finishStep(long jobStepId) throws SQLException;
 
 
@@ -27,9 +25,7 @@ public interface JoblogPersistence {
 	 * 
 	 * @param persistTrace true if the trace file should be written to the database
 	 */
-	public void setPersistTraceOnJobCompletion(boolean persistTrace);
 
-	public void setPersistPlansOnSQLExceptionJobCompletion(boolean persistPlans);
 
 	long getNextJobLogId();
 
@@ -41,12 +37,8 @@ public interface JoblogPersistence {
 	void setAction(String string);
 
 	void ensureDatabaseObjects() throws SQLException;
-
+	void setPersistTraceOnJobCompletion(boolean persistTrace);
 	void setPersistPlansOnJobCompletion(boolean persistPlans);
-
-
-
-
 
 
 }
