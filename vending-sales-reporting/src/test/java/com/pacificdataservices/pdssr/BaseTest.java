@@ -15,6 +15,9 @@ public class BaseTest extends DbTest {
 	public Connection getConnection(Dialect dialect) throws SQLException, FileNotFoundException, PropertyVetoException {
 		Connection retval;
 		switch (dialect) {
+		case ORACLE:
+			retval = getOracleConnection();
+			break;
 		case POSTGRES:
 			retval = getPostgresConnection();
 			break;

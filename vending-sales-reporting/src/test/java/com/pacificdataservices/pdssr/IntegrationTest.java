@@ -34,8 +34,15 @@ public class IntegrationTest implements FilenameFilter {
 
 	public IntegrationTest() throws FileNotFoundException, PropertyVetoException, SQLException {
 	}
-
 	@Test
+	public void fullOracleDialectTest() throws SQLException, IOException, ParseException, PropertyVetoException, InvalidLoadFileException {
+		dialect = Dialect.ORACLE;
+		dbTest = new DbTest(Dialect.ORACLE);
+		conn = getConnection(Dialect.ORACLE);
+		fullTest(Dialect.ORACLE);
+	}
+	
+	//@Test
 	public void fullDialectTest() throws SQLException, IOException, ParseException, PropertyVetoException, InvalidLoadFileException {
 		dialect = Dialect.POSTGRES;
 		dbTest = new DbTest(Dialect.POSTGRES);
@@ -220,6 +227,9 @@ public class IntegrationTest implements FilenameFilter {
 			break;
 		case H2:
 			retval = dbTest.getH2Connection();
+			break;
+		case ORACLE:
+			retval = dbTest.getOracleConnection();
 			break;
 		default:
 			throw new IllegalArgumentException("unsupported dialect");

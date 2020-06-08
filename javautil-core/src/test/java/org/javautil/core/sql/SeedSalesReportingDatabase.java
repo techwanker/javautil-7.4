@@ -107,18 +107,18 @@ public class SeedSalesReportingDatabase {
 
 	void setSqlStatementsOracle(Connection connection) throws SQLException {
 
-		orgStmt = new SqlStatement("insert into org (org_cd, org_nm) " + " values (%(ORG_CD)s, %(ORG_NM)s)", connection);
+		orgStmt = new SqlStatement("insert into org (org_cd, org_nm) " + " values (:ORG_CD, :ORG_NM)", connection);
 
-		mfrStmt = new SqlStatement("insert into org_mfr( org_id,cds_mfr_id) " + "select org_id, %(CDS_MFR_ID)s "
+		mfrStmt = new SqlStatement("insert into org_mfr( org_id,cds_mfr_id) " + "select org_id, :CDS_MFR_ID "
 		    + "from   org " + "where org_cd = %(ORG_CD)s", connection); // TODO externalize
 		mfrStmt.useColonBind();
 
 		orgDistrib = new SqlStatement(
-		    "insert into org_distrib(org_id) " + "select org_id" + " from org " + "where org_cd = %(ORG_CD)s", connection)
+		    "insert into org_distrib(org_id) " + "select org_id" + " from org " + "where org_cd = :ORG_CD", connection)
 		        .useColonBind();
 
 		orgDatafeed = new SqlStatement(
-		    "insert into org_datafeed(org_id) " + "select org_id " + "from org " + "where org_cd = %(ORG_CD)s", connection);
+		    "insert into org_datafeed(org_id) " + "select org_id " + "from org " + "where org_cd = :ORG_CD", connection);
 		orgDatafeed.useColonBind();
 	}
 

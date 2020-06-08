@@ -199,8 +199,9 @@ create table job_step (
     stacktrace              varchar(4000),
     constraint job_step_pk primary key (job_step_id),
     constraint step_status_fk
-	foreign key (job_log_id) references job_log
-);
+	foreign key (job_log_id) references job_log  -- is_a
+)
+;--
 
 alter table job_msg 
 add constraint upl_ups_fk 

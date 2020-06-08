@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import org.javautil.core.misc.Timer;
 import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.Dialect;
+import org.javautil.core.sql.SequenceHelper;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.core.sql.SqlStatements;
 import org.javautil.util.ListOfNameValue;
@@ -44,7 +45,7 @@ public class CdsDataLoader implements FilenameFilter {
 
 	private static final String CUSTOMER_RECORD = "CD";
 	private static final String CUSTOMER_TOTAL_RECORD = "CT";
-	private static final String INVENTORY_RECOD = "IR";
+	private static final String INVENTORY_RECORD = "IR";
 	private static final String INVENTORY_TOTAL_RECORD = "IT";
 	private static final String SALES_RECORD = "SA";
 	private static final String SALES_TOTAL_RECORD = "AT";
@@ -55,7 +56,7 @@ public class CdsDataLoader implements FilenameFilter {
 		connection.setAutoCommit(false);
 		sqlNameByType.put(CUSTOMER_RECORD, "etl_customer_insert");
 		sqlNameByType.put(CUSTOMER_TOTAL_RECORD, "etl_customer_tot_insert");
-		sqlNameByType.put(INVENTORY_RECOD, "etl_inventory_insert");
+		sqlNameByType.put(INVENTORY_RECORD, "etl_inventory_insert");
 		sqlNameByType.put(INVENTORY_TOTAL_RECORD, "etl_inventory_tot_insert");
 		sqlNameByType.put(SALES_RECORD, "etl_sale_insert");
 		sqlNameByType.put(SALES_TOTAL_RECORD, "etl_sale_tot_insert");
@@ -75,7 +76,7 @@ public class CdsDataLoader implements FilenameFilter {
 	 */
 	public void process(String filename, Connection conn, String distributor_cd, boolean validate)
 			throws ParseException, IOException, SQLException {
-
+		SequenceHelper sequences = new SequenceHelper(conn);
 		long startTime = System.nanoTime();
 		Binds binds = new Binds();
 		binds.put("ORG_CD", distributor_cd);
@@ -103,6 +104,16 @@ public class CdsDataLoader implements FilenameFilter {
 				}
 				String hash = TreeHash.hash(info);
 				binds.put("INFO_HASH", hash);
+				long etlCustomerId = sequences.getSequence("etl_customer_id_seq");
+				binds.put("ETL_CUSTOMER_ID",etlCustomerId);
+			}
+			if (SALES_RECORD.equals(reader.getRecordType())) {
+				long etlSaleId = sequences.getSequence("etl_sale_id_seq");
+				binds.put("ETL_SALE_ID",etlSaleId);
+			}
+			if (INVENTORY_RECORD.equals(reader.getRecordType())) {
+				long etlInventoryId = sequences.getSequence("etl_inventory_id_seq");
+				binds.put("ETL_INVENTORY_ID",etlInventoryId);
 			}
 			logger.debug("line #: {} binds: {}", reader.getLineNumber(), binds);
 //			logger.debug("line#: {}\nline: {}\nsql:{}\nbinds: {}", reader.getLineNumber(), reader.getInputLine(),

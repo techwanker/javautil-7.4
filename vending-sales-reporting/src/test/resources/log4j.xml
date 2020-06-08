@@ -14,13 +14,13 @@
 		<priority value="warn" />
 	</category>
 		<category name="org.javautil.core.sql.SqlRunner">
-		<priority value="debug" />
+		<priority value="info" />
 	</category>
 	<category name="org.javautil.core.sql.SqlStatement">
-		<priority value="warn" />
+		<priority value="info" />
 	</category>
 	<category name="org.pacificdataservices.pdssr.CdsDataLoader">
-		<priority value="debug" />
+		<priority value="info" />
 	</category>
 	<root>
 		<priority value="info" />

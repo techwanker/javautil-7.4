@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +166,14 @@ public class SqlSplitterTest2 {
 		assertEquals(3, sqls.size());
 	}
 
+	 @Test
+	 public void utCondition() throws FileNotFoundException {
+		File    f = new File("src/main/resources/org/javautil/conditionidentification/ut_condition_tables.oracle.sr.sql");
+		
+		SqlSplitter splitter =  new SqlSplitter(f);
+		List<SqlStatement> stmts = splitter.getSqlStatementList();
+		logger.info("ut_condition statements\n{}",stmts);
+	 }
 	 
 
 	 //@Ignore

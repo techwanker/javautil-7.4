@@ -102,7 +102,7 @@ public class ConditionIdentificationPersistence {
 		SqlStatement utConditionRunStepIdSs = sqlStatements.getSqlStatement("ut_condition_run_step_id_seq");
 		utConditionRunStepIdSs.setConnection(connection);
 		long utConditionRunStepId = utConditionRunStepIdSs.nextval();
-		binds.put("ut_condition_run_step_id", utConditionRunStepId);
+		binds.put("UT_CONDITION_RUN_STEP_ID", utConditionRunStepId);
 
 		SqlStatement utConditionRunStepInsertSs = sqlStatements.getSqlStatement("ut_condition_run_step_insert");
 		utConditionRunStepInsertSs.setConnection(connection);

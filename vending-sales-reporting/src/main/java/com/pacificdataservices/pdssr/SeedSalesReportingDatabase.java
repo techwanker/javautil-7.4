@@ -21,21 +21,23 @@ public class SeedSalesReportingDatabase {
 
 	private Dialect dialect = Dialect.POSTGRES;
 
-	private SqlStatement orgStmt = new SqlStatement("insert into org (org_cd, org_nm) values (%(ORG_CD)s, %(ORG_NM)s)");
+	private SqlStatement orgStmt = new SqlStatement(
+			"insert into org (org_id, org_cd, org_nm) "
+			+ "values (org_id_seq.nextval,:ORG_CD, :ORG_NM)");
 	// private SqlStatement orgStmt = new SqlStatement("insert into org (org_cd,
 	// org_nm) values (:ORG_CD, :ORG_NM)");
 
 	private SqlStatement mfrStmt = new SqlStatement("insert into org_mfr( org_id,cds_mfr_id) "
-			+ "select org_id, %(CDS_MFR_ID)s " + "from   org " + "where org_cd = %(ORG_CD)s"); // TODO externalize
+			+ "select org_id, :CDS_MFR_ID " + "from   org " + "where org_cd = :ORG_CD"); // TODO externalize
 
 	private SqlStatement orgDistrib = new SqlStatement(
 			// "insert into org_distrib(org_id) " + "select org_id " + "from org " + "where
 			// org_cd = %(ORG_CD)s");
-			"insert into org_distrib(org_id,distrib_id) " + "select org_id, %(DISTRIB_ID)s " + "from org "
-					+ "where org_cd = %(ORG_CD)s");
+			"insert into org_distrib(org_id,distrib_id) " + "select org_id, :DISTRIB_ID " + "from org "
+					+ "where org_cd = :ORG_CD");
 
 	private SqlStatement orgDatafeed = new SqlStatement(
-			"insert into org_datafeed(org_id) " + "select org_id " + "from org " + "where org_cd = %(ORG_CD)s");
+			"insert into org_datafeed(org_id) " + "select org_id " + "from org " + "where org_cd = :ORG_CD");
 
 	ArrayList<String[]> mfrs = new ArrayList<String[]>();
 

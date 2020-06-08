@@ -209,12 +209,20 @@ public class SqlSplitter {
 				//	logger.debug("blockBegin type {} {}",blockBegin.getType(),blockBegin);
 				switch (blockBegin.getBlockType()) {
 				case STATEMENT:
-					line.setBlockNumber(blockNumber);
-					line.setBlockType(BlockType.STATEMENT);
 					line.setBlockLineNumber(blockLineNbr++);
+					if (line.getType().equals(LineType.SQL_WITH_SEMICOLON)) {
+						line.setBlockNumber(blockNumber);
+						line.setBlockType(BlockType.STATEMENT);
+						break loop;
+					}
 					if(	line.getType().isStatementEnd()) {
+						line.setBlockNumber(++blockNumber);
+						line.setBlockType(BlockType.STATEMENT_DIRECTIVE);
 						logger.debug("isStatementEnd {}",line.getType());
 						break loop;
+					} else {
+						line.setBlockNumber(blockNumber);
+						line.setBlockType(BlockType.STATEMENT);
 					}
 					break;
 				case STATEMENT_BLOCK:

@@ -4,11 +4,11 @@
     sql_text: >
             select etl_file_id
             from etl_file
-            where etl_file_id = %(ETL_FILE_ID)s
+            where etl_file_id = :ETL_FILE_ID
             and not exists (
                select 'x'
                from etl_customer_tot
-               where etl_file_id = %(ETL_FILE_ID)s
+               where etl_file_id = :ETL_FILE_ID
             )
     narrative: >
             There is no customer total record
@@ -22,15 +22,15 @@
     sql_text: >
             select etl_file_id
             from etl_file
-            where etl_file_id = %(ETL_FILE_ID)s
+            where etl_file_id = :ETL_FILE_ID
             and not exists (
                select 'x'
                from etl_customer_tot
-               where etl_file_id = %(ETL_FILE_ID)s
+               where etl_file_id = :ETL_FILE_ID
             ) and exists (
                select 'x'
                from etl_customer
-               where etl_file_id = %(ETL_FILE_ID)s
+               where etl_file_id = :ETL_FILE_ID
             )     
     narrative: >
             There is no customer total record but customers were reported
@@ -47,10 +47,10 @@
     sql_text: >
             select ec.etl_customer_id, ship_to_cust_id, ec.cust_nm, etl_file_id
             from etl_customer ec
-            where ec.etl_file_id = %(ETL_FILE_ID)s and not exists (
+            where ec.etl_file_id = :ETL_FILE_ID and not exists (
                select 'x'
                from etl_sale
-               where etl_sale.etl_file_id = %(ETL_FILE_ID)s and
+               where etl_sale.etl_file_id = :ETL_FILE_ID and
                      ec.ship_to_cust_id = etl_sale.ship_to_cust_id
             )
     severity: 1
@@ -65,11 +65,11 @@
     sql_text: >
             select etl_file_id
             from   etl_customer_tot
-            where  etl_file_id = %(ETL_FILE_ID)s
+            where  etl_file_id = :ETL_FILE_ID
             and customer_count is null or
                 customer_count != (select count(*)
                                  from etl_customer
-                                 where etl_file_id = %(ETL_FILE_ID)s)
+                                 where etl_file_id = :ETL_FILE_ID)
     severity: 7
     format_str: "Customer total is incorrect for etl_file %s "
     java_format: "Customer total is incorrect for etl_file %s "
@@ -81,7 +81,7 @@
     sql_text: >
             select etl_sale_id, ship_to_cust_id, etl_file_Id
             from   etl_sale
-            where  etl_file_id = %(ETL_FILE_ID)s and
+            where  etl_file_id = :ETL_FILE_ID and
             not exists (select 'x' from etl_customer
                         where etl_customer.ship_to_cust_id = etl_sale.ship_to_cust_id)
     narrative: >
@@ -108,7 +108,7 @@
                       from product
                       where product.case_gtin = etl_sale.case_gtin
                             or product.mfr_product_id = etl_sale.mfr_product_id)
-            and etl_file_id = %(ETL_FILE_ID)s
+            and etl_file_id = :ETL_FILE_ID
             order by etl_sale_id
     narrative: >
                 This sales does not identify an authoritative product

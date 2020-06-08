@@ -292,7 +292,8 @@ public class SqlStatement {
 		if (hasPythonBinds) {
 			bindList = pythonBindList;
 		}
-		logger.debug(String.format("binds: %s, sql: %s", binds, sql));
+		logger.debug("binds: {}, sql: {}", binds, sql);
+		logger.debug("bindList {}",bindList);
 		int i = 1;
 		for (final String bindName : bindList) {
 			try {
@@ -322,7 +323,7 @@ public class SqlStatement {
 					preparedStatement.setObject(i, binds.get(bindName));
 				}
 			} catch (final SQLException e) {
-				final String message = this.toString() + "\n" + binds + "\nexception: \n" + e.getMessage();
+				final String message = this.toString() + "\n" + binds + " for bind " + bindName +  "\nexception: \n" + e.getMessage();
 				logger.error(message);
 				throw new SQLException(message);
 			} catch (final IllegalArgumentException e) {
@@ -895,9 +896,9 @@ public class SqlStatement {
 		builder.append(sql);
 		// builder.append(", sqlOrig=\n");
 		// builder.append(sqlOrig);
-		builder.append(", preparedSql=\n");
+		builder.append("\n, preparedSql=\n");
 		builder.append(preparedSql);
-		builder.append(", description=");
+		builder.append("\n, description=");
 		builder.append(description);
 		builder.append(", narrative=");
 		builder.append(narrative);

@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 public class DbTest {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	private static DataSourceFactory dataSourceFactory = new DataSourceFactory();
 
 	private Dialect dialect;
 
@@ -58,6 +60,12 @@ public class DbTest {
 		parms.put("url", "jdbc:h2:/tmp/it.dbf");
 		DataSource ds = DataSourceFactory.getDatasource(parms);
 		return ds.getConnection();
+	}
+	
+	Connection getOracleConnection() throws PropertyVetoException, SQLException {
+		DataSource ds = dataSourceFactory.getDatasource("integration_oracle");
+		return ds.getConnection();
+		
 	}
 
 	Connection getPostgresConnection() throws FileNotFoundException, PropertyVetoException, SQLException {

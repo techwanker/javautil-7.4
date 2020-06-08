@@ -4,11 +4,13 @@ org_sql:
 etl_customer_insert:
   sql: >
     insert into ETL_CUSTOMER (
+      etl_customer_id,
       ETL_FILE_ID, LINE_NUMBER, SHIP_TO_CUST_ID, CUST_NM,
       ADDR_1, ADDR_2, CITY, STATE,
       POSTAL_CD, TEL_NBR, NATIONAL_ACCT_ID,
       SPECIAL_FLG
     ) values (
+      :ETL_CUSTOMER_ID,
       :ETL_FILE_ID, :LINE_NUMBER, :SHIP_TO_CUST_ID, :CUST_NM,
       :ADDR_1, :ADDR_2, :CITY, :STATE,
       :POSTAL_CD, :TEL_NBR, :NATIONAL_ACCT_ID,
@@ -43,12 +45,14 @@ etl_sale_tot_insert:
 etl_inventory_insert:
   sql: >
     insert into ETL_INVENTORY (
+        ETL_INVENTORY_ID,
         ETL_FILE_ID,           LINE_NUMBER,
         DISTRIBUTOR_ID,        MFR_ID,
         MFR_PRODUCT_ID,        COMMENTS,
         CASES,                 BOXES,
         UNITS,                 CASE_GTIN
     ) values (
+        :ETL_INVENTORY_ID,
         :ETL_FILE_ID,      :LINE_NUMBER,
         :DISTRIBUTOR_ID,   :MFR_ID,
         :MFR_PRODUCT_ID,   :COMMENTS,
@@ -67,6 +71,7 @@ etl_inventory_tot_insert:
 etl_sale_insert:
     sql: >
         insert into ETL_SALE (
+            ETL_SALE_ID,
             ETL_FILE_ID, 
             LINE_NUMBER,
             DISTRIB_ID, MFR_ID,
@@ -76,6 +81,7 @@ etl_sale_insert:
             PRODUCT_DESCR, CASES_SHIPPED, BOXES_SHIPPED, UNITS_SHIPPED,
             CASE_GTIN
         ) values (
+            :ETL_SALE_ID,
             :ETL_FILE_ID, :LINE_NUMBER,
             :DISTRIB_ID, :MFR_ID,
             :MFR_PRODUCT_ID, :SHIP_TO_CUST_ID, :INVOICE_CD, :INVOICE_DT,

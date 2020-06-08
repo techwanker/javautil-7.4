@@ -28,6 +28,9 @@ public class DropUtConditionDatabaseObjects {
 		case POSTGRES:
 			conditionDdl = getResource("drop_ut_condition_tables.postgres.sr.sql");
 			break;
+		case ORACLE:
+			conditionDdl = getResource("drop_ut_condition_tables.h2.sr.sql");
+			break;
 		default:
 			throw new IllegalArgumentException("unsupported dialect " + dialect);
 		}

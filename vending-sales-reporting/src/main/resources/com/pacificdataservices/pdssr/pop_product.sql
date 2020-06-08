@@ -75,7 +75,7 @@ INSERT INTO product (product_id, mfr_id, product_descr, mfr_product_id, case_gti
 ;--
 INSERT INTO product (product_id, mfr_id, product_descr, mfr_product_id, case_gtin, box_gtin, unit_gtin, units_per_box, units_per_case) VALUES (38, 17, 'Fish and Chips Potato Chips', '34531984', '00012345319842', NULL, NULL, 12, 72)
 ;--
-INSERT INTO product (product_id, mfr_id, product_descr, mfr_product_id, case_gtin, box_gtin, unit_gtin, units_per_box, units_per_case) VALUES (39, 17, '', '00000000', '00000000000000', NULL, NULL, 12, 72)
+INSERT INTO product (product_id, mfr_id, product_descr, mfr_product_id, case_gtin, box_gtin, unit_gtin, units_per_box, units_per_case) VALUES (39, 17, 'Squid ', '00000000', '00000000000000', NULL, NULL, 12, 72)
 ;--
 INSERT INTO product (product_id, mfr_id, product_descr, mfr_product_id, case_gtin, box_gtin, unit_gtin, units_per_box, units_per_case) VALUES (40, 17, 'Garguantua', '34555789', '00012345557892', NULL, NULL, 12, 72)
 ;--

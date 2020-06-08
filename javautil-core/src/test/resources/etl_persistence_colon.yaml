@@ -3,12 +3,14 @@ org_sql:
      select org_id from org where org_cd = :ORG_CD
 etl_customer_insert:
   sql: >
-    insert into ETL_CUSTOMER (
+    insert into etl_customer (
+      ETL_CUSTOMER_ID,
       ETL_FILE_ID, LINE_NUMBER, SHIP_TO_CUST_ID, CUST_NM,
       ADDR_1, ADDR_2, CITY, STATE,
       POSTAL_CD, TEL_NBR, NATIONAL_ACCT_ID,
       SPECIAL_FLG
     ) values (
+      :ETL_CUSTOMER_ID,
       :ETL_FILE_ID, :LINE_NUMBER, :SHIP_TO_CUST_ID, :CUST_NM,
       :ADDR_1, :ADDR_2, :CITY, :STATE,
       :POSTAL_CD, :TEL_NBR, :NATIONAL_ACCT_ID,

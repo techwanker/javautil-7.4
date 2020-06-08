@@ -12,6 +12,7 @@ import org.javautil.core.sql.MappedResultSetIterator;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.core.sql.SqlStatementRunner;
 import org.javautil.core.sql.SqlStatements;
+import org.javautil.util.ListOfNameValue;
 import org.javautil.util.NameValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,23 +44,32 @@ public class Prepost {
 		prepostQueries = loadDml();
 	}
 
+	// TODO isn't this in post?
 	Date getEffectiveDate(long etlFileId) throws SQLException, InvalidLoadFileException {
 
 		Date retval = null;
-		String sql = "select file_create_dt from etl_sale_tot " + "where etl_file_id = %(ETL_FILE_ID)s";
+		String sql = "select file_create_dt from etl_sale_tot " + "where etl_file_id = :ETL_FILE_ID";
 		SqlStatement ss = new SqlStatement(connection, sql);
 		Binds binds = new Binds();
 		binds.put("ETL_FILE_ID", etlFileId);
 		// TODO get one row
-		MappedResultSetIterator it = ss.iterator(binds);
-		// TODO should get use a get one method
-		NameValue result;
-		if (it.hasNext()) {
-			result = it.next();
-			retval = (Date) result.get("file_create_dt");
+		
+		ListOfNameValue lonv = ss.getListOfNameValue(binds, true);
+		if (lonv.size() == 1) {
+			retval = (Date) lonv.get(0).get("file_create_dt");
 		} else {
 			throw new InvalidLoadFileException("load " + etlFileId + " has no etl_sale_tot");
 		}
+		MappedResultSetIterator it = ss.iterator(binds);
+		// TODO should get use a get one method
+//		NameValue result;
+//		if (it.hasNext()) {
+//			result = it.next();
+//			logger.debug("result is {}", result);
+//			retval = (Date) result.get("file_create_dt");
+//		} else {
+//			throw new InvalidLoadFileException("load " + etlFileId + " has no etl_sale_tot");
+//		}
 		return retval;
 	}
 

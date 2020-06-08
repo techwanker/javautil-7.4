@@ -29,6 +29,9 @@ public class CreateUtConditionDatabaseObjects {
 		case POSTGRES:
 			conditionDdl = getResource("ut_condition_tables.postgres.sr.sql");
 			break;
+		case ORACLE:
+			conditionDdl = getResource("ut_condition_tables.oracle.sr.sql");
+			break;
 		default:
 			throw new IllegalArgumentException("unsupported dialect " + dialect);
 		}
