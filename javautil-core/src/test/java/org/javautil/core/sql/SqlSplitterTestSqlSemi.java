@@ -44,6 +44,19 @@ public class SqlSplitterTestSqlSemi {
 		logger.debug("expected\n{}\nactual\n{}",expected_0,texts.get(0));
 		assertEquals(expected_0,texts.get(0));
 	}
-
+	
+	
+	@Test
+	public void testSqlSemiFile() throws IOException, SqlSplitterException {
+		SqlSplitter sr = new SqlSplitter(this, "testsr/joblog_drop.sr.sql").setProceduresOnly(true);
+		sr.process();
+		List<String> texts = sr.getSqlTexts();
+		assertNotNull(texts);
+		assertEquals(11,texts.size());
+		String expected0 =  "drop sequence logger_settings_id_seq";
+		logger.debug("texts.get(0) {}", expected0);
+		logger.debug("expected\n{}\nactual\n{}",expected0,texts.get(0));
+		assertEquals(expected0,texts.get(0));
+	}
 }
 

@@ -33,4 +33,8 @@ public class JoblogInstaller {
 			throw new IllegalArgumentException("unsupported dialect");
 		}
 	}
+	
+	public void drop() {
+		
+	}
 }
