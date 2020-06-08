@@ -1,5 +1,6 @@
 package org.javautil.conditionidentification;
 
+import java.sql.Types;
 import java.util.Map;
 
 import org.javautil.core.sql.Binds;
@@ -71,13 +72,13 @@ public class ConditionRule {
 
 	public Binds getBinds() {
 		Binds binds = new Binds();
-		binds.put("rule_name", ruleName);
-		binds.put("table_name", tableName);
-		binds.put("msg", msg);
-		binds.put("sql_text", sqlText);
-		binds.put("narrative", narrative);
-		binds.put("severity", severity);
-		binds.put("format_str", formatString);
+		binds.put("rule_name", ruleName, Types.VARCHAR);
+		binds.put("table_name", tableName,Types.VARCHAR);
+		binds.put("msg", msg,Types.VARCHAR);
+		binds.put("sql_text", sqlText,Types.VARCHAR);
+		binds.put("narrative", narrative,Types.VARCHAR);
+		binds.put("severity", severity,Types.VARCHAR);
+		binds.put("format_str", formatString,Types.VARCHAR);
 		return binds;
 
 	}

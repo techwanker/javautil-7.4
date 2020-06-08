@@ -304,7 +304,13 @@ public class SqlStatement {
 				logger.debug("binding index " + i + " bindName: " + bindName + " value " + binds.get(bindName) + " class " + className);
 				if (value == null) {
 					logger.debug("calling setNull for index " + i);
-					preparedStatement.setNull(i, java.sql.Types.VARCHAR); // TODO WTF
+					Integer type = binds.getType(bindName);
+					if (type == null) {
+						String message = String.format("bind %s is null type not specified",bindName);
+						logger.error(message);
+						throw new IllegalStateException(message);
+					}
+					preparedStatement.setNull(i, type); // TODO WTF
 				} else if (value instanceof java.sql.Timestamp) {
 					java.sql.Timestamp ts = (java.sql.Timestamp) value;
 					preparedStatement.setTimestamp(i, ts);

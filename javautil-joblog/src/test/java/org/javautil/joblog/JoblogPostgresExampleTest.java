@@ -17,7 +17,6 @@ import org.javautil.core.sql.DataSourceFactory;
 import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.joblog.installer.PostgresInstall;
-import org.javautil.joblog.installer.H2Install;
 import org.javautil.joblog.installer.JoblogOracleInstall;
 import org.javautil.joblog.persistence.AbstractJoblogPersistence;
 import org.javautil.joblog.persistence.JoblogPersistence;
@@ -31,7 +30,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JoblogH2ExampleTest  {
+public class JoblogPostgresExampleTest  {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	static DataSource applicationDataSource;
@@ -42,22 +41,21 @@ public class JoblogH2ExampleTest  {
 	static JoblogPersistence joblogPersistence;
 	static JoblogPersistence oraclePackagePersistence;
 	boolean showSql = false;
-	
+
 	@BeforeClass
 	public static void beforeClass() throws SqlSplitterException, Exception {
 		DataSourceFactory dsf = new DataSourceFactory();
 
-		applicationDataSource = dsf.getDatasource("integration_oracle");
+		applicationDataSource = DataSources.getOracleDataSource();
 		applicationConnection = applicationDataSource.getConnection();
-		
-		jobDataSource = DataSourceFactory.getH2Permanent("/tmp/JobLogTest1", "sa", "tutorial");
-		joblogConnection = jobDataSource.getConnection();
-		SqlStatement dropJoblog = new SqlStatement(joblogConnection,"drop all objects");
-		dropJoblog.execute(new Binds());
-		joblogPersistence = new JoblogPersistenceSql(joblogConnection, applicationConnection);
-		new  H2Install(joblogConnection).process();
-		oraclePackagePersistence = new JoblogPersistencePackage(applicationConnection);
 
+		jobDataSource = DataSources.getPostgresJoblogDataSource();
+		joblogConnection = jobDataSource.getConnection();
+		DataSources.initializePostgresJoblogConnection(joblogConnection);
+
+		joblogPersistence = new JoblogPersistenceSql(joblogConnection, applicationConnection);
+		new  PostgresInstall(joblogConnection).process();
+		oraclePackagePersistence = new JoblogPersistencePackage(applicationConnection);
 	}
 
 	@AfterClass
@@ -66,7 +64,7 @@ public class JoblogH2ExampleTest  {
 		((Closeable) jobDataSource).close();
 	}
 
-//	@Test
+	//	@Test
 	public void testDirectly() throws SQLException {
 		String token = joblogPersistence.joblogInsert("DbLoggerForOracle", getClass().getName(), "ExampleLogging");
 		SqlStatement ss = new SqlStatement("select * from job_log where job_token = :token");
@@ -80,7 +78,7 @@ public class JoblogH2ExampleTest  {
 	@Test
 	public void testSql() throws SQLException, IOException {
 		test1(joblogPersistence);
-}   
+	}   
 
 	// TODO should be commo9n with Oracle
 	public void test1(JoblogPersistence joblogPersistence) throws SQLException, IOException {

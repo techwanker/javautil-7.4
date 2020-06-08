@@ -193,6 +193,8 @@ public enum DataType {
 		switch (this) {
 		case STRING:
 			return Types.VARCHAR;
+		case NUMERIC:
+			return Types.NUMERIC;
 		case LONG:
 			return Types.NUMERIC;
 		case SHORT:

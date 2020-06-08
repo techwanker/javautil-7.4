@@ -97,7 +97,7 @@ public class WorkbookWriter  {
 
 	private void runJob(String token) throws SQLException {
 		for (Worksheet worksheet : workbookDefinition.getWorksheets().values()) {
-			long stepId = dbLogger.insertStep(token, "sheet " + worksheet.getName(), null, getClass().getName(), null);
+			long stepId = dbLogger.insertStep(token, "sheet " + worksheet.getName(), null, getClass().getName());
 			Timer sqlTime = new Timer();
 			// create the sheet
 			logger.info("processing {}", worksheet);

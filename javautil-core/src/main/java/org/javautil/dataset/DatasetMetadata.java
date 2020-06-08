@@ -41,7 +41,9 @@ public interface DatasetMetadata {
 	public ArrayList<ColumnMetadata> getColumnMetadata();
 
 	public LinkedHashMap<String, ColumnMetadata> getColumnMetadataMap();
-
+	
+	
+	public Map<String,Integer> getSqlTypeMap();
 	/**
 	 * Returns the name of the column at the specified index.
 	 * 

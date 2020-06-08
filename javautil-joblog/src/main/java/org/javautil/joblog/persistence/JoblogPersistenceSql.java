@@ -7,6 +7,7 @@ import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -114,12 +115,12 @@ public class JoblogPersistenceSql extends AbstractJoblogPersistence implements J
 		SqlStatement ss = statements.getSqlStatement("job_log_insert");
 		ss.setConnection(joblogConnection);
 		Binds binds = new Binds();
-		binds.put("job_log_id", joblogId);
-		binds.put("job_token",token);
-		binds.put("process_name", processName);
-		binds.put("classname", className);
-		binds.put("module_name", moduleName);
-		binds.put("status_msg", statusMsg);
+		binds.put("job_log_id", joblogId,Types.INTEGER);
+		binds.put("job_token",token,Types.VARCHAR);
+		binds.put("process_name", processName,Types.VARCHAR);
+		binds.put("classname", className,Types.VARCHAR);
+		binds.put("module_name", moduleName,Types.VARCHAR);
+		binds.put("status_msg", statusMsg,Types.VARCHAR);
 		binds.put("thread_name", Thread.currentThread().getName());
 		binds.put("start_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		logger.debug("job_log_insert\n{}", ss.getSql());
@@ -169,7 +170,16 @@ public class JoblogPersistenceSql extends AbstractJoblogPersistence implements J
 				throw new IllegalStateException("sequencehelper is null");
 			}
 			this.jobStepId = sequenceHelper.getSequence("job_step_id_seq");
-			Binds binds = getSessionInfo(applicationConnection);
+			
+			Binds binds;
+			if (isJoblogConnectionOracle) {
+				binds = getSessionInfo(applicationConnection);
+			} else {
+				binds = new Binds();
+				binds.putNull("tracefile_name",Types.VARCHAR);
+				binds.putNull("sid",Types.INTEGER);
+				binds.putNull("serial_nbr",Types.INTEGER);
+			}
 			//
 			SqlStatement ssJob = new SqlStatement(joblogConnection,
 					"select * from job_log where job_token = :token");
@@ -183,12 +193,15 @@ public class JoblogPersistenceSql extends AbstractJoblogPersistence implements J
 			//
 			binds.put("job_step_id", jobStepId);
 			binds.put("job_log_id", nvJob.get("job_log_id"));
-			binds.put("step_name", stepName);
-			binds.put("step_info", stepInfo);
-			binds.put("classname", className);
+			binds.put("step_name", stepName,Types.VARCHAR);
+			binds.put("step_info", stepInfo, Types.VARCHAR);
+			binds.put("classname", className,Types.VARCHAR);
 			binds.put("start_ts", new java.sql.Timestamp(System.currentTimeMillis()));
 		//	binds.put("serial_nbr",binds.get("serial_nbr"));
-			binds.put("stacktrace", null);
+			binds.putNull("stacktrace", Types.VARCHAR);
+			binds.putType("module_name", Types.VARCHAR);
+			//binds.putType("classname", Types.VARCHAR);
+			//binds.putType("stacktrace",Types.VARCHAR);
 			//binds.put("instance_name", );
 			if (statements == null) {
 				throw new IllegalStateException("statements is null");

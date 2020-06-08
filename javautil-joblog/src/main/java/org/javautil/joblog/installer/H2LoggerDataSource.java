@@ -60,7 +60,7 @@ public class H2LoggerDataSource {
 		DataSource dataSource = new HikariDataSource(config);
 		Connection connection = dataSource.getConnection();
 		System.out.println("before H2Install");
-		H2Install installer = new H2Install(connection).setNoFail(true).setDrop(false).setShowSql(false);
+		PostgresInstall installer = new PostgresInstall(connection).setNoFail(true).setDrop(false).setShowSql(false);
 		try {
 			installer.process();
 		} catch (Exception e) {

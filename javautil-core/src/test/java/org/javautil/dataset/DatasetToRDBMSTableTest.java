@@ -88,7 +88,9 @@ public class DatasetToRDBMSTableTest {
 
 			di.next();
 			Map<String,Object> map= di.getRowAsMap();
+			Map <String,Integer> sqlTypeMap = ds.getMetadata().getSqlTypeMap();
 			Binds binds = new Binds(map);
+			binds.putAllTypes(sqlTypeMap);
 
 			logger.debug("about to execute with binds {}", binds.toString());
 			//		insert.execute(binds);

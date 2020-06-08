@@ -1,5 +1,4 @@
-package org.javautil.dataset;
-
+package org.javautil.dataset; 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -411,5 +410,16 @@ public class DatasetMetadataImpl implements MutableDatasetMetadata {
 		retval = sb.toString();
 		logger.debug("getInsertStatement()\n{}",retval);
 		return retval;
+	}
+
+	@Override
+	public Map<String, Integer> getSqlTypeMap() {
+		Map<String,Integer> sqlTypes = new TreeMap<>();
+		for (String colName :  columnMetaDataMap.keySet()) {
+			ColumnMetadata meta = columnMetaDataMap.get(colName);
+			int sqlType = meta.getDataType().getSqlType();
+			sqlTypes.put(colName,sqlType);
+		}
+		return sqlTypes;
 	}
 }

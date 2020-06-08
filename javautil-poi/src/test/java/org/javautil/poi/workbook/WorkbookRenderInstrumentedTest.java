@@ -20,7 +20,8 @@ import org.javautil.core.text.YamlUtils;
 import org.javautil.core.workbook.WorkbookDefinition;
 import org.javautil.dataset.ColumnMetadata;
 import org.javautil.dataset.DataType;
-import org.javautil.joblog.installer.H2Install;
+import org.javautil.joblog.DataSources;
+import org.javautil.joblog.installer.PostgresInstall;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,22 +40,23 @@ public class WorkbookRenderInstrumentedTest {
 	@Before
 	public void before() throws Exception {
 		//DataSource jobDatasource = DataSourceFactory.getH2Permanent("./target/joblogging", "sa", "tutorial");
-		DataSource jobDatasource = DataSourceFactory.getH2Permanent("/tmp/joblogging", "sa", "tutorial");
-	  loggingConnection = jobDatasource.getConnection();	
-	  
-		
-		H2Install installer = new H2Install(loggingConnection);
+		//DataSource jobDatasource = DataSourceFactory.getH2Permanent("/tmp/joblogging", "sa", "tutorial");\
+		DataSource jobDatasource = DataSources.getPostgresDataSource();
+
+		loggingConnection = jobDatasource.getConnection();	
+
+		PostgresInstall installer = new PostgresInstall(loggingConnection);
 		installer.dropObjects();
 		installer.process();
-		
+
 		DataSourceFactory dataSourceFactory = new DataSourceFactory();
 		dataSource = dataSourceFactory.getDatasource("integration_postgres");
 		conn = dataSource.getConnection();
 	}
-	
+
 	@Test
 	public void metaTest() throws JsonParseException, JsonMappingException, IOException, PropertyVetoException,
-			SQLException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	SQLException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		File file = new File("src/test/resources/workbook/DataLoadWorkbookMeta2.yaml");
 		logger.info("processing file: '{}'", file.getAbsoluteFile());
 		WorkbookDefinition wd = WorkbookDefinition.getWorkbookDefinition(file);
@@ -68,10 +70,10 @@ public class WorkbookRenderInstrumentedTest {
 		assertNotNull(shipDt);
 		String dataTypeName = shipDt.getDataTypeName();
 		assertNotNull(dataTypeName);
-		
+
 		DataType shipDtDataType = shipDt.getDataType();
 		assertNotNull(shipDtDataType);
-		
+
 		Binds binds = new Binds();
 		binds.put("etl_file_id", 1);
 		WorkbookWriter workbookRenderer = new WorkbookWriter(conn, loggingConnection, wd, binds);
@@ -91,7 +93,7 @@ public class WorkbookRenderInstrumentedTest {
 	@Ignore
 	@Test
 	public void simpleTest() throws JsonParseException, JsonMappingException, IOException, PropertyVetoException,
-			SQLException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	SQLException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		File file = new File("src/test/resources/workbook/DataLoadWorkbook.yaml");
 		DataSourceFactory dataSourceFactory = new DataSourceFactory();
 		DataSource dataSource = dataSourceFactory.getDatasource("integration_postgres");
@@ -113,5 +115,5 @@ public class WorkbookRenderInstrumentedTest {
 	}
 
 
-	
+
 }

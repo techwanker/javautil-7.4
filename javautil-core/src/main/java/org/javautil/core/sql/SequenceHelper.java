@@ -22,11 +22,12 @@ public class SequenceHelper {
 		case ORACLE:
 			sequenceText = oracleSequence;
 			break;
+		case POSTGRES:
 		case H2:
 			sequenceText = h2Sequence;
 			break;
 		default:
-			throw new UnsupportedOperationException("dialect not supported");
+			throw new UnsupportedOperationException("dialect not supported " + Dialect.getDialect(connection));
 		}
 	}
 
