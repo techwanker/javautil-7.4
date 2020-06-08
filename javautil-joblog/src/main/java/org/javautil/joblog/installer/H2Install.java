@@ -9,7 +9,7 @@ import org.javautil.core.sql.SqlRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class H2Install extends AbstractDbloggerDatabaseObjectsInstaller implements CreateDbloggerDatabaseObjects {
+public class H2Install extends AbstractDbloggerDatabaseObjectsInstaller implements JoblogSchemaCreator {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

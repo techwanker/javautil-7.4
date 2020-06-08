@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TOD collapse these installers
-public class PostgresInstall extends AbstractDbloggerDatabaseObjectsInstaller implements CreateDbloggerDatabaseObjects {
+public class PostgresInstall extends AbstractDbloggerDatabaseObjectsInstaller implements JoblogSchemaCreator {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
