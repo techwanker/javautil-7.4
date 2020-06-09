@@ -11,6 +11,8 @@ import java.sql.Statement;
 import org.javautil.conditionidentification.CreateUtConditionDatabaseObjects;
 import org.javautil.core.sql.Dialect;
 import org.javautil.core.sql.SqlRunner;
+import org.javautil.core.sql.SqlSplitterException;
+import org.javautil.joblog.installer.JoblogInstaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ public class CreateSchema {
 	InputStream salesReportingDdl;
 	// InputStream conditionDdl;
 	private boolean showSql = true;
+	private JoblogInstaller joblogInstaller;
 
 	public CreateSchema(Connection conn, Dialect dialect) {
 		logger.warn("creating with dialect " + dialect);
@@ -59,7 +62,7 @@ public class CreateSchema {
 		return is;
 	}
 
-	public void process() throws SQLException, IOException {
+	public void process() throws SqlSplitterException, Exception {
 		nukeSchema(connection);
 		CreateUtConditionDatabaseObjects condi = new CreateUtConditionDatabaseObjects(connection, dialect, showSql);
 		condi.setDrop(true);
@@ -71,6 +74,8 @@ public class CreateSchema {
 
 		runner.process();
 		salesReportingDdl.close();
+		JoblogInstaller	joblogInstaller = new JoblogInstaller(connection);
+		joblogInstaller.process();
 	}
 	
 	public void nukeSchema(Connection conn) throws SQLException {

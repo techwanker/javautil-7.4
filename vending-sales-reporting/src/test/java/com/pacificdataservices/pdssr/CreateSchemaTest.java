@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 
 import org.javautil.core.sql.TestDataSource;
 import org.javautil.core.sql.Dialect;
+import org.javautil.core.sql.SqlSplitterException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +26,13 @@ public class CreateSchemaTest  {
     public void ahum() {
     	
     }
-//     @Ignore
-// 	@Test
-// 	public void test1() throws IOException, SQLException, PropertyVetoException, ParseException {
-// 	 	DataSource ds = TestDataSource.getDataSource(Dialect.ORACLE);
-// 		Connection conn = ds.getConnection(); 
-// 		CreateSchema cs = new CreateSchema(conn,dialect);
-// 		cs.process();
-// 		conn.close();
-// 		((Closeable) ds).close();
+ 	@Test
+ 	public void test1() throws SqlSplitterException, Exception {
+ 	 	DataSource ds = TestDataSource.getDataSource(Dialect.ORACLE);
+ 		Connection conn = ds.getConnection(); 
+ 		CreateSchema cs = new CreateSchema(conn,dialect);
+ 		cs.process();
+ 		conn.close();
+ 		((Closeable) ds).close();
+ 	}
 }

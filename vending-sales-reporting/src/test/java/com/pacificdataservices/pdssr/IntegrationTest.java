@@ -88,7 +88,7 @@ public class IntegrationTest implements FilenameFilter {
 
 	}
 
-	private void createSchema() throws SQLException, IOException {
+	private void createSchema() throws SqlSplitterException, Exception {
 		Timer t = new Timer("createSchema");
 		logger.info("creating schema");
 //		SqlStatement ss = new SqlStatement(conn,"create schema integration_test");
