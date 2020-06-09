@@ -741,9 +741,48 @@ SQL> CREATE OR REPLACE PACKAGE BODY logger
 739  --#<
 740  /
 
-Package body created.
+Warning: Package Body created with compilation errors.
 
 SQL> show errors
-No errors.
+Errors for PACKAGE BODY LOGGER:
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+11/3     PL/SQL: Item ignored                                                   
+11/36    PLS-00201: identifier 'LOGGER_DTL' must be declared                    
+553/13   PL/SQL: Item ignored                                                   
+553/13   PLS-00201: identifier 'LOGGER_DTL' must be declared                    
+562/13   PL/SQL: Statement ignored                                              
+562/13   PLS-00320: the declaration of the type of this expression is           
+         incomplete or malformed                                                
+                                                                                
+563/13   PL/SQL: Statement ignored                                              
+563/33   PLS-00320: the declaration of the type of this expression is           
+         incomplete or malformed                                                
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+                                                                                
+578/20   PL/SQL: Item ignored                                                   
+578/20   PLS-00201: identifier 'LOGGER_DTL' must be declared                    
+585/14   PL/SQL: Statement ignored                                              
+585/14   PLS-00320: the declaration of the type of this expression is           
+         incomplete or malformed                                                
+                                                                                
+587/14   PL/SQL: Statement ignored                                              
+587/24   PLS-00320: the declaration of the type of this expression is           
+         incomplete or malformed                                                
+                                                                                
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+599/13   PL/SQL: Statement ignored                                              
+602/41   PLS-00320: the declaration of the type of this expression is           
+         incomplete or malformed                                                
+                                                                                
+617/9    PL/SQL: SQL Statement ignored                                          
+617/21   PL/SQL: ORA-00942: table or view does not exist                        
+623/14   PL/SQL: Item ignored                                                   
+623/14   PLS-00201: identifier 'LOGGER_DTL' must be declared                    
 SQL> --#>
 SQL> exit

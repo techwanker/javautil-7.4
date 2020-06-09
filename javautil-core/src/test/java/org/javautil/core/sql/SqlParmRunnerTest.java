@@ -86,4 +86,40 @@ public class SqlParmRunnerTest {
 		}
 
 	}
+	
+	@Test
+	public void dropAndInstallLoggerFromResource() throws SQLException, PropertyVetoException, IOException {
+		DataSource  ds = null;
+		Connection conn = null;
+		try {
+			ArrayList<SqlRunnerParms> parmList = new ArrayList<>();
+			ds = TestDataSource.getDataSource(Dialect.ORACLE);
+			conn = ds.getConnection();
+			
+			String dropNameResource = "/testsr/joblog_drop.sr.sql";
+			SqlRunnerParms dropParms = new SqlRunnerParms(conn, this, dropNameResource, 3);
+			dropParms.setContinueOnError(true);
+			dropParms.setShowSql(true);
+			parmList.add(dropParms);
+			
+			
+			String isnameResource = "/testsr/job_tables.sr.sql";
+			SqlRunnerParms installParms = new SqlRunnerParms(conn, this, isnameResource, 3);
+			installParms.setShowSql(true);
+			parmList.add(installParms);
+			
+			SqlParmRunner spr = new SqlParmRunner(parmList, new Binds());
+			
+			spr.process();
+		}
+		finally {
+			if (conn != null) {
+				conn.close();
+			}
+			if (ds != null) {
+				((Closeable)ds).close();
+			}
+		}
+
+	}
 }

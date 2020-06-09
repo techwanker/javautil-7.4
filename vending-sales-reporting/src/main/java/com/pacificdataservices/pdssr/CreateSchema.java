@@ -88,7 +88,8 @@ public class CreateSchema {
 				"	for obj_rec in (\n" + 
 				"		select object_type, object_name \n" + 
 				"		from user_objects\n" + 
-				"		where object_type not like '%LOB')\n" + 
+				"		where object_type not like '%LOB'"
+				+ "     and object_type != 'PACKAGE BODY')\n" + 
 				"	loop\n" + 
 				"		stmt :=  'drop ' || obj_rec.object_type || ' ' ||  obj_rec.object_name ;\n" + 
 				"		        dbms_output.put_line(stmt);\n" + 

@@ -1,17 +1,9 @@
 package org.javautil.core.sql;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.javautil.commandline.CommandLineHandler;
-import org.javautil.io.ResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +20,29 @@ public class SqlRunnerParms {
 	private boolean       commitOrRollbackEveryStatement;
 	private boolean       showSqlSplitterOnError = true;
 	private boolean commit;
+	
+	public SqlRunnerParms(Connection connection, Object resourceBase, String resourceName, int verbosity) throws FileNotFoundException {
+		super();
+		if (connection == null) {
+			throw new IllegalArgumentException("connection is null");
+		}
+		if (resourceBase == null) {
+			throw new IllegalArgumentException("resourceBase is null");
+		}
+		if (resourceName == null) {
+			throw new IllegalArgumentException("resourceName  is null");
+		}
+	
+		this.connection = connection;
+		InputStream is = connection.getClass().getResourceAsStream( resourceName);
+		if (is == null) {
+			throw new IllegalStateException("could not open " + resourceName);
+		}
+		
+		this.splitterInputStream = is;
+		this.inputStreamDescription = resourceName;
+		this.verbosity = verbosity;
+	}
 	
 	public SqlRunnerParms(Connection connection, InputStream splitterInputStream, String inputStreamDescription,
 			int verbosity) {

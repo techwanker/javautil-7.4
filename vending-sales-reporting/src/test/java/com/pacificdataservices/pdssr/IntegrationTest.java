@@ -13,7 +13,9 @@ import java.util.Arrays;
 import org.javautil.conditionidentification.DropUtConditionDatabaseObjects;
 import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.Dialect;
+import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.core.sql.SqlStatement;
+import org.javautil.joblog.installer.JoblogOracleInstall;
 import org.javautil.core.misc.Timer;
 import org.javautil.util.NameValue;
 import org.junit.Test;
@@ -35,7 +37,7 @@ public class IntegrationTest implements FilenameFilter {
 	public IntegrationTest() throws FileNotFoundException, PropertyVetoException, SQLException {
 	}
 	@Test
-	public void fullOracleDialectTest() throws SQLException, IOException, ParseException, PropertyVetoException, InvalidLoadFileException {
+	public void fullOracleDialectTest() throws SqlSplitterException, Exception {
 		dialect = Dialect.ORACLE;
 		dbTest = new DbTest(Dialect.ORACLE);
 		conn = getConnection(Dialect.ORACLE);
@@ -43,19 +45,23 @@ public class IntegrationTest implements FilenameFilter {
 	}
 	
 	//@Test
-	public void fullDialectTest() throws SQLException, IOException, ParseException, PropertyVetoException, InvalidLoadFileException {
+	public void fullDialectTest() throws SqlSplitterException, Exception {
 		dialect = Dialect.POSTGRES;
 		dbTest = new DbTest(Dialect.POSTGRES);
 		conn = getConnection(Dialect.POSTGRES);
 		fullTest(Dialect.POSTGRES);
 	}
 
-	public void fullTest(Dialect dialect) throws SQLException, IOException, ParseException, PropertyVetoException, InvalidLoadFileException {
+	public void fullTest(Dialect dialect) throws SqlSplitterException, Exception {
 		logger.info("dialect is " + dialect);
 		Timer t = new Timer("fullTest " + dialect);
 		logger.info("fullTest");
 		if (dialect.equals(Dialect.POSTGRES)) {
 			dropSchema();
+		}
+		if (Dialect.ORACLE.equals(dialect)) {
+			JoblogOracleInstall oinstaller = new JoblogOracleInstall(conn, true, false);
+			oinstaller.process();
 		}
 		createSchema();
 		seedDatabase();
@@ -239,7 +245,7 @@ public class IntegrationTest implements FilenameFilter {
 	}
 
 	
-	public static void main(String[] args) throws PropertyVetoException, SQLException, IOException, ParseException, InvalidLoadFileException {
+	public static void main(String[] args) throws SqlSplitterException, Exception {
 		IntegrationTest it = new IntegrationTest();
 		it.fullDialectTest();
 	}

@@ -2,7 +2,11 @@ package org.javautil.joblog.installer;
 
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,7 +15,9 @@ import javax.sql.DataSource;
 
 import org.javautil.core.sql.Binds;
 import org.javautil.core.sql.DataSourceFactory;
+import org.javautil.core.sql.SqlParmRunner;
 import org.javautil.core.sql.SqlRunner;
+import org.javautil.core.sql.SqlRunnerParms;
 import org.javautil.core.sql.SqlSplitterException;
 import org.javautil.core.sql.SqlStatement;
 import org.javautil.util.ListOfLists;
@@ -24,34 +30,21 @@ public class JoblogOracleInstall {
 
 	private final Connection connection;
 
-	private boolean drop = true;
 	private final  transient static Logger logger = LoggerFactory.getLogger(JoblogOracleInstall.class);
 	private boolean showSql = true;
 
-	private boolean dryRun;
-
-	private String sqlOutputFilename;
-
-	private boolean showErrorOnDrop = false;
-
 	public JoblogOracleInstall(Connection connection, boolean drop, boolean showSql) {
 		this.connection = connection;
-		this.drop = drop;
 		this.showSql = showSql;
 	}
 
 	public JoblogOracleInstall(String outputFileName) {
 		this.connection = null;
 		this.showSql = true;
-		this.dryRun = true;
-		this.sqlOutputFilename = outputFileName;
 	}
 
 	public void process() throws Exception, SqlSplitterException {
 		logger.info("process begins===================================");
-		if (drop) {
-			drop();
-		}
 		logger.info("existing tables ==================");
 		SqlStatement ss = new SqlStatement("select table_name from user_tables order by table_name");
 		ss.setConnection(connection);
@@ -69,27 +62,103 @@ public class JoblogOracleInstall {
 		loggerObjectInstall();
 
 	}
-
-	public void drop() throws SqlSplitterException, SQLException, IOException {
-		logger.info("dropping tables");
-		new SqlRunner(this, "ddl/oracle/dblogger_uninstall.sr.sql").setConnection(connection).setShowSql(showSql)
-		.setContinueOnError(true).setShowError(showErrorOnDrop).process();
+	
+	void testResourceStream(Connection conn, String resourceName) throws IOException {
+		InputStream is = conn.getClass().getResourceAsStream(resourceName);
+		logger.warn("is is {} for {}", is, resourceName);
+		if (is == null) {
+			throw new IllegalStateException("unable to open " + resourceName);
+		}
+		is.close();
 	}
 
-	public void createTables() throws SqlSplitterException, SQLException, IOException {
-		//	final String cursorTables = "ddl/oracle/cursor_tables.sr.sql";
-		final String jobTables = "ddl/oracle/job_tables.sr.sql";
-
-		logger.info("loggerObjectInstall showSql: {}", showSql);
-
-		//		new SqlRunner(this, cursorTables.setConnection(connection).setContinueOnError(true).setShowSql(showSql)
-		//				.process();
-
-		new SqlRunner(this, jobTables).setConnection(connection).setContinueOnError(true).setShowSql(showSql)
-		.process();
-
+	void createTheTables() throws SQLException, IOException {
+			ArrayList<SqlRunnerParms> parmList = new ArrayList<>();
+			
+			//String loggerTablesName = "src/main/resources/ddl/oracle/logger_tables.sr.sql";
+			String loggerTablesResourceName = "/ddl/oracle/logger_tables.sr.sql";
+			testResourceStream(connection, loggerTablesResourceName);
+			SqlRunnerParms loggerTablesParms = new SqlRunnerParms(connection, connection, loggerTablesResourceName, 3);
+			loggerTablesParms.setContinueOnError(true);
+			loggerTablesParms.setShowSql(true);
+			parmList.add(loggerTablesParms);
+			
+			
+			String dropName = "/ddl/oracle/joblog_drop.sr.sql";
+			//InputStream dropIs = new FileInputStream(dropName);
+			SqlRunnerParms dropParms = new SqlRunnerParms(connection, connection, dropName, 3);
+			dropParms.setContinueOnError(true);
+			dropParms.setShowSql(true);
+			parmList.add(dropParms);
+			
+			
+			String isname = "/ddl/oracle/job_tables.sr.sql";
+			//InputStream is = new FileInputStream(isname);
+			SqlRunnerParms installParms = new SqlRunnerParms(connection, connection, isname, 3);
+			installParms.setShowSql(true);
+			parmList.add(installParms);
+			
+			SqlParmRunner spr = new SqlParmRunner(parmList, new Binds());
+			
+			spr.process();
 	}
+			
+//	void createTheTables() throws FileNotFoundException, SQLException {
+//			ArrayList<SqlRunnerParms> parmList = new ArrayList<>();
+//			
+//			String loggerTablesName = "src/main/resources/ddl/oracle/logger_tables.sr.sql";
+//			String loggerTablesResourceName = "ddl/oracle/logger_tables.sr.sql";
+//			File loggerTablesFile = ResourceHelper.getResourceAsFile(this, loggerTablesResourceName);
+//			InputStream loggerTablesIs = new FileInputStream(loggerTablesFile);
+//	//  TODO make such a constructor		
+//			SqlRunnerParms loggerTablesParms = new SqlRunnerParms(connection, loggerTablesIs, loggerTablesName, 3);
+//			loggerTablesParms.setContinueOnError(true);
+//			loggerTablesParms.setShowSql(true);
+//			parmList.add(loggerTablesParms);
+//			
+//			
+//			String dropName = "src/main/resources/ddl/oracle/joblog_drop.sr.sql";
+//			InputStream dropIs = new FileInputStream(dropName);
+//			SqlRunnerParms dropParms = new SqlRunnerParms(connection, dropIs, dropName, 3);
+//			dropParms.setContinueOnError(true);
+//			dropParms.setShowSql(true);
+//			parmList.add(dropParms);
+//			
+//			
+//			String isname = "src/main/resources/ddl/oracle/job_tables.sr.sql";
+//			InputStream is = new FileInputStream(isname);
+//			SqlRunnerParms installParms = new SqlRunnerParms(connection, is, isname, 3);
+//			installParms.setShowSql(true);
+//			parmList.add(installParms);
+//			
+//			SqlParmRunner spr = new SqlParmRunner(parmList, new Binds());
+//			
+//			spr.process();
+//	}
 
+	/*
+	 * public void drop() throws SqlSplitterException, SQLException, IOException {
+	 * logger.info("dropping tables"); new SqlRunner(this,
+	 * "ddl/oracle/dblogger_uninstall.sr.sql").setConnection(connection).setShowSql(
+	 * showSql) .setContinueOnError(true).setShowError(showErrorOnDrop).process(); }
+	 * 
+	 * public void createTables() throws SqlSplitterException, SQLException,
+	 * IOException { // final String cursorTables =
+	 * "ddl/oracle/cursor_tables.sr.sql"; final String jobTables =
+	 * "ddl/oracle/job_tables.sr.sql";
+	 * 
+	 * logger.info("loggerObjectInstall showSql: {}", showSql);
+	 * 
+	 * // new SqlRunner(this,
+	 * cursorTables.setConnection(connection).setContinueOnError(true).setShowSql(
+	 * showSql) // .process();
+	 * 
+	 * new SqlRunner(this,
+	 * jobTables).setConnection(connection).setContinueOnError(true).setShowSql(
+	 * showSql) .process();
+	 * 
+	 * }
+	 */
 	public void loggerObjectInstall() throws SqlSplitterException, SQLException, IOException {
 
 		final String loggerSpec = "ddl/oracle/logger.pks.sr.sql";
@@ -99,11 +168,7 @@ public class JoblogOracleInstall {
 
 		logger.info("loggerObjectInstall showSql: {}", showSql);
 
-		createTables();
-
-		//		logger.info("======= creating logger_message_formatter");
-		//		new SqlRunner(this, "ddl/oracle/logger_message_formatter.plsql.sr.sql").setConnection(connection)
-		//				.setShowSql(showSql).setProceduresOnly(true).setContinueOnError(true).process();
+		createTheTables();
 
 		logger.info("======= about to compile specs " + loggerSpec);
 		SqlRunner runner = new SqlRunner(this, loggerSpec).setConnection(connection).
@@ -126,19 +191,10 @@ public class JoblogOracleInstall {
 		setContinueOnError(true).process();
 		
 		ensureLoggerPackage(connection);
-		//		String sql = "select object_type, status from user_objects\n" + 
-		//				"where object_name = 'LOGGER'";
-		//
-		//		SqlStatement ss = new SqlStatement(connection,sql);
-		//		ListOfNameValue lonv = ss.getListOfNameValue();
-		//		for (NameValue nv : lonv) {
-		//		assertEquals("VALID",nv.get("status"));
-		//		}
-		//	ss.close();
+
 	}
 
 	public JoblogOracleInstall setDrop(boolean drop) {
-		this.drop = drop;
 		return this;
 	}
 
